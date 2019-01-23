@@ -2,9 +2,9 @@
 
 iOS 进阶知识点
 
-1、![runtime](https://fcf5646448.github.io/2019/01/23/Runtime/)
+1、[runtime](https://fcf5646448.github.io/2019/01/23/Runtime/)
 
-![runtimr](https://upload-images.jianshu.io/upload_images/1940317-187c43c2c23abc64.png)
+![img](https://upload-images.jianshu.io/upload_images/1940317-187c43c2c23abc64.png)
 
 2、《runloop》
 
