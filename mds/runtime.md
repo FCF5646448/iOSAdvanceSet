@@ -1,6 +1,12 @@
-iOS RunTime
+---
+title: Runtime
+date: 2019-01-23 20:20:41
+tags: runtime
+categories: iOS进阶
+description: OC的面向对象、消息派发、动态绑定、内存管理等机制，都是与Runtime运行时环境息息相关的。OC是一个面向对象的语言，面向对象是指把一定的算法函数和数据变量以某种内在联系绑定在一起，形成最基本的结构单元，这些结构单元即是抽象的对象，对其进行赋值等操作，则就会成为实体对象，即实例。通过使用继承、派生等手法可以让对象与对象之间产生各种微妙的联系。
+---
 
-![img](../screenshots/runtimexmind.png)
+![img](Runtime/runtimexmind.png)
 
 #### OC与Runtime
 OC是一个面向对象的语言，面向对象是指**把一定的算法函数和数据变量以某种内在联系绑定在一起，形成最基本的结构单元**，这些结构单元即是抽象的对象，对其进行赋值等操作，则就会成为实体对象，即实例。通过使用继承、派生等手法可以让对象与对象之间产生各种微妙的联系。
@@ -60,7 +66,7 @@ typedef struct objc_object *id;
 ```
 这里我们可以看到，类Class是一个objc_class结构体指针，对象id是一个objc_object结构体指针。
 
-![](../screenshots/runtimeObjc.png)
+![](Runtime/runtimeObjc.png)
 
 上文中提到，OC中一切皆为对象，包括实例对象和类对象。Class表示类，object表示类的实例。
 
@@ -301,8 +307,8 @@ objc_msgSend 有几个变体：
 OC可以通过Category添加属性、方法、协议。category和Extension的区别在于：Extension在编译期就直接和原类编译在一起，而**category是在运行时动态添加到原类中的**。
 
 * category添加的同名方法并不会覆盖掉原来的方法，只是它添加的方法有可能会在原类方法的前面被调用，所以当方法调用时，一般是优先遍历category方法（优先的的顺序取决于Build Phases--compile Sources的文件顺序，越下面的类，方法越优先调用）。如果从方法列表找到方法后，就不会继续向后查找了，这就导致了方法被category覆盖的假象。
-Q1、在多个Category和原类方法重名的情况下，怎样在一个Category的方法被调用后，调用所有Category和原类的方法？
-Q2、怎样再任何一个Category的方法被调用后，只调用原类方法？
+  Q1、在多个Category和原类方法重名的情况下，怎样在一个Category的方法被调用后，调用所有Category和原类的方法？
+  Q2、怎样再任何一个Category的方法被调用后，只调用原类方法？
 ```Objective-C
 	//前提是当前类有3个分类，并且都实现了test方法。
 	-(void)allcategorys {
@@ -340,7 +346,7 @@ associated添加的属性，都被存放在一个单独的哈希表AssociationHa
 
 上面有提到，在消息转发前，runtime会给一次机会动态添加方法实现。可以通过重写resolveInstanceMethod:和resolveClassMethod:方法，动态添加未实现的实例方法或类方法。
 
-![img](../screenshots/methodforward.png)
+![img](Runtime/methodforward.png)
 
 有图所示，**前一步骤是动态消息解析，第二步骤是快速消息转发，第三步骤是完整的消息转发。**
 测试：
@@ -510,16 +516,16 @@ OBJC_EXPORT void method_exchangeImplementations(Method m1, Method m2) __OSX_AVAI
 
 #### Runtime应用总结
 * **__attribute__**
-	__attribute__是一套编译器指令。不同的属性表示不同的含义：
-	objc_subclassing_restricted 表示被修饰的类不能被其他的类继承；
+  __attribute__是一套编译器指令。不同的属性表示不同的含义：
+  objc_subclassing_restricted 表示被修饰的类不能被其他的类继承；
 ```Objective-C
 	//系统定义的NSLog方法
 	FOUNDATION_EXPORT void NSLog(NSString *format,...) NS_FORMAT_FUNCTION(1,2) NS_NO_TAIL_CALL;
 	#define NS_FORMAT_FUNCTION(F,A) __attribute__((format(__NSString__, F,A)))
 ```
 * **ORM**
-	ORM 对象关系映射。比如 MJExtension 。
-	实现思路：1、创建一个Category用来做模型转换，并提供方法并传入字典对象；2、通过runtime对应的函数，获取属性列表并遍历，根据属性名从字典中取出对应的对象；3、通过KVC将从字典中取出的值，赋值给对象。4、同时注意处理多层嵌套的问题。
+  ORM 对象关系映射。比如 MJExtension 。
+  实现思路：1、创建一个Category用来做模型转换，并提供方法并传入字典对象；2、通过runtime对应的函数，获取属性列表并遍历，根据属性名从字典中取出对应的对象；3、通过KVC将从字典中取出的值，赋值给对象。4、同时注意处理多层嵌套的问题。
 ```Objective-C
 @interface ORMTestObjc : NSObject
 @property (nonatomic, copy) NSString * name;
