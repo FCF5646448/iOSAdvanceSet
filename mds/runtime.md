@@ -6,7 +6,7 @@ categories: iOS进阶
 description: OC的面向对象、消息派发、动态绑定、内存管理等机制，都是与Runtime运行时环境息息相关的。OC是一个面向对象的语言，面向对象是指把一定的算法函数和数据变量以某种内在联系绑定在一起，形成最基本的结构单元，这些结构单元即是抽象的对象，对其进行赋值等操作，则就会成为实体对象，即实例。通过使用继承、派生等手法可以让对象与对象之间产生各种微妙的联系。
 ---
 
-![img](Runtime/runtimexmind.png)
+![img](../screenshots/runtimexmind.png)
 
 #### OC与Runtime
 OC是一个面向对象的语言，面向对象是指**把一定的算法函数和数据变量以某种内在联系绑定在一起，形成最基本的结构单元**，这些结构单元即是抽象的对象，对其进行赋值等操作，则就会成为实体对象，即实例。通过使用继承、派生等手法可以让对象与对象之间产生各种微妙的联系。
@@ -66,7 +66,7 @@ typedef struct objc_object *id;
 ```
 这里我们可以看到，类Class是一个objc_class结构体指针，对象id是一个objc_object结构体指针。
 
-![](Runtime/runtimeObjc.png)
+![](../screenshots/runtimeObjc.png)
 
 上文中提到，OC中一切皆为对象，包括实例对象和类对象。Class表示类，object表示类的实例。
 
