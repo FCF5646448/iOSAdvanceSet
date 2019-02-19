@@ -1,3 +1,13 @@
+---
+title: RunLoop
+date: 2019-02-19 11:18:03
+tags: runloop
+categories: iOS进阶
+description: RunLoop是内部维护事件循环的一个对象。而事件循环可以不断地对消息或事件进行管理：当没有消息时，会将进程从用户态切到内核态，由此对当前线程进行休眠，以避免资源占用；当有消息需要处理时，会从内核态切到用户态，以便及时唤醒线程。
+---
+
+![](../screenshots/7RunLoop.png)
+
 ### 理论
 #### 自我理解
 首先，一个函数(包括main函数)在按顺序执行完逻辑代码后就会return，然后函数栈里的资源就会被回收掉。比如C语言的简单main函数，执行return后，程序就结束了。那一个APP，其实也是由main函数入口和结束的程序。如果main函数里什么都不做，跑完会立马回到桌面上。比如iOS
@@ -52,12 +62,12 @@ NSRunLoop是对CFRunLoop的封装。
 * CFRunLoopSource：source0、source1；source0需要手动唤醒线程，source1具备唤醒线程的能力。
 * CFRunLoopTimer：基于事件的定时器，具备和NSTimer免费转换
 * CFRunLoopObserver：可以通过注册一些observer对runloop进行一些相关时间点的监测和观察。主要监测的时间点有6个：
-**KCFRunLoopEntry** （通知观察者runloop准备启动了）；
-**kCFRunLoopBeforeTimers**（通知观察者runloop将要对一些timer的相关事件进行处理）；
-**kCFRunLoopBeforeSources** (通知观察者runloop将要处理一些source时间)
-**kCFRunLoopBeforeWaiting** (通知观察者runloop即将进入休眠状态，用户态到内核态的切换)
-**kCFRunLoopAfterWaiting** (通知观察者runloop即将从内核态切换为用户态)
-**KCFRunLoopExit** (通知观察者runloop即将退出)
+  **KCFRunLoopEntry** （通知观察者runloop准备启动了）；
+  **kCFRunLoopBeforeTimers**（通知观察者runloop将要对一些timer的相关事件进行处理）；
+  **kCFRunLoopBeforeSources** (通知观察者runloop将要处理一些source时间)
+  **kCFRunLoopBeforeWaiting** (通知观察者runloop即将进入休眠状态，用户态到内核态的切换)
+  **kCFRunLoopAfterWaiting** (通知观察者runloop即将从内核态切换为用户态)
+  **KCFRunLoopExit** (通知观察者runloop即将退出)
 
 **一个RunLoop对应若干个Mode，每个Mode对应若干个Observer、Timer、Source。** 不同mode里的事件不会相互影响。也就是说当我们把一个timer、observer、source添加到某一个mode上后，如果当前runloop是运行在另一个runloop下面的话，对应的timer、source、observer事件是不会进行响应的。
 
@@ -74,7 +84,7 @@ NSRunLoop是对CFRunLoop的封装。
 
 
 #### RunLoop事件循环机制
-![](../screenshots/runtimeloop.jpeg)
+![](../screenshots/runloop.jpeg)
 
 大概说一下，在runloop开启的时候会发出kCFRunLoopEntry通知，告知即将进去RunLoop。那一启动就相当于进入了用户态的模式，所以优先处理Timer事件，如果有标记过的source0事件那就接着处理source0事件，如果有source1事件（也就是唤醒时收到的消息）那就处理source1事件，如果没有source1事件，那就会发出beforWaiting通知进入休眠状态。在休眠期间如果收到了Timer、source1、外部手动唤醒等事件，则runloop又会被唤醒。
 
@@ -539,14 +549,4 @@ static void runloopTimerCallBack(CFRunLoopTimerRef timer, void *info) {
 #### RunLoop 让应用“起死回生”
 应用起死回生就不再赘述了，因为结果也只是防止第一次崩溃而已。有兴趣可以去看这个大神的文章
 [让应用起死回生](https://blog.csdn.net/u011619283/article/details/53673255)
-
-
-
-
-
-
-
-
-
-
 

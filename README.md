@@ -4,9 +4,11 @@ iOS 进阶知识点
 
 1、[runtime](https://fcf5646448.github.io/2019/01/23/Runtime/)
 
-![img](https://upload-images.jianshu.io/upload_images/1940317-187c43c2c23abc64.png)
+![img](screenshots/3Runtime.png)
 
-2、《runloop》
+2、[runloop](https://fcf5646448.github.io/2019/02/19/RunLoop/)
+
+![img](screenshots/7RunLoop.png)
 
 3、《GCD》
 
