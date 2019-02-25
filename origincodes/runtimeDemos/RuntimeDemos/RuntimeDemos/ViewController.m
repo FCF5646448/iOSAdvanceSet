@@ -125,9 +125,9 @@ typedef void(^Block)(void);
 //    [self blockTest];
 //    self.age = 1;
     
-//    [self classClusters];
+    [self classClusters];
     
-    [self interview];
+//    [self interview];
     
     
 }
@@ -186,10 +186,15 @@ typedef void(^Block)(void);
     
     NSArray * arr = @[@(1),@(2),@(3),@(4),@(5)];
     NSLog(@"%@",[arr objectAtIndex:0]);
-    NSLog(@"%@",[arr objectAtIndex:6]);
     
-    //但是用语法糖就避免不了崩溃了？
-    NSLog(@"%@",arr[2]);
+    NSLog(@"%@",[arr objectAtIndex:6]);
+    NSLog(@"%@",arr[7]);
+    
+    NSMutableArray * marr = [NSMutableArray arrayWithObjects:@[@(1),@(2),@(3),@(4),@(5)], nil];
+    NSLog(@"%@",[marr objectAtIndex:0]);
+    
+    NSLog(@"%@",[marr objectAtIndex:6]);
+    NSLog(@"%@",marr[7]);
     
 }
 

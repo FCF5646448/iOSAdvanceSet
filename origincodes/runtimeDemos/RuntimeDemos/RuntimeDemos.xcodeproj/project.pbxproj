@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		191AC7F82223D25700E7697C /* NSMutableArray+Category.m in Sources */ = {isa = PBXBuildFile; fileRef = 191AC7F72223D25700E7697C /* NSMutableArray+Category.m */; };
 		192DE22021C4D99500E1C587 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 192DE21F21C4D99500E1C587 /* AppDelegate.m */; };
 		192DE22321C4D99500E1C587 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 192DE22221C4D99500E1C587 /* ViewController.m */; };
 		192DE22621C4D99500E1C587 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 192DE22421C4D99500E1C587 /* Main.storyboard */; };
@@ -23,6 +24,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		191AC7F62223D25700E7697C /* NSMutableArray+Category.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableArray+Category.h"; sourceTree = "<group>"; };
+		191AC7F72223D25700E7697C /* NSMutableArray+Category.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableArray+Category.m"; sourceTree = "<group>"; };
 		192DE21B21C4D99500E1C587 /* RuntimeDemos.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RuntimeDemos.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		192DE21E21C4D99500E1C587 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		192DE21F21C4D99500E1C587 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -93,6 +96,8 @@
 				192F258321DF8A4C00088BCB /* ViewController+category03.m */,
 				198EC53221F2FBA3009B0802 /* NSArray+Category.h */,
 				198EC53321F2FBA3009B0802 /* NSArray+Category.m */,
+				191AC7F62223D25700E7697C /* NSMutableArray+Category.h */,
+				191AC7F72223D25700E7697C /* NSMutableArray+Category.m */,
 				1967427E21F70EA300105790 /* ORMTestObjc.h */,
 				1967427F21F70EA300105790 /* ORMTestObjc.m */,
 				192DE22421C4D99500E1C587 /* Main.storyboard */,
@@ -183,6 +188,7 @@
 				192DE22321C4D99500E1C587 /* ViewController.m in Sources */,
 				1979414B21E746FA0066AD24 /* ViewController+Statistics.m in Sources */,
 				192F257E21DF8A3700088BCB /* ViewController+category01.m in Sources */,
+				191AC7F82223D25700E7697C /* NSMutableArray+Category.m in Sources */,
 				19478B9C21E33EEC00E2AB79 /* TestObjc.m in Sources */,
 				192F258121DF8A4100088BCB /* ViewController+category02.m in Sources */,
 				192F258421DF8A4C00088BCB /* ViewController+category03.m in Sources */,
