@@ -18,9 +18,15 @@
         
         Method originMethod0 = class_getInstanceMethod(objc_getClass("__NSArrayM"), @selector(objectAtIndexedSubscript:));
         Method newMethod0 = class_getInstanceMethod(objc_getClass("__NSArrayM"), @selector(msObjectAtIndexedSubscript:));
+        Method originMethod1 = class_getInstanceMethod(objc_getClass("__NSArrayM"), @selector(insertObject:atIndex:));
+        Method newMethod1 = class_getInstanceMethod(objc_getClass("__NSArrayM"), @selector(msinsertObject:atIndex:));
         
         method_exchangeImplementations(originMethod, newMethod);
         method_exchangeImplementations(originMethod0, newMethod0);
+        method_exchangeImplementations(originMethod1, newMethod1);
+        
+        
+        
     });
 }
 
@@ -56,6 +62,20 @@
         }
     }else{
         return [self msObjectAtIndexedSubscript:index];
+    }
+}
+
+- (void)msinsertObject:(id)objc atIndex:(NSUInteger)index {
+    if (objc == nil) {
+        @try {
+            [self msinsertObject:objc atIndex:index];
+        } @catch (NSException *exception) {
+            NSLog(@"insert a nil objc");
+        } @finally {
+            //
+        }
+    }else{
+        [self msinsertObject:objc atIndex:index];
     }
 }
 

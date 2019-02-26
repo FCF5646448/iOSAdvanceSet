@@ -195,6 +195,8 @@ typedef void(^Block)(void);
     
     NSLog(@"%@",[marr objectAtIndex:6]);
     NSLog(@"%@",marr[7]);
+    [marr insertObject:nil atIndex:0];
+    [marr addObject:nil];
     
 }
 
