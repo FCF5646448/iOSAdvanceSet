@@ -100,7 +100,7 @@ UITableView有一个数据源dataSource。在弱网情况下，用户连续执�
 1、将删除后的元数据进行拷贝，当接口数据回来之后，进行比对，剔除被删除的数据，然后再进行DataSource的赋值，最后回到主线程更新UI。
 2、删除操作时，先对要删除的数据进行标识(实际先不进行删除)，然后在数据接口回来之后，再将数据进行删除，最后回到主线程更新UI。
 
-事件传递
+#### 事件传递
 * UIView 和 CALayer：
 UIView有一个属性叫做layer，它所对应的类型就是CALayer类型，CALayer有个id类型的contents属性，它实际上对应着一个CGImageRef(位图)。实际上UIView的显示部分就是由CALayer的contents决定的，最终的显示可以理解为都是位图。
 **UIView 的职责就是为CALayer提供内容，已经负责处理触摸登响应事件，参与响应链。而CALayer 的职责则是负责显示内容contents**。这实际上就是付合**单一职责**的设计原则。
@@ -126,6 +126,7 @@ UIView有一个属性叫做layer，它所对应的类型就是CALayer类型，CA
 2、子view超出了父view的bounds响应事件：正常情况下超出部分是不会响应事件的，因为在父view的pointInsert函数里过不了关，所以解决方案是重写父view的pointInsert方法。
 
 *视图响应链
+https://www.jianshu.com/p/2e074db792ba
 
 
 
