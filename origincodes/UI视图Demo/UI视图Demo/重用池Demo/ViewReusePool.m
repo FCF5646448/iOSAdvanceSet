@@ -47,7 +47,7 @@
     }
     [_usingQueue addObject:view];
 }
-//重置
+//重置复用池
 - (void)reset {
     UIView *view = nil;
     while ((view = [_usingQueue anyObject])) {

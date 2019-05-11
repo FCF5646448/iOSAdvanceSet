@@ -15,7 +15,7 @@
 - (UIView *)dequeuereusebleView;
 //存
 - (void)addUsingView:(UIView *)view;
-//重置
+//重置复用池
 - (void)reset;
 
 @end
