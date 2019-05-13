@@ -10,7 +10,7 @@
 #import "ReuseTableViewController.h"
 
 @interface ViewController ()
-
+@property (strong, nonatomic) AsyncDrawing
 @end
 
 @implementation ViewController
@@ -24,5 +24,8 @@
     ReuseTableViewController * vc = [[ReuseTableViewController alloc] init];
     [self presentViewController:vc animated:YES completion:nil];
 }
+
+
+
 
 @end

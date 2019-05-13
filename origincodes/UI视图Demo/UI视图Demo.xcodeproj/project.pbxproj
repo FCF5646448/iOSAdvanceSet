@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		19189A7322892382001411E0 /* BGDrawingClass.m in Sources */ = {isa = PBXBuildFile; fileRef = 19189A7222892382001411E0 /* BGDrawingClass.m */; };
 		1932142B22855ABD008C4489 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 1932142A22855ABD008C4489 /* AppDelegate.m */; };
 		1932142E22855ABD008C4489 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1932142D22855ABD008C4489 /* ViewController.m */; };
 		1932143122855ABD008C4489 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1932142F22855ABD008C4489 /* Main.storyboard */; };
@@ -19,6 +20,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		19189A7122892382001411E0 /* BGDrawingClass.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BGDrawingClass.h; sourceTree = "<group>"; };
+		19189A7222892382001411E0 /* BGDrawingClass.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BGDrawingClass.m; sourceTree = "<group>"; };
 		1932142622855ABD008C4489 /* UI视图Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "UI视图Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1932142922855ABD008C4489 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		1932142A22855ABD008C4489 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -77,6 +80,8 @@
 				1932143422855ABF008C4489 /* LaunchScreen.storyboard */,
 				1932143722855ABF008C4489 /* Info.plist */,
 				1932143822855ABF008C4489 /* main.m */,
+				19189A7122892382001411E0 /* BGDrawingClass.h */,
+				19189A7222892382001411E0 /* BGDrawingClass.m */,
 			);
 			path = "UI视图Demo";
 			sourceTree = "<group>";
@@ -168,6 +173,7 @@
 				19321445228572FE008C4489 /* IndexdTableView.m in Sources */,
 				1932142E22855ABD008C4489 /* ViewController.m in Sources */,
 				1932143922855ABF008C4489 /* main.m in Sources */,
+				19189A7322892382001411E0 /* BGDrawingClass.m in Sources */,
 				1932142B22855ABD008C4489 /* AppDelegate.m in Sources */,
 				193214422285679E008C4489 /* ViewReusePool.m in Sources */,
 			);
