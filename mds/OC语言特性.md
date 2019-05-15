@@ -3,12 +3,8 @@ title: OC语言特性
 date: 2019-02-19 11:18:03
 tags: OC特性
 categories: iOS进阶
-description: 
+description: 1、简述分类的实现原理，2、简述KVO的实现原理，3、简述通知的实现原理
 ---
-
-1、简述分类的实现原理
-2、简述KVO的实现原理
-3、简述通知的实现原理
 
 #### 分类Category
 category在开发中主要的作用是给类添加实例方法，但其实苹果还推荐我们：
@@ -38,18 +34,18 @@ objc_removeAssociatedObjects
 2、扩展只以声明的形式，多数情况下存在于宿主类的.m文件中
 3、扩展不能作用于系统类
 
-代理:
+#### 代理:
 1、注意循环引用
 2、一对一传递方式
 3、使用代理模式实现的
 
-通知
+#### 通知
 1、一对多的传递方式
 2、使用观察者模式实现的，用于跨层传递消息
 怎样实现通知机制
 **NSNotificationCenter里面应该维护了一个Map表，key值应该就是notificationName，value则应该是一个list表，list中的每个元素应该包含了Observer和Selector**
 
-KVO： key-value-observering
+#### KVO： key-value-observering
 1、使用观察者模式
 2、使用isa-swizzling技术来实现kvo
 kvo的实现细节：
@@ -69,7 +65,7 @@ q1、通过kvc设置value能否生效?
 q2、通过成员变量直接赋值value能否生效？
 不能。需手动添加willChangeValueForKey和didChangeValueForKey方法才能生效。
 
-KVC：key-value-Coding
+#### KVC：key-value-Coding
 两个方法：
 *  -(id)valueForKey: ( NSString * ) key
 *  -(void)setValue:(id)value forKey:(NSString * ) key
@@ -79,8 +75,9 @@ q2: 系统实现逻辑
 * valueForKey：会判断是否存在对应的getter方法，如果不存在，会判断实例变量是否存在，如果存在，会直接获取实例变量的值，否则会调用当前实例的 valueUndefinedKey的方法，抛出NSUndefinedKeyException异常。
 * setValue: forKey: 会判断是否有跟这个key相关的方法，如果不存在，会判断实例变量是否存在，如果存在，直接赋值，否则会调用setValue: ForUndefinedKey方法，会抛出NSUndefinedKeyException异常。
 
-属性关键字
+#### 属性关键字
 属性关键字分为哪几类？
+
 * 读写权限：readWrite、 readOnly
 * 原子性：atomic、nonatomic
 * 引用计数：retain/strong 、assign/unSafe_unretaind、weak、copy
@@ -102,16 +99,4 @@ q5：copy & mutableCopy
 2、对可变对象进行mutableCopy。产生可变对象，是深拷贝；
 3、对不可变对象进行copy，产生不可变对象，是浅拷贝；
 4、对不可变对象进行mutableCopy，产生可变对象，是深拷贝；
-
-
-
-
-
-
-
-
-
-
-
-
 
