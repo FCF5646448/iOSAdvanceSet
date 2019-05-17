@@ -169,19 +169,71 @@ q3： _  block :
     NSLog(@"%d",Block(2)); //8
 }
 ```
-栈上的 _ forwarding指针指向 _ block 变量本身。
+_ block 修饰的变量也会从栈复制到堆上，一是为了可以让多个block使用这个变量，二是为了更好管理，因为被 _ block修饰过的变量，会转换成 _ block 结构体， _ block 结构体中有一个forwarding指针，它始终指向结构体，所以在被block截获复制到堆上之后，无论在哪里修改该变量，都是对同一份变量进行操作。这里要注意，如果这个 _ block 修饰的变量未被某个block截获，那么它还是在栈上的生命周期。
+
 
 q4:  block内存管理：
 block分为以下三种
-* 全局类型block：放到已初始化数据区中；进行copy操作，等于什么都没做
-* 栈类型上的block：放到栈里；进copy操作，copy的结果是在堆上产生了一个block
-* 堆上的block：放到堆里；进copy操作，copy的结果是会增加其引用计数。
+* 全局类型block：指没有用到任何外部变量，只用到全局变量、静态变量的block称作全局block，生命周期与应用程序等同。存放在已初始化数据区中；
+进行copy操作，等于什么都没做。
+* 栈类型上的block：只用到外部局部变量、成员属性变量，无强指针引用的block。
+放到栈里；进copy操作，copy的结果是在堆上产生了一个block
+* 堆上的block：有强指针引用或使用了copy关键字修饰的block。
+放到堆里；进copy操作，copy的结果是会增加其引用计数。
+```OC
+NSObject * obj = [[NSObject alloc]init];
+    NSLog(@"1.Block外 obj = %lu",(unsigned long)obj.retainCount);
+    
+    void (^myBlock)(void) = [^{
+        NSLog(@"Block中 obj = %lu",(unsigned long)obj.retainCount);
+    }copy];
+    
+    NSLog(@"2.Block外 obj = %lu",(unsigned long)obj.retainCount);
+    myBlock();
+   //[myBlock release];
+    NSLog(@"3.Block外 obj = %lu",(unsigned long)obj.retainCount);
+
+结果：
+1.Block外 obj = 1
+2.Block外 obj = 2
+Block中 obj = 2
+3.Block外 obj = 1
+```
+
 如果我们声明一个对象的成员变量是一个block，然后在栈上创建block，同时赋值给成员变量。如果成员变量block没有使用copy关键字，而是使用assign，那么当栈函数内存被释放的时候，继续访问这个block就会导致崩溃。那如果使用了copy关键字，那么在堆上就会产生一个一模一样的block。那么在MRC下，此时堆上的block就没有被释放掉，导致内存泄露。而被copy关键字进行修饰后的block，无论在哪对block进行访问，其实都是通过 _ forwarding 指针访问的堆上的block。
 
 1、何时需要对block进行copy操作。
 所以说如果一个block成员变量在栈上进行创建的话，那么就应该进行copy操作，避免block跟随栈函数被释放。
 
 q5: block循环引用
+1、自循环引用：
+```OC
+{
+    _arr = [NSMutableArray array];
+    _block = ^NSString *(NSString *name){
+        return [NSString stringWithFormat:@“%@”，_arr[0]];
+    };
+    _block(@"hello");
+}
+```
+block截获会连同属性关键字一起截获，所以 _ arr 应该是一个 _ strong类型，所以被截获到block里面后依然是 _ strong类型，所以这里就变成了自循环引用。解决方案就是改变block截获的 _ arr 的属性关键字，使用一个weak：
+```OC
+	__weak typeof(NSMutableArray *) weakArr = _arr;
+    ...
+    return [NSString stringWithFormat:@“%@”，weakArr[0]];
+```
+_ block 修饰符 引起的循环引用：
+在MRC下，这段代码没有任何问题，但是在ARC下会产生循环引用，引起内存泄露。
+```OC
+{
+    __block ClassSelf * blockself = selfl;
+    _block = ^int (int num){
+        return num * blockself.var;
+    }
+	_block(3);
+}
+```
+
 
 
 
