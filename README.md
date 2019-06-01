@@ -10,16 +10,16 @@ iOS 进阶知识点
 
 ![img](screenshots/7RunLoop.png)
 
-3、《GCD》
+3、[多线程](https://fcf5646448.github.io/2018/04/19/multithreads/)
+![img](screenshots/6multithreads.png)
 
-4、《UI渲染过程》
+4、[UI渲染过程](https://fcf5646448.github.io/2017/11/19/UIViewAbout/)
+![img](screenshots/1UIViewAbout.png)
 
-5、《通知》
+5、[iOS内存管理](https://fcf5646448.github.io/2018/06/13/OC-Memory/)
+![img](screenshots/4Memory.png)
 
-6、《响应连》
-
-8、《卡顿优化》
-
-7、《模块化》
+6、[计算机网络](https://fcf5646448.github.io/2018/08/08/NetWork/)
+![img](screenshots/8NetWork.png)
 
 [iOS思维导图](https://www.jianshu.com/p/a2c85b9f6a25)
