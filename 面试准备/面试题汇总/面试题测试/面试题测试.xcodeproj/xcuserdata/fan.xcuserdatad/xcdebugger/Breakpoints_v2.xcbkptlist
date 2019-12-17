@@ -14,8 +14,8 @@
             filePath = "&#x9762;&#x8bd5;&#x9898;&#x6d4b;&#x8bd5;/ViewController.m"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "24"
-            endingLineNumber = "24"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
             landmarkName = "-touchesBegan:withEvent:"
             landmarkType = "7">
             <Locations>
@@ -30,8 +30,8 @@
                   urlString = "file:///Users/fan/Documents/github/iOS%E8%BF%9B%E9%98%B6%E6%95%B4%E7%90%86/iOSAdvanceSet/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B1%87%E6%80%BB/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B5%8B%E8%AF%95/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B5%8B%E8%AF%95/ViewController.m"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "24"
-                  endingLineNumber = "24"
+                  startingLineNumber = "43"
+                  endingLineNumber = "43"
                   offsetFromSymbolStart = "70">
                </Location>
                <Location
@@ -45,8 +45,8 @@
                   urlString = "file:///Users/fan/Documents/github/iOS%E8%BF%9B%E9%98%B6%E6%95%B4%E7%90%86/iOSAdvanceSet/%E9%9D%A2%E8%AF%95%E5%87%86%E5%A4%87/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B1%87%E6%80%BB/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B5%8B%E8%AF%95/%E9%9D%A2%E8%AF%95%E9%A2%98%E6%B5%8B%E8%AF%95/ViewController.m"
                   startingColumnNumber = "9223372036854775807"
                   endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "25"
-                  endingLineNumber = "25"
+                  startingLineNumber = "44"
+                  endingLineNumber = "44"
                   offsetFromSymbolStart = "23">
                </Location>
             </Locations>

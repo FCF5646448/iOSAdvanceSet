@@ -14,6 +14,8 @@
 		311DE2C8238CAC3100CA4A8D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 311DE2C7238CAC3100CA4A8D /* Assets.xcassets */; };
 		311DE2CB238CAC3100CA4A8D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 311DE2C9238CAC3100CA4A8D /* LaunchScreen.storyboard */; };
 		311DE2CE238CAC3100CA4A8D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 311DE2CD238CAC3100CA4A8D /* main.m */; };
+		311DE2DB238F4D5E00CA4A8D /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 311DE2DA238F4D5E00CA4A8D /* Person.m */; };
+		311DE2DE238F4D7200CA4A8D /* Student.m in Sources */ = {isa = PBXBuildFile; fileRef = 311DE2DD238F4D7200CA4A8D /* Student.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -29,6 +31,10 @@
 		311DE2CA238CAC3100CA4A8D /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		311DE2CC238CAC3100CA4A8D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		311DE2CD238CAC3100CA4A8D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		311DE2D9238F4D5E00CA4A8D /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		311DE2DA238F4D5E00CA4A8D /* Person.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
+		311DE2DC238F4D7200CA4A8D /* Student.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Student.h; sourceTree = "<group>"; };
+		311DE2DD238F4D7200CA4A8D /* Student.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Student.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -72,6 +78,10 @@
 				311DE2C9238CAC3100CA4A8D /* LaunchScreen.storyboard */,
 				311DE2CC238CAC3100CA4A8D /* Info.plist */,
 				311DE2CD238CAC3100CA4A8D /* main.m */,
+				311DE2D9238F4D5E00CA4A8D /* Person.h */,
+				311DE2DA238F4D5E00CA4A8D /* Person.m */,
+				311DE2DC238F4D7200CA4A8D /* Student.h */,
+				311DE2DD238F4D7200CA4A8D /* Student.m */,
 			);
 			path = "面试题测试";
 			sourceTree = "<group>";
@@ -148,8 +158,10 @@
 			files = (
 				311DE2C3238CAC3000CA4A8D /* ViewController.m in Sources */,
 				311DE2BD238CAC3000CA4A8D /* AppDelegate.m in Sources */,
+				311DE2DB238F4D5E00CA4A8D /* Person.m in Sources */,
 				311DE2CE238CAC3100CA4A8D /* main.m in Sources */,
 				311DE2C0238CAC3000CA4A8D /* SceneDelegate.m in Sources */,
+				311DE2DE238F4D7200CA4A8D /* Student.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

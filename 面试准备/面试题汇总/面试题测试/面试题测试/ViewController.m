@@ -7,6 +7,7 @@
 //
 
 #import "ViewController.h"
+#import "Student.h"
 
 @interface ViewController ()
 
@@ -18,7 +19,22 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+//    [Student new];
+//
+//    BOOL res1 = [[NSObject class] isKindOfClass:[NSObject class]];
+//    BOOL res2 = [[NSObject class] isMemberOfClass:[NSObject class]];
+//    BOOL res3 = [[Person class] isKindOfClass:[Person class]];
+//    BOOL res4 = [[Person class] isMemberOfClass:[Person class]];
+//
+//    NSLog(@"%d %d %d %d",res1,res2,res3,res4);
+    
+//    id cls = [Person class];
+//    void * obj = &cls;
+//    [(__bridge id)obj print];
+    
+    Class objc = [[NSObject class] class];
+    NSLog(@"%@",objc);
 }
 
 
@@ -29,6 +45,7 @@
     }];
     [thread start];
     [self performSelector:@selector(test) onThread:thread withObject:nil waitUntilDone:YES];
+    
 }
 
 - (void)test {
