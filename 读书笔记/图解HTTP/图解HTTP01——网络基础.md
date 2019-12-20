@@ -25,7 +25,7 @@
 URI：统一资源标识符；
 URL：统一资源定位符；
 URI用字符串标识某一互联网资源，URL则表示资源地点。URL是URI子集。
-一个绝对的URI的格式：
+一个**绝对的URI的格式**：
 http://user:pass@www.example.jp:8080/dir/index.html?uid=1#ch1
 http : 协议方案
 user:pass : 认证(可选)
@@ -34,4 +34,7 @@ www.example.jp ：服务器地址
 /dir/index.html：带层次的文件路径
 uid=1：查询字符串
 ch1：片段标识符。
+
+
+
 
