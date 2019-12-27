@@ -3,7 +3,7 @@ ARC是自动内存管理技术，它通过LLVM编译器与runtime协作，在合
 
 ##### 怎样进行管理？
 ARC通过所有权修饰符来对引用计数进行管理。
-* _ _ strong ：它是id类型和对象类型默认的修饰符。使用 _ _ strong 修饰的对象，引用计数+1，初始化时引用计数为1。
+* __ strong ： 它是id类型和对象类型默认的修饰符。使用 _ _ strong 修饰的对象，引用计数+1，初始化时引用计数为1。
 ```OC
 //首先，所有的变量都遵循作用域规则，在超出作用域范围后，变量会被回收释放。
 //eg1、默认修饰符
@@ -53,24 +53,50 @@ ARC通过所有权修饰符来对引用计数进行管理。
 	*/
 ```
 
-* _ _ weak ：
+* _ _ weak:
+	__weak修饰的变量会被立即释放。赋值给 _ _ weak 的对象，引用计数不会变。在对象被释放后，_ _weak 变量会自动失效且被置为nil，这样不会产生垂悬指针。
+```oc
+//eg1
+{
+	id __weak objc = [[NSObject alloc] init];
+    /*
+    代码如果仅是这样的话，那么NSObject对象刚初始化就会被释放；
+    实际上，编译器也会给出警告的。
+    */
+}	
+//eg2
+{
+    id __strong objc =[[NSObject alloc] init];
+    id __weak objc1 = objc;
+    /*
+    实际上，__weak 的变量都是这样使用的；
+    NSObject对象初始化后都默认赋值给__strong的变量；
+    之后再赋值给__weak的变量。
+    */
+}
+	/*
+	超出作用域后，objc变量被释放，同时释放了持有的NSObject对象；
+	而weak本身就不强引用对象，况且已超出作用域，所以objc1变量也会被置为nil
+	NSObject对象的所有者不在了，所以NSObject对象惨遭废弃；
+	*/
+```
+* __ unsafe_unretained ：
+	 __weak是iOS5之后出来的，在iOS5之前使用__unsafe_unretained.其和__weak的作用是一样的，只是正如其名，它是unsafe的，unsafe的地方在于其修饰的变量所持有的对象释放后，其修饰的变量不会自动置为nil，导致垂悬指针。
 
-  循环引用会导致内存泄漏，内存泄漏就是应当废弃的对象在超出其生存周期后继续存在。
 
-  _ _ weak 提供弱引用，弱引用不会持有对象实例。引用计数不变，对象被释放后，指针会被置为nil；
+```OC
+id _unsafe_unretained obj1 = nil;
+{
+    id __strong obj = [[NSObject alloc] init];
+    obj1 = obj;
+}
+	/*
+	超出作用域后，objc变量被释放，同时释放了持有的NSObject对象；
+	NSObject对象的所有者不在了，所以NSObject对象惨遭废弃；
+	obj1所持有的对象释放了，但是obj1变量不会被置为nil，会产生垂悬指针！
+	*/
+```
+* __ autorelease ：
 
-* _ _ unsafe_unretained ：
-
-  _ _ unsafe_unretained 是不安全的所有权修饰符。起作用同_ _ weak 一样。只是在对象被释放后，指针不会置为nil；
-
-* _ _ autorelease ：
-  在@autoreleasepool{}里的对象都默认带有_ _ autorelease：
-  ```oc
-	 	@autoreleasepool{
-        id __autoreleasing obj = [[NSObject alloc] init];
-	 	}
-  ```
-
-  
 
 ##### 
