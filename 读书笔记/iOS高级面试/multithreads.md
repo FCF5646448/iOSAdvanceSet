@@ -131,4 +131,20 @@ class CusOperation:Operation{
 }
 ```
 
-所以总结一下：NSOperation较与GCD，就是可以添加依赖、最大并发量、控制状态。
+所以总结一下：NSOperation较与GCD，就是可以添加依赖、最大并发量、控制状态。GCD是基于C语言实现的，NSOperation是基于GCD实现的！
+
+
+#### 锁
+* 自旋锁 OSSpinLock 存在优先级反转的问题。就是等待线程的优先级更高，会一直占用CPU，优先级低的线程就无法释放锁；
+* os_unfair_lock 用来替换OSSpinLock，但是它并非忙等的锁；
+* pthread_mutex 互斥锁，等待线程时会进行休眠。它同时含有多种锁，比如pthread_mutex—递归锁、pthread_mutex—条件锁；
+* NSLock是对pthread_mutex 普通锁的封装；
+* NSRecursiveLock是对pthread_mutex—递归锁的封装；
+* NSCondition是对phread_mutex—条件锁的封装；
+* NSConditionLock是对NSCondition的又一层封装；
+* @synchronized是对pthread_mutex—递归锁的封装；
+
+另外信号量和同步队列也能实现类似锁的操作！
+
+
+

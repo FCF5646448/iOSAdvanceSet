@@ -52,9 +52,25 @@ ARC通过所有权修饰符来对引用计数进行管理。
 	NSObject对象的所有者不存在了，所以NSObject对象惨遭废弃。
 	*/
 ```
-	
+
 * _ _ weak ：
+
+  循环引用会导致内存泄漏，内存泄漏就是应当废弃的对象在超出其生存周期后继续存在。
+
+  _ _ weak 提供弱引用，弱引用不会持有对象实例。引用计数不变，对象被释放后，指针会被置为nil；
+
 * _ _ unsafe_unretained ：
+
+  _ _ unsafe_unretained 是不安全的所有权修饰符。起作用同_ _ weak 一样。只是在对象被释放后，指针不会置为nil；
+
 * _ _ autorelease ：
+  在@autoreleasepool{}里的对象都默认带有_ _ autorelease：
+  ```oc
+	 	@autoreleasepool{
+        id __autoreleasing obj = [[NSObject alloc] init];
+	 	}
+  ```
+
+  
 
 ##### 
