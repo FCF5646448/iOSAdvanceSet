@@ -82,8 +82,6 @@ ARC通过所有权修饰符来对引用计数进行管理。
 ```
 * __ unsafe_unretained ：
 	 __weak是iOS5之后出来的，在iOS5之前使用__unsafe_unretained.其和__weak的作用是一样的，只是正如其名，它是unsafe的，unsafe的地方在于其修饰的变量所持有的对象释放后，其修饰的变量不会自动置为nil，导致垂悬指针。
-
-
 ```OC
 id _unsafe_unretained obj1 = nil;
 {
@@ -97,6 +95,12 @@ id _unsafe_unretained obj1 = nil;
 	*/
 ```
 * __ autorelease ：
+	在ARC中，@autoreleasePool{}用来替换NSAutoreleasePool类；用附有__autorelease修饰符的变量替代autorelease方法。
+	autorelease是在一次runloop迭代时会查找
+```OC
+	
+```
 
+#####  总结：
+总体来说，这个章节给我的感觉就是混乱，看的我很纠结。个人总体概括来说，主要是分析了ARC下，strong、weak、Autorelease、unsafe_unretained等具体底层实现。其实只讲解了内存管理中weak表及side table的问题！对新的TagPoint、NONPOINTER_ISA没有任何涉及。不过也算是对，内存管理方面的巩固吧，让我对引用计数有了更清晰的认识！
 
-##### 
