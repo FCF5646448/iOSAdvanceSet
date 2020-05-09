@@ -19,7 +19,7 @@ category在开发中主要的作用是给类添加实例方法，但其实苹果
 * category中可以添加+load方法，那多个category中是否可以同时添加+load方法，调用顺序又是怎样的呢？
 答案是可以调用，执行顺序是先宿主类，后category。而category之间的+load方法则是根据编译顺序来决定的。
 
-#### category + 关联：
+#### 关联对象Associated
 category无法为类添加实例变量，若要实现为类添加实例变量，则可以使用关联对象。
 objc_setAssociatedObjct , 
 objc_getAssociatedObjct，
@@ -47,10 +47,11 @@ objc_removeAssociatedObjects
 
 #### KVO： key-value-observering
 1、使用观察者模式
-2、使用isa-swizzling技术来实现kvo
+2、使用isa-swizzling技术来实现kvo：
 kvo的实现细节：
 **当我们给类A添加addObserver:forKeyPath:方法后，在运行时，系统会给类A生成一个NSKVONotifying_A的子类，同时将类A的isa指针指向NSKVONotifying_A，同时重新setter方法，以便通知所有观察者**。
 重写的Setter方法：
+
 ```OC
 - (void)setter:(id)obj {
     [self willChangeValueForKey:@"keyPath"];
@@ -59,11 +60,36 @@ kvo的实现细节：
     [self didChangeValueForKey:@"keyPath"];
 }
 ```
+q1: isa swizzling是怎么实现的？与method Swizzling有什么区别？
+Method swizzling: 通过调用method_exchangeImplemantations来交换两个函数的method，达到方法交换：
+```OC
+Method originalMethod = class_getInstanceMethod(self, originalSelector);
+Method swizzledMethod = class_getInstanceMethod(self, swizzledSelector);
+method_exchangeImplementations(originalMethod, swizzledMethod);
+```
+Isa swizzling：通过调用运行时API：Class object_setClass(id obj, Class cls)来实现的，具体步骤是：
+* 调用runtime的API：objc_allocateClassPair动态创建和使用objc_registerClassPair注册一个子类；
+* 调用runtime的API：object_setClass修改isa的指向；
+* 调用runtime的API：class_addMethod给类动态添加方法，在子类中实现set方法。
+```OC
+//获取当前类
+Class selfClass = self.class;
+//动态创建KVO类
+const char* selfClassName = NSStringFromClass(selfClass).UTF8String;
+char kvoClassName[1000];
+sprintf(kvoClassName,"%s%s","Test_KVO_",selfClassName);
+Class subClass = objc_allocateClassPair(selfClass,kvoClassName,0);
+objc_registerClassPair(kvoClass);
+// 修改isa
+object_setClass(self, kvoClass);
 
-q1、通过kvc设置value能否生效?
-能，因为KVC调用的setValue:forKey:这个方法，最终也会调用该类对应属性的set方法，而setter方法又正好被子类重写了，所以能够生效
-q2、通过成员变量直接赋值value能否生效？
-不能。需手动添加willChangeValueForKey和didChangeValueForKey方法才能生效。
+//动态添加set方法
+SEL sel = NSSelectorFromString([NSString stringWithFormat:@"set%@",keyPath.capitalizedString]);
+class_addMethod(kvoClass,sel,(IMP)setValue,NULL);
+```
+
+
+
 
 #### KVC：key-value-Coding
 两个方法：
@@ -74,6 +100,11 @@ q1: KVC 是否会破坏面向对象编程思想？
 q2: 系统实现逻辑
 * valueForKey：会判断是否存在对应的getter方法，如果不存在，会判断实例变量是否存在，如果存在，会直接获取实例变量的值，否则会调用当前实例的 valueUndefinedKey的方法，抛出NSUndefinedKeyException异常。
 * setValue: forKey: 会判断是否有跟这个key相关的方法，如果不存在，会判断实例变量是否存在，如果存在，直接赋值，否则会调用setValue: ForUndefinedKey方法，会抛出NSUndefinedKeyException异常。
+
+q1、通过kvc设置value能否生效?
+能，因为KVC调用的setValue:forKey:这个方法，最终也会调用该类对应属性的set方法，而setter方法又正好被子类重写了，所以能够生效
+q2、通过成员变量直接赋值value能否生效？
+不能。需手动添加willChangeValueForKey和didChangeValueForKey方法才能生效。
 
 #### 属性关键字
 属性关键字分为哪几类？
