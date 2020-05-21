@@ -12,7 +12,19 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
+        
+        let group = DispatchGroup.init()
+        
+        DispatchQueue.global().async(group: group, qos: DispatchQoS.default, flags: []) {
+            
+        }
+        
+        
+        let semaphore = DispatchSemaphore(value: 0)
+        semaphore.wait(timeout: DispatchTime.distantFuture)
+        
+        semaphore.signal()
+        
     }
 
 
