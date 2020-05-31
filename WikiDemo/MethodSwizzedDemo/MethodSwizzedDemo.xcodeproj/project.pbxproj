@@ -16,6 +16,7 @@
 		310EB5D5247EC74D00C382D6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 310EB5D4247EC74D00C382D6 /* main.m */; };
 		310EB5DD247EC7A500C382D6 /* ViewController+Category1.m in Sources */ = {isa = PBXBuildFile; fileRef = 310EB5DC247EC7A500C382D6 /* ViewController+Category1.m */; };
 		310EB5E0247EC9B000C382D6 /* ViewController+Category2.m in Sources */ = {isa = PBXBuildFile; fileRef = 310EB5DF247EC9B000C382D6 /* ViewController+Category2.m */; };
+		312996B02483F605003B2F44 /* NSObject+SelectCrash.m in Sources */ = {isa = PBXBuildFile; fileRef = 312996AF2483F605003B2F44 /* NSObject+SelectCrash.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,8 @@
 		310EB5DC247EC7A500C382D6 /* ViewController+Category1.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ViewController+Category1.m"; sourceTree = "<group>"; };
 		310EB5DE247EC9B000C382D6 /* ViewController+Category2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ViewController+Category2.h"; sourceTree = "<group>"; };
 		310EB5DF247EC9B000C382D6 /* ViewController+Category2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ViewController+Category2.m"; sourceTree = "<group>"; };
+		312996AE2483F605003B2F44 /* NSObject+SelectCrash.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+SelectCrash.h"; sourceTree = "<group>"; };
+		312996AF2483F605003B2F44 /* NSObject+SelectCrash.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+SelectCrash.m"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -82,6 +85,8 @@
 				310EB5D0247EC74D00C382D6 /* LaunchScreen.storyboard */,
 				310EB5D3247EC74D00C382D6 /* Info.plist */,
 				310EB5D4247EC74D00C382D6 /* main.m */,
+				312996AE2483F605003B2F44 /* NSObject+SelectCrash.h */,
+				312996AF2483F605003B2F44 /* NSObject+SelectCrash.m */,
 			);
 			path = MethodSwizzedDemo;
 			sourceTree = "<group>";
@@ -162,6 +167,7 @@
 				310EB5D5247EC74D00C382D6 /* main.m in Sources */,
 				310EB5C7247EC74C00C382D6 /* SceneDelegate.m in Sources */,
 				310EB5E0247EC9B000C382D6 /* ViewController+Category2.m in Sources */,
+				312996B02483F605003B2F44 /* NSObject+SelectCrash.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
