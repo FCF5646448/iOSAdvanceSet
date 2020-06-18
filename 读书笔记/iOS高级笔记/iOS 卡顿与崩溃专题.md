@@ -1,5 +1,218 @@
 ### Crash 及 APP 性能监控相关
 
+#### 卡顿处理 具体实践流程 (结合各种实际demo的总结)
+
+针对不同的列表样式，使用不同的优化策略
+
+##### 预排版+预渲染+异步绘制
+
+这种主要针对比较复杂的cell，比如富文本较多的类似微博这种列表。
+
+- 首先**预排版**：拿到json之后先计算主要控件的布局，比如头像、内容、按钮等frame， 将其放到内存中。这里计算布局也可以使用Core Text的CTFramesetterRef来进行计算，性能消耗更小：
+
+```
+- (CGSize)sizeWithConstrainedToSize:(CGSize)size fromFont:(UIFont *)font1 lineSpace:(float)lineSpace{
+    CGFloat minimumLineHeight = font1.pointSize,maximumLineHeight = minimumLineHeight, linespace = lineSpace;
+    CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)font1.fontName,font1.pointSize,NULL);
+    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
+    //Apply paragraph settings
+    CTTextAlignment alignment = kCTLeftTextAlignment;
+    CTParagraphStyleRef style = CTParagraphStyleCreate((CTParagraphStyleSetting[6]){
+        {kCTParagraphStyleSpecifierAlignment, sizeof(alignment), &alignment},
+        {kCTParagraphStyleSpecifierMinimumLineHeight,sizeof(minimumLineHeight),&minimumLineHeight},
+        {kCTParagraphStyleSpecifierMaximumLineHeight,sizeof(maximumLineHeight),&maximumLineHeight},
+        {kCTParagraphStyleSpecifierMaximumLineSpacing, sizeof(linespace), &linespace},
+        {kCTParagraphStyleSpecifierMinimumLineSpacing, sizeof(linespace), &linespace},
+        {kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&lineBreakMode}
+    },6);
+    NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font,(NSString*)kCTFontAttributeName,(__bridge id)style,(NSString*)kCTParagraphStyleAttributeName,nil];
+    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:self attributes:attributes];
+    //    [self clearEmoji:string start:0 font:font1];
+    CFAttributedStringRef attributedString = (__bridge CFAttributedStringRef)string;
+    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedString);
+    CGSize result = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, [string length]), NULL, size, NULL);
+    return result;
+}
+```
+
+- 预渲染：在预排版的过程中，也可以做一些预渲染的部分工作，比如如果头像是圆形，可以使用CAShapeLayer和UIBezierPath先设置好圆角path。
+
+```
+UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorners:corners cornerRadii:CGSizeMake(radius, radius)];
+CAShapeLayer *maskLayer = [CAShapeLayer layer];
+maskLayer.frame = rect;
+maskLayer.path = maskPath.CGPath;
+self.layer.mask = maskLayer;
+```
+
+- 在头像的UIImageView上加了一层薄薄的CALayer灰度图层。CALayer设置为shouldResterize = YES，也就是开启了光栅化，CALayer会被光栅化为bitmap，也可以有效提高性能，但是使用前提是在内容不变的前提下。
+- Cell中的用于显示富文本的相关内容使用一个自定义的UIView子类AsyncLayer。AsyncLayer含有text文本内容、文本颜色、字体、字间距、居中样式等信息。然后在setText方法中异步绘制文本。大概的绘制流程就是：
+  - 使用异步串行队列开启绘制； 
+  - 使用UIGraphicsBeginImageContextWithOptions创建Context上下文；
+  - 创建CoreText，注意要先转换坐标；
+  - 设置好文本样式，生成NSMutableAttributedString；
+  - 使用NSMutableAttributedString创建CTFrame；
+  - 使用CTFrame在CGContextRef上下文上绘制；CTFrameDraw(frame, context);
+  - 获取上下文当中的image，UIGraphicsGetImageFromCurrentImageContext();
+  - 回到主线程，给UIView的layer.contents属性进行赋值。
+- cell中非富文本相关区域。比如整个背景、固定的头像、点赞这些固定的属性，也可以使用异步绘制的方式，在setModel的时候进行绘制。大概的流程就是：
+  - 使用异步串行队列开启绘制；
+  - 使用UIGraphicsBeginImageContextWithOptions创建Context上下文；
+  - 绘制整个cell区域，及各种小空间；
+  - 获取上下文中的Image；
+  - 回到主线程，给最底层的layer.contents进行赋值；(注意这里不是直接给cell的layer的contents进行赋值，因为像富文本相关也是添加到cell的layer上面的)
+- cell的图片，首先cell的图片就是使用SDWebImage这种方式去设置。其次，要对一些图片做一些特殊的设置，比如降低采样率等。
+
+##### 按需加载
+
+按需加载就是说在滚动停止的时候进行加载。这种方式有个弊端就是滑动的过程中可能会出现空白页。但是也是一种解决滑动时卡顿的方案，像一些课时列表页，它的排列顺序有可能是按章节从小到大的排序的。那么用户一进来就可能会想要滑到最底部，查看最新的课时，那么可以考虑使用这种方案。具体的实现方案：
+
+- 监听scrollview滚动状态，主要是监听scrollViewWillEndDragging、scrollViewDidScroll、scrollViewDidEndDecelerating等函数。在scrollViewWillEndDragging函数中，计算tableview将要显示的范围(一般会上下多加三行cell)，然后将将要显示的indexPath添加进一个待绘制数组里。其次，在scrollViewDidScroll、scrollViewDidEndDecelerating监听滚动状态，设置一个bool值。
+- 将cell的绘制方法独立开来，在cellForRowAtIndexPath:方法中，如果当前正在滚动，或者当前待绘制的数组有值切不包含cell，则不进行绘制。否则进行绘制操作。
+
+```
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
+    NeedLoadNewsCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    [self drawCell:cell withIndexPath:indexPath];
+    cell.delegate = self;   // VC作为Cell视图的代理对象
+    return cell;
+}
+
+// 按需绘制
+- (void)drawCell:(NeedLoadNewsCell *)cell withIndexPath:(NSIndexPath *)indexPath{
+    NewsModel *model = [self.dataSource objectAtIndex:indexPath.row];
+    cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    [cell clear];
+    cell.model = model;
+    // 如果当前 cell 不在需要绘制的cell 中,则直接 pass。
+    // 注意第一屏肯定可以显示出来，因为第一屏不会触发滚动，待绘制数组里也没有数据，其次滚动过程中，可保证需要绘制的cell进行绘制。
+    if (self.needLoadArray.count > 0 && [self.needLoadArray indexOfObject:indexPath] == NSNotFound) {
+        [cell clear];
+        //不在待绘制列表，不绘制。
+        return;
+    }
+    if (_scrollToToping) {
+    //正在滚动不绘制
+        return;
+    }
+    //绘制方法
+    [cell draw]; 
+}
+```
+
+- 在每一次touchBegin函数中将需要绘制的cell清空。
+- 在scrollViewDidEndScrollingAnimation和scrollViewDidScrollToTop方法中开始绘制tableview的visibleCells。
+
+##### 延时加载
+
+延时加载主要针对图片，这个SDWebImage也可以进行设置（SDWebImage是可以设置在滚动的时候不加载）；
+监听RunLoop的状态，这里和卡顿检测检测的状态就不一样了。这里主要是监听runloop 的 DefaultMode下的KCFRunLoopBeforeWaiting。首先列表滑动时是UITrackingRunLoopMode，其次KCFRunLoopBeforeWaiting正好是defaultMode即将进入休眠的一个空闲状态。所以监听DefaultMode的BeforeWaiting状态就正好表示cpu有空闲处理问题。具体实现步骤：
+
+- 1、将cell中图片绘制的代码独立成一个方法。比如：
+
+```
+/// 绘制图片
+- (void)drawImg {
+    if (_model.imgs.count > 0) {
+        __block float posX = 0;
+        [_model.imgs enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
+            UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(posX, 0, kImgViewWH, kImgViewWH)];
+            [imgView sd_setImageWithURL:[NSURL URLWithString:obj]];
+            imgView.layer.cornerRadius = 5;
+            imgView.layer.masksToBounds = YES;
+            
+            [self.imgListView addSubview:imgView];
+            posX += (5 + kImgViewWH);
+            if (idx >= 3) {
+                *stop = YES;
+            }
+        }];
+    }
+}
+```
+
+- 2、在tableview或者vc上添加监听方法，监听RunLoop的defaultMode状态下的beforeWaiting状态。
+
+```
+// 监听 runloop 状态
+- (void)addRunloopObserver {
+    // 获取当前 runloop
+    //获得当前线程的runloop，因为我们现在操作都是在主线程，这个方法就是得到主线程的runloop
+    CFRunLoopRef runloop = CFRunLoopGetCurrent();
+
+    //定义一个观察者,这是一个结构体
+    CFRunLoopObserverContext context = {
+        0,
+        (__bridge void *)(self),
+        &CFRetain,
+        &CFRelease,
+        NULL
+    };
+
+    // 定义一个观察者
+    static CFRunLoopObserverRef defaultModeObsever;
+    // 创建观察者
+    defaultModeObsever = CFRunLoopObserverCreate(NULL,
+                                                 kCFRunLoopBeforeWaiting,   // 观察runloop等待的时候就是处于NSDefaultRunLoopMode模式的时候
+                                                 YES,   // 是否重复观察
+                                                 NSIntegerMax - 999,
+                                                 &Callback, // 回掉方法，就是处于NSDefaultRunLoopMode时候要执行的方法
+                                                 &context);
+    
+    // 添加当前 RunLoop 的观察者 注意防止DefaultMode中，正好是不在滑动时的mode。
+    CFRunLoopAddObserver(runloop, defaultModeObsever, kCFRunLoopDefaultMode);
+    //c语言有creat 就需要release
+    CFRelease(defaultModeObsever);
+}
+
+// 每次 runloop 回调执行代码块
+static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
+    DelayLoadImgViewController *vc = (__bridge DelayLoadImgViewController *)(info);  // 这个info就是我们在context里面放的self参数
+    
+    if (vc.tasks.count == 0) {
+        return;
+    }
+    
+    BOOL result = NO;
+    while (result == NO && vc.tasks.count) {
+        NSLog(@"开始执行加载图片总任务数:%d",vc.tasks.count);
+        // 取出任务
+        RunloopBlock unit = vc.tasks.firstObject;
+        // 执行任务
+        result = unit();
+        // d干掉第一个任务
+        [vc.tasks removeObjectAtIndex:0];
+    }
+}
+```
+
+- 3、使用一个tasks装cell的图片绘制任务
+
+```
+//cellForRowAtIndexPath函数中：
+	DelayLoadImgCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
+    cell.model = model;
+    // 将加载绘制图片操作丢到任务中去
+    [self addTask:^BOOL{
+        [cell drawImg];
+        return YES;
+    }];
+    return cell;
+    
+// 添加任务
+- (void)addTask:(RunloopBlock)unit {
+    [self.tasks addObject:unit];
+    // 保证之前没有显示出来的任务,不再浪费时间加载
+    if (self.tasks.count > self.max) {
+        [self.tasks removeObjectAtIndex:0];
+    }
+}
+```
+
+解析一下：这里刚拿到数据的时候，主线程RunLoop就是defaultMode。所以不会影响第一屏数据的绘制。这也是为什么RunLoop可以用来优化UITableView的原因。只不过在滑动的时候，同样会出现图片位置空白的情况。可以结合第一种方案来一起用。
+
+
+
 #### Crash处理
 
 面试常考题：介绍你碰到过的印象较深刻的外网crash，并介绍发现、定位、解决的过程。
@@ -187,201 +400,6 @@ void handleSignalException(int signal) {
   - 怎么监控呢？在Background Task里进行计时，如果时间接近3分钟，任务还在执行，那么就可以判断它即将后台崩溃，然后记录下内容，进行上报。
 - 内存被爆 和 主线程超时：
   内存被爆和主线程超时，都是由于Watch Dog检测到超时，而向系统杀掉导致的。那这类监控和后台崩溃一样，需要先找到它的阈值，然后临近阈值时进行收集和上报。
-
-
-
-#### 卡顿处理 具体实践流程 (结合各种实际demo的总结)
-针对不同的列表样式，使用不同的优化策略
-##### 预排版+预渲染+异步绘制
-这种主要针对比较复杂的cell，比如富文本较多的类似微博这种列表。
-* 首先**预排版**：拿到json之后先计算主要控件的布局，比如头像、内容、按钮等frame， 将其放到内存中。这里计算布局也可以使用Core Text的CTFramesetterRef来进行计算，性能消耗更小：
-```
-- (CGSize)sizeWithConstrainedToSize:(CGSize)size fromFont:(UIFont *)font1 lineSpace:(float)lineSpace{
-    CGFloat minimumLineHeight = font1.pointSize,maximumLineHeight = minimumLineHeight, linespace = lineSpace;
-    CTFontRef font = CTFontCreateWithName((__bridge CFStringRef)font1.fontName,font1.pointSize,NULL);
-    CTLineBreakMode lineBreakMode = kCTLineBreakByWordWrapping;
-    //Apply paragraph settings
-    CTTextAlignment alignment = kCTLeftTextAlignment;
-    CTParagraphStyleRef style = CTParagraphStyleCreate((CTParagraphStyleSetting[6]){
-        {kCTParagraphStyleSpecifierAlignment, sizeof(alignment), &alignment},
-        {kCTParagraphStyleSpecifierMinimumLineHeight,sizeof(minimumLineHeight),&minimumLineHeight},
-        {kCTParagraphStyleSpecifierMaximumLineHeight,sizeof(maximumLineHeight),&maximumLineHeight},
-        {kCTParagraphStyleSpecifierMaximumLineSpacing, sizeof(linespace), &linespace},
-        {kCTParagraphStyleSpecifierMinimumLineSpacing, sizeof(linespace), &linespace},
-        {kCTParagraphStyleSpecifierLineBreakMode,sizeof(CTLineBreakMode),&lineBreakMode}
-    },6);
-    NSDictionary* attributes = [NSDictionary dictionaryWithObjectsAndKeys:(__bridge id)font,(NSString*)kCTFontAttributeName,(__bridge id)style,(NSString*)kCTParagraphStyleAttributeName,nil];
-    NSMutableAttributedString *string = [[NSMutableAttributedString alloc] initWithString:self attributes:attributes];
-    //    [self clearEmoji:string start:0 font:font1];
-    CFAttributedStringRef attributedString = (__bridge CFAttributedStringRef)string;
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attributedString);
-    CGSize result = CTFramesetterSuggestFrameSizeWithConstraints(framesetter, CFRangeMake(0, [string length]), NULL, size, NULL);
-    return result;
-}
-```
-* 预渲染：在预排版的过程中，也可以做一些预渲染的部分工作，比如如果头像是圆形，可以使用CAShapeLayer和UIBezierPath先设置好圆角path。
-```
-UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorners:corners cornerRadii:CGSizeMake(radius, radius)];
-CAShapeLayer *maskLayer = [CAShapeLayer layer];
-maskLayer.frame = rect;
-maskLayer.path = maskPath.CGPath;
-self.layer.mask = maskLayer;
-```
-* 在头像的UIImageView上加了一层薄薄的CALayer灰度图层。CALayer设置为shouldResterize = YES，也就是开启了光栅化，CALayer会被光栅化为bitmap，也可以有效提高性能，但是使用前提是在内容不变的前提下。
-* Cell中的用于显示富文本的相关内容使用一个自定义的UIView子类AsyncLayer。AsyncLayer含有text文本内容、文本颜色、字体、字间距、居中样式等信息。然后在setText方法中异步绘制文本。大概的绘制流程就是：
-	* 使用异步串行队列开启绘制； 
-	* 使用UIGraphicsBeginImageContextWithOptions创建Context上下文；
-	* 创建CoreText，注意要先转换坐标；
-	* 设置好文本样式，生成NSMutableAttributedString；
-	* 使用NSMutableAttributedString创建CTFrame；
-	* 使用CTFrame在CGContextRef上下文上绘制；CTFrameDraw(frame, context);
-	* 获取上下文当中的image，UIGraphicsGetImageFromCurrentImageContext();
-	* 回到主线程，给UIView的layer.contents属性进行赋值。
-* cell中非富文本相关区域。比如整个背景、固定的头像、点赞这些固定的属性，也可以使用异步绘制的方式，在setModel的时候进行绘制。大概的流程就是：
-	*  使用异步串行队列开启绘制；
-	*  使用UIGraphicsBeginImageContextWithOptions创建Context上下文；
-	*  绘制整个cell区域，及各种小空间；
-	*  获取上下文中的Image；
-	*  回到主线程，给最底层的layer.contents进行赋值；(注意这里不是直接给cell的layer的contents进行赋值，因为像富文本相关也是添加到cell的layer上面的)
-* cell的图片，首先cell的图片就是使用SDWebImage这种方式去设置。其次，要对一些图片做一些特殊的设置，比如降低采样率等。
-
-##### 按需加载
-按需加载就是说在滚动停止的时候进行加载。这种方式有个弊端就是滑动的过程中可能会出现空白页。但是也是一种解决滑动时卡顿的方案，像一些课时列表页，它的排列顺序有可能是按章节从小到大的排序的。那么用户一进来就可能会想要滑到最底部，查看最新的课时，那么可以考虑使用这种方案。具体的实现方案：
-* 监听scrollview滚动状态，主要是监听scrollViewWillEndDragging、scrollViewDidScroll、scrollViewDidEndDecelerating等函数。在scrollViewWillEndDragging函数中，计算tableview将要显示的范围(一般会上下多加三行cell)，然后将将要显示的indexPath添加进一个待绘制数组里。其次，在scrollViewDidScroll、scrollViewDidEndDecelerating监听滚动状态，设置一个bool值。
-* 将cell的绘制方法独立开来，在cellForRowAtIndexPath:方法中，如果当前正在滚动，或者当前待绘制的数组有值切不包含cell，则不进行绘制。否则进行绘制操作。
-```
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    NeedLoadNewsCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-    [self drawCell:cell withIndexPath:indexPath];
-    cell.delegate = self;   // VC作为Cell视图的代理对象
-    return cell;
-}
-
-// 按需绘制
-- (void)drawCell:(NeedLoadNewsCell *)cell withIndexPath:(NSIndexPath *)indexPath{
-    NewsModel *model = [self.dataSource objectAtIndex:indexPath.row];
-    cell.selectionStyle = UITableViewCellSelectionStyleNone;
-    [cell clear];
-    cell.model = model;
-    // 如果当前 cell 不在需要绘制的cell 中,则直接 pass。
-    // 注意第一屏肯定可以显示出来，因为第一屏不会触发滚动，待绘制数组里也没有数据，其次滚动过程中，可保证需要绘制的cell进行绘制。
-    if (self.needLoadArray.count > 0 && [self.needLoadArray indexOfObject:indexPath] == NSNotFound) {
-        [cell clear];
-        //不在待绘制列表，不绘制。
-        return;
-    }
-    if (_scrollToToping) {
-    //正在滚动不绘制
-        return;
-    }
-    //绘制方法
-    [cell draw]; 
-}
-```
-* 在每一次touchBegin函数中将需要绘制的cell清空。
-* 在scrollViewDidEndScrollingAnimation和scrollViewDidScrollToTop方法中开始绘制tableview的visibleCells。
-
-##### 延时加载
-延时加载主要针对图片，这个SDWebImage也可以进行设置（SDWebImage是可以设置在滚动的时候不加载）；
-监听RunLoop的状态，这里和卡顿检测检测的状态就不一样了。这里主要是监听runloop 的 DefaultMode下的KCFRunLoopBeforeWaiting。首先列表滑动时是UITrackingRunLoopMode，其次KCFRunLoopBeforeWaiting正好是defaultMode即将进入休眠的一个空闲状态。所以监听DefaultMode的BeforeWaiting状态就正好表示cpu有空闲处理问题。具体实现步骤：
-
-* 1、将cell中图片绘制的代码独立成一个方法。比如：
-```
-/// 绘制图片
-- (void)drawImg {
-    if (_model.imgs.count > 0) {
-        __block float posX = 0;
-        [_model.imgs enumerateObjectsUsingBlock:^(NSString *obj, NSUInteger idx, BOOL *stop) {
-            UIImageView *imgView = [[UIImageView alloc] initWithFrame:CGRectMake(posX, 0, kImgViewWH, kImgViewWH)];
-            [imgView sd_setImageWithURL:[NSURL URLWithString:obj]];
-            imgView.layer.cornerRadius = 5;
-            imgView.layer.masksToBounds = YES;
-            
-            [self.imgListView addSubview:imgView];
-            posX += (5 + kImgViewWH);
-            if (idx >= 3) {
-                *stop = YES;
-            }
-        }];
-    }
-}
-```
-* 2、在tableview或者vc上添加监听方法，监听RunLoop的defaultMode状态下的beforeWaiting状态。
-```
-// 监听 runloop 状态
-- (void)addRunloopObserver {
-    // 获取当前 runloop
-    //获得当前线程的runloop，因为我们现在操作都是在主线程，这个方法就是得到主线程的runloop
-    CFRunLoopRef runloop = CFRunLoopGetCurrent();
-
-    //定义一个观察者,这是一个结构体
-    CFRunLoopObserverContext context = {
-        0,
-        (__bridge void *)(self),
-        &CFRetain,
-        &CFRelease,
-        NULL
-    };
-
-    // 定义一个观察者
-    static CFRunLoopObserverRef defaultModeObsever;
-    // 创建观察者
-    defaultModeObsever = CFRunLoopObserverCreate(NULL,
-                                                 kCFRunLoopBeforeWaiting,   // 观察runloop等待的时候就是处于NSDefaultRunLoopMode模式的时候
-                                                 YES,   // 是否重复观察
-                                                 NSIntegerMax - 999,
-                                                 &Callback, // 回掉方法，就是处于NSDefaultRunLoopMode时候要执行的方法
-                                                 &context);
-    
-    // 添加当前 RunLoop 的观察者 注意防止DefaultMode中，正好是不在滑动时的mode。
-    CFRunLoopAddObserver(runloop, defaultModeObsever, kCFRunLoopDefaultMode);
-    //c语言有creat 就需要release
-    CFRelease(defaultModeObsever);
-}
-
-// 每次 runloop 回调执行代码块
-static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info) {
-    DelayLoadImgViewController *vc = (__bridge DelayLoadImgViewController *)(info);  // 这个info就是我们在context里面放的self参数
-    
-    if (vc.tasks.count == 0) {
-        return;
-    }
-    
-    BOOL result = NO;
-    while (result == NO && vc.tasks.count) {
-        NSLog(@"开始执行加载图片总任务数:%d",vc.tasks.count);
-        // 取出任务
-        RunloopBlock unit = vc.tasks.firstObject;
-        // 执行任务
-        result = unit();
-        // d干掉第一个任务
-        [vc.tasks removeObjectAtIndex:0];
-    }
-}
-```
-
-* 3、使用一个tasks装cell的图片绘制任务
-```
-//cellForRowAtIndexPath函数中：
-	DelayLoadImgCell *cell = [tableView dequeueReusableCellWithIdentifier:cellId];
-    cell.model = model;
-    // 将加载绘制图片操作丢到任务中去
-    [self addTask:^BOOL{
-        [cell drawImg];
-        return YES;
-    }];
-    return cell;
-    
-// 添加任务
-- (void)addTask:(RunloopBlock)unit {
-    [self.tasks addObject:unit];
-    // 保证之前没有显示出来的任务,不再浪费时间加载
-    if (self.tasks.count > self.max) {
-        [self.tasks removeObjectAtIndex:0];
-    }
-}
-```
-解析一下：这里刚拿到数据的时候，主线程RunLoop就是defaultMode。所以不会影响第一屏数据的绘制。这也是为什么RunLoop可以用来优化UITableView的原因。只不过在滑动的时候，同样会出现图片位置空白的情况。可以结合第一种方案来一起用。
 
 
 
@@ -692,102 +710,31 @@ APP启动主要分为三个阶段：main函数之前、main函数之后、首屏
 #### QQ问题
 
 * 1、说一下哪个项目的技术点比较难。
+
+  原则：所有这些抽象类的问题，都应该尽可能引导到自己熟悉的知识点上。其次切忌模棱两可回答一些不必要的东西。 比如说：最难的项目应该是我最新的那个项目吧，因为在那个项目上，我做了很多列表流畅度优化、卡顿检测、崩溃检测等相关的尝试。
+
 * 2、在项目里都做了哪些卡顿的优化？（理论被断掉了，直接说自己做了哪些处理？）
+	原则：永远优先直接回答问题，如果是自己比较熟悉的知识点，可以在回答关键点之后，逐一进行解释。其次再看提问者会不会追问一些更深入的东西。
+	比如：主要对不同的列表做过一些：预排版、预渲染、异步绘制、按需加载、延迟加载、离屏渲染相关的处理。...
+
 * 3、卡顿是怎么做的检测？为什么还要自己写检测工具？那检测的过程中是怎么定位到具体的方法的？
-* 4、主线程的卡顿是怎么检测到的？为什么要单独写一个CADisplayLink检测主线程上的帧率，如果是主线程已经卡顿的情况下岂不是会加重卡顿？
-* 5、为什么要使用RunLoop做tableView卡顿优化？一开始加载数据的时候岂不是没法使用？（简历里的坑）
-* 6、在项目里是如何检测Crash的，降低崩溃率都做了哪些事情？
-* 7、Bugly的检测原理是什么？
-* 8、是否了解直播的一些底层原理？还是说只停留在SDK的使用过程？
-
-1、可能是因为一开始紧张，有点语无伦次，所以理论被直接断掉了。然后说实践的时候，自己都觉得这些点很微不足道，没有底气。
-2、面试官估计能力很强，他一直就觉得我使用的是系统API之类的，都应该是基础的东西。没什么难的。而且做的一些实践应该是必须要做的。(总之，被鄙视了)
-
-不过最主要的是自己对知识点里的细节没有把握清楚。主要就是CADisplayLink检测主线程、runloop为什么用来优化tableview，是怎么做的。木有说清楚。
-
-##### 回答原则
-1、原则：所有这些抽象类的问题，都应该尽可能引导到自己熟悉的知识点上。其次切忌模棱两可回答一些不必要的东西。
-
-比如说：最难的项目应该是我最新的那个项目吧，因为在那个项目上，我做了很多列表流畅度优化、卡顿检测、崩溃检测等相关的尝试。
-
-2、原则：永远优先直接回答问题，如果是自己比较熟悉的知识点，可以在回答的过程中，稍微带过。其次再看提问者会不会追问一些更深入的东西。
-
-**预排版**：一般就是将**布局计算、文本计算、文字排版等放到后台线程中先异步生成**。比如： 刚获取到JSON数据时，将Cell中要显示的控件的布局数据都在后台线程中计算并封装在一个FeedLayout里。FeedLayout可以包含的内容包括：**cell中每个控件控件CGRect、整体Cell的高度、甚至CoreText的排版结果**等。这样cell里的所有布局就都提前计算好了。但是这个方式需要考虑如果第一页数据非常多的话，可能会导致预排版的时间过长，所以可以结合滑动减速或RunLoop等一起使用。
-
-```
-//预排版类
-@interface FCFFeedLayout : NSObject
-@property (nonatomic, strong) FCFFeed *feed; //对应cell Model
-//其他数据全是对应的CGRect
-@property (nonatomic, assign) CGRect iconRect;
-@property (nonatomic, assign) CGRect nameRect;
-@property (nonatomic, assign) CGRect sexRect;
-@property (nonatomic, assign) CGRect contentRect;
-... ...
-@property (nonatomic, assign) CGRect seperatorViewRect;
-//cell整体高度
-@property (nonatomic, assign) CGFloat height;
-@end
-```
-**预渲染**：这里主要是指图片的提前异步解码。预渲染也是可以将将要显示的内容提前在后台线程中生成好，然后使用的时候直接赋值就好了。
-
-* 同样是在TableView加载之前，就在后台线程将图片这种资源先渲染出来，尤其是要处理圆角等容易容易导致离屏渲染的属性，尽量使用Core Graphics的API代替，同时缓存到内存中，基本的实现步骤就类似SDWebImage了。
-* 预渲染和预排版实际就是提前准备好文本、图片相关的绘制内容。和异步绘制类似，只是时机不一样而已。
-
-**异步绘制**：预渲染是在一开始数据回来的时候做的处理。而在列表滑动过程中，对于文本和图像的绘制，则可以使用异步绘制来进行。异步绘制的实现原理就是实现CALayer的displayer方法，然后在函数里，把文本绘制或图片绘制的操作放到后台线程中进行，最后将结果返回主线程显示。
-**文本绘制主要使用CoreText进行排版绘制，最后包装到Core Graphics的上下文中。图片则直接使用Core Graphics的API进行解码绘制**。
-
-```
-- (void)display{
-	dispatch_async(backgroundQueue, ^{
-        CGContextRef ctx = CGBitmapContextCreate(...);
-        // draw in context...
-        CGImageRef img = CGBitmapContextCreateImage(ctx);
-        CFRelease(ctx);
-        dispatch_async(mainQueue, ^{
-            layer.contents = img;
-        });
-	});   
-}
-```
-
-这一套东西下来，基本能够保证一个复杂的列表达到接近50~60帧的效果了。
-
-其次，除了列表的这些步骤，我们平时写代码的过程中，也需要注意一下其他的操作（主要是从CPU和GPU的角度）：
-* 对象创建：对象创建会分配内存、调整属性、甚至读取文件，比较消耗CPU。策略就是**尽量用轻量级的对象创建**，比如CALayer代替无需操作的UIView。又比如说YYKit，单张图片时，直接给CALayer添加了一个setImageWithURL的方法，将图片直接赋值给layer.contents。其次就是**尽量推迟创建对象的时间**，比如使用懒加载。而对于可以复用的对象，**尽可能放到缓存池复用**，比如Cell。
-
-* 对象调整：主要是CALayer的一些属性的调整，比如frame、bounds等，它实际上是通过运行时resolveInstanceMethod为对象临时添加一个方法，然后将对应属性保存到Dictionary里，同时通知Delegate、创建动画。 其次改变CALayer的一些**可动画属性值**时，会对模型层数据做动画，最后显示在展示层上，也多了一份数据的拷贝。所以对象(尤其是视图里的对象)的调整应尽量避免，尤其是视图层次，以及频繁地添加和移除视图。
-
-* 布局计算和渲染：尽可能使用**预排版**的方式处理布局和排版。其次尽量少调整，对于复杂的视图来说，尽可能不使用Autolayout和storyboard。
-
-* 纹理的渲染：实际就是指图片的渲染。iOS中几乎所有的UI视图最终都是绘制成Bitmap，包括文本、图片、栅格化的内容。所以可以尽量减少短时间内大量图片的显示，尽可能将多张图片合成到一张图片中。其次对于过大的图片，比如超过GPU的最大纹理尺寸（4096*4096）,则需要CPU先预处理。所以尽量不要让图片大小超过这个值。
-
-* 视图混合：多个视图重叠时，GPU，所以应该尽量减少视图数量与层次。不透明的视图表明opaque属性，避免无用的Alpha通道合成。
-
-* 避免离屏渲染。
-
-* 线程数量的控制等。
-
-3、卡顿检测：
-首先之所以写卡顿的检测工具，主要是用于测试及产品等部门使用。在线的卡顿检测则是更依赖于Bugly来做的。
+	首先之所以写卡顿的检测工具，主要是用于测试及产品等部门使用。在线的卡顿检测则是更依赖于Bugly来做的。
 首先，我的工具里对于卡顿的检测，只做了两方面：
 
 一是FPS帧率检测。PFS是通过CADisplayerLink来计算的。主要就是在主线程创建一个DisplayerLink，然后在回调函数里计算每秒回调的次数。CADIsplayerLink是RunLoop的回调帧率，也就是每一帧会回调一次。如果列表滑动的帧率保持在50到60帧的样子，就可以算是很流畅了。如果低于24帧，则基本有肉眼可见的卡顿。但是FPS只能显示出是否卡顿，但是没法定位到具体的函数。
 
 二就是重写一个NSThread的子类，设置一个时间间隔和最大Watch Dog时间阈值。然后重写她的main函数，在函数里开启一个while循环，然后在时间间隔内查看主线程是否能够及时处理事件，如果主线程能及时处理消息，则说明不卡顿。如果不能处理，则获取主线程的线程堆栈，然后在主线程操作信号量发出之后或者超过最大Watch Dog时间阈值，则将获取到的线程堆栈及卡顿时长进行记录，视为一次卡顿，如果超过一个watch dog阈值则可以视为一次卡顿崩溃，先暂时存起来，如果后续有主线程的信号过来，则把假定的Watch Dog崩溃日志去除。
 
-
-
 卡顿定位：刚才说过，FPS是没法定位到具体函数的。具体方法：一是使用Instrument的Timer Profile来分析代码的执行时间，基本可以定位到具体的函数。二就是通过内核线程信息获取线程堆栈，找到对应的函数。
 
+* 4、主线程的卡顿是怎么检测到的？为什么要单独写一个CADisplayLink检测主线程上的帧率，如果是主线程已经卡顿的情况下岂不是会加重卡顿？
+	回答如3题的第二种检测方案。只能说主线程放置CADisplayerLink是一种择中的方案。主要用于开发阶段。其次要把问题说出来，即CADisplayLink确实会消耗性能，而且也不是非常准备的一个判断。
 
+* 5、为什么要使用RunLoop做tableView卡顿优化？一开始加载数据的时候岂不是没法使用？（简历里的坑）
+	使用runloop做tableview的优化主要是根据runloop的工作原理，将一些耗时的操作放到DefaultMode下的beforeWaiting状态下进行。
 
-4、回答如3题的第二种检测方案。只能说主线程放置CADisplayerLink是一种择中的方案。
-5、使用RunLoop做卡顿优化，是指将一些耗时操作，比如图片解码，放到一个队里里，在监听到RunLoop是BeforeWaiting（即将进入休眠）的时候，再开始解码操作。
-
-6、崩溃的捕获。
-
-首先，根据是否可捕获，我们可以将崩溃记录大致分为三种：一是语言层面的Exception，二是mach异常，这两类是可以通过方法捕获到崩溃的，另外一种无法捕获到的崩溃就是后台查杀、内存被爆、主线程卡顿超时等导致的系统级别的查杀。
+* 6、在项目里是如何检测Crash的，降低崩溃率都做了哪些事情？
+	首先，根据是否可捕获，我们可以将崩溃记录大致分为三种：一是语言层面的Exception，二是mach异常，这两类是可以通过方法捕获到崩溃的，另外一种无法捕获到的崩溃就是后台查杀、内存被爆、主线程卡顿超时等导致的系统级别的查杀。
 
 语言层面的Exception：可以通过注册uncaught_exception_handler，来截获崩溃，获取到Exception的callStackSymbols（异常堆栈列表）、reason、name；
 
@@ -799,7 +746,17 @@ mach异常则会发出Unix标准的Signal信号。所以可以通过注册Signal
 
 后台线程也可以通过监听后台线程运行时长来模拟判断。
 
-7、Bugly的检测原理：略。
+* 7、Bugly的检测原理是什么？
+	Bugly的崩溃和卡顿的原理可能不是非常清楚，但是可以回答一下自己做的卡顿崩溃检测相关知识点。
+
+* 8、是否了解直播的一些底层原理？还是说只停留在SDK的使用过程？
+	可以说一下直播的组成结构，已经自己了解的怎么检测直播的卡顿相关知识点。这样即使不会直播的底层实现，也可以有一些拿得出手的东西。
+
+**注意**：
+1、可能是因为一开始紧张，有点语无伦次，所以理论被直接断掉了。然后说实践的时候，自己都觉得这些点很微不足道，没有底气。
+2、面试官估计能力很强，他一直就觉得我使用的是系统API之类的，都应该是基础的东西。没什么难的。而且做的一些实践应该是必须要做的。(总之，被鄙视了)
+不过最主要的是自己对知识点里的细节没有把握清楚。主要就是CADisplayLink检测主线程、runloop为什么用来优化tableview，是怎么做的。木有说清楚。
+3、一定要思路清晰，把自己掌握的东西尽可能地表现出来。
 
 
 #### 其他看到的关系卡顿和Crash相关的面试问题
@@ -901,17 +858,6 @@ static void LDAPMUncaughtExceptionHandler(NSException *exception) {
 
   所以最科学地**检测卡顿的方式**：直接监听RunLoop的BefoeWaiting或Exit通知的时间间隔。当然也有人通过子线程定时地ping主线程，然后根据pong的返回间隔来确定是否卡顿问题。这两个方法的原理都是一样的，就是监听RunLoop本身事件循环的周期，当前最关键的问题是时间阈值的确定。卡顿的阈值一般设置为16.7ms * 40（也就是卡了40帧左右）、卡顿崩溃的阈值大概设为3min。
   对于有时候FPS很高，但是仍然卡顿，没怎么明白原因。
-
-
-  **如何定位**：
-
-  1、开发阶段：使用Time Profile来检测有卡顿的列表，找出耗时的函数；
-  2、自己开发的工具里：可以在已经确定卡顿的时候，使用thread_info获取对应的线程具体信息。然后查找到对应的堆栈。
-
-
-
-
-
 
 
 ##### 质量保障体系相关体系：
