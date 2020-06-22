@@ -35,14 +35,24 @@
 }
 ```
 
-- 预渲染：在预排版的过程中，也可以做一些预渲染的部分工作，比如如果头像是圆形，可以使用CAShapeLayer和UIBezierPath先设置好圆角path。
+- 预渲染：在预排版的过程中，也可以做一些预渲染的部分工作，比如如果头像是圆形，可以使用 Core Graphics 绘制圆角。
 
 ```
-UIBezierPath *maskPath = [UIBezierPath bezierPathWithRoundedRect:rect byRoundingCorners:corners cornerRadii:CGSizeMake(radius, radius)];
-CAShapeLayer *maskLayer = [CAShapeLayer layer];
-maskLayer.frame = rect;
-maskLayer.path = maskPath.CGPath;
-self.layer.mask = maskLayer;
+func kt_drawRectWithRoundedCorner(radius radius: CGFloat,  
+                                  borderWidth: CGFloat,
+                                  backgroundColor: UIColor,
+                                  borderColor: UIColor) -> UIImage {    
+    UIGraphicsBeginImageContextWithOptions(sizeToFit, false, UIScreen.mainScreen().scale)
+    let context = UIGraphicsGetCurrentContext()
+
+    CGContextMoveToPoint(context, 开始位置);  // 开始坐标右边开始
+    CGContextAddArcToPoint(context, x1, y1, x2, y2, radius);  // 这种类型的代码重复四次
+
+    CGContextDrawPath(UIGraphicsGetCurrentContext(), .FillStroke)
+    let output = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+    return output
+}
 ```
 
 - 在头像的UIImageView上加了一层薄薄的CALayer灰度图层。CALayer设置为shouldResterize = YES，也就是开启了光栅化，CALayer会被光栅化为bitmap，也可以有效提高性能，但是使用前提是在内容不变的前提下。
