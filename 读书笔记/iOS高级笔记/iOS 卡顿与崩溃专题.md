@@ -330,9 +330,19 @@ static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, 
 
   - 可以使用NullSafe第三方库。
 
+* 常见的信号崩溃：
+	* SIGSEGV：(Segmentation Violation,段违例)，无效内存地址，比如空指针、未初始化指针，栈溢出等；
+	* SIGABRT：进程终止信号；
+	* SIGBUS：总线错误。与SIGSEGV不同的是SIGSEGV访问的是无效地址，SIGBUS访问的是有效地址，但是总线访问异常，比如地址对齐问题；
+	* SIGILL：尝试执行非法的指令，可能不被识别或者没有权限；
+	* SIGFPE：Floating Point Error，数学计算相关问题（可能不限于浮点计算），比如除零操作；
+	* SIGPIPE：管道另一端没有进程接手数据；
+
 [iOS中常见Crash总结](https://juejin.im/post/5c617b85e51d45015e0475ac#heading-3)
 
 #### Crash捕获
+
+当iOS设备发生APP闪退时，操作系统会生成一个crash日志，如果用户愿意让设备与iTunes同步，则可以在电脑路径(~/Library/Logs/CrashReporter/MobileDevice/)下下载对应日志文件，然后发送给我们；如果崩溃设备就在身边，则可以使用xcode，在Device Logs下下载到对应的崩溃日志；其次也可以去iTunes connect上获取部分崩溃日志。最后则是通过crash收集工具进行收集，比如Bugly。
 
 iOS的主要崩溃分为三大类，一类是OC抛出的Exception异常，可以通过注册NSUncaugthExceptionHandler来捕获；一类是Mach异常，比如说野指针访问、线程问题，这一类异常会被转换成Signal信号，可以通过注册signalHandler来捕获。还有一类则是无法使用信号和Exception捕获的，比如像后台任务超时、内存被爆、主线程卡顿超阈值等。
 
@@ -626,6 +636,14 @@ iOS的类NSURLProtocol可以拦截NSURLConnect、NSURLSession、UIWebView中的�
 #### 堆栈收集与分析。
 
 堆栈获取的话，一种是**直接使用系统函数**，类似使用signal捕获的方式获取堆栈，但是它不太好定位到具体函数，堆栈信息符号化不好处理。还有一种就是直接使用**PLCrashReporter开源库**。PLCrashReporter开源库能够定位到具体代码位置，性能消耗也不是很大。
+
+捕获到的Crash信息，主要包括：
+* crash标识信息，比如crash唯一标识、硬件设备、APP进程相关信息；
+* 基本信息描述：crash发生的时间和系统版本信息；
+* 异常类型描述：crash发生时抛出的异常类型和错误码；
+* 线程回溯信息：包括每个线程每一帧对应的函数调用信息；
+* crash发生时已加载的二进制文件。
+然后使用工具对这些信息解析定位到具体的代码逻辑。这就需要用到符号化解析过程；
 
 
 

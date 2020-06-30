@@ -103,19 +103,92 @@ end
 pod install
 ```
 
-这样差不多就可以使用这个pod了，可以在Example里写对应的测试代码了。
+这样差不多就可以使用这个Demo了，可以在Example里写对应的测试代码了。
 
+6、写代码的过程
 
+* 如果你要重新创建文件夹或文件，新建的文件夹会在项目的根目录，需要自己手动移到class文件夹下。然后pod install，就可以将代码导进Demo中。
+* 
+
+7、完成之后回到项目文件夹将代码提交到仓库。然后给podspec打上tag
+
+```
+$git tag 0.0.1 #注意这里的tag和podspec的version一样
+$git push --tag
+```
+
+8、验证podspec。这一步是最难的，因为不允许出现错误，只要报错就无法push到repos。
+
+```
+pod spec lint --verbose --allow-warnings --use-libraries #--allow-warnings表示忽略警告，--use-libraries表示有使用第三方库
+```
+
+* 第一个错误：
+```
+ERROR | [iOS] unknown: Encountered an unknown error (Could not find a `ios` simulator (valid values: ). Ensure that Xcode -> Window -> Devices has at least one `ios` simulator listed or otherwise add one.
+```
+查看博客[pod lib lint报错001](<https://www.jianshu.com/p/5a160a64c0fd>) , 大概是说要升级cocoapod。
+然后执行
+```
+sudo gem install cocoapods
+```
+又报错：Error installing cocoapods:  \n ERROR: Failed to build gem native extension.
+查找问题[Errors when installing cocoapods with gem](https://stackoverflow.com/questions/60481623/errors-when-installing-cocoapods-with-gem)是说需要切换到xcode的ruby：
+
+```
+$sudo xcode-select --switch /Library/Developer/CommandLineTools
+$ruby -rrbconfig -e 'puts RbConfig::CONFIG["rubyhdrdir"]'
+```
+然后重新sudo gem install cocoapods。成功
+
+**注意**：成功之后要把ruby 切换回去，否则 pod spec lint 仍然不成功
+```
+sudo xcode-select --switch /Applications/Xcode.app
+```
+
+重新执行，pod spec lint … 成功了会有 xx.podspec passed validation.
+
+9、将验证完的podspec库push到第一步创建的私有库里，执行
+
+```
+$pod repo push BTCoreKit BTCoreKitDemo.podspec --allow-warnings #前面是索引库名，后面是podspec文件名
+```
+
+这里也有个点需要注意，就是索引库必须先关联远程仓库，如果只clone下来，push也是会报错的。
+
+end
+
+这样一个私有仓库就算是创建完成了。
 
 [创建cocoapod私有库详细步骤](<https://www.jianshu.com/p/f903ecf8e882>)
 
 [在现有工程中实施CTmediator](<https://casatwy.com/modulization_in_action.html>)
 
-
-
-
-
 ### 创建主项目
+
+主项目可以使用development pods + pods的组合来创建。development pods存放本地私有仓库，pods存放远程共有仓库。
+
+1、使用xcode创建主项目。
+
+2、创建podfile文件，注意，文件里的内容，本地私有仓库使用path，path的值等于私有仓库xx.podspec的文件地址。这样最后创建出来的项目就自动带有development pods文件夹。
+
+```
+platform :ios, '9.0'
+
+target 'ModularTestDemo2' do
+use_frameworks!
+#远程仓库
+pod 'Alamofire', '~> 4.8.2'
+#本地组件
+pod 'BTCoreKitDemo', :path => "../../btcorekitdemo/BTCoreKitDemo"
+end
+```
+
+3、对development pod库的修改，修改后回到对应的库的Example里执行pod update。更新到对应pod的代码库中。
+
+4、
+
+
 
 
 
@@ -126,6 +199,34 @@ pod install
 1、pod里不知道怎么使用OC和swift混编，貌似一个pod只能是一种语言；
 
 2、pch没法共用；
+
+
+
+#### 实战：
+
+实战开发中，并不需要每一个pod包都创建一个仓库。只需要用一个仓库，然后用development pod隔开。这样每次私有库创建过程中就无需第八步验证阶段了。
+
+
+
+
+
+
+
+
+
+
+
+[创建cocoapod私有库详细步骤](<https://www.jianshu.com/p/f903ecf8e882>)
+
+[模块化之路实践](<https://www.jianshu.com/p/9d49216682f4>)
+
+[CTMediator的swift应用](<https://casatwy.com/CTMediator_in_Swift.html>)
+
+
+
+
+
+
 
 
 
