@@ -8,8 +8,10 @@
 
 #import "ViewController.h"
 
-@interface ViewController ()
+typedef void(^TestBlock)(void);
 
+@interface ViewController ()
+@property (nonatomic, copy) TestBlock block;
 @end
 
 @implementation ViewController
@@ -30,6 +32,15 @@
 //    NSMutableDictionary* dic = [NSMutableDictionary dictionary];
     [dic setValue:nullStr forKey:@"key"]; //not crash
     NSNumber* number = [dic valueForKey:@"key"]; //crash
+    
+    
+    NSMutableArray * arr = [NSMutableArray array];
+    _block = ^{
+        arr = [NSMutableArray array];
+    };
+    
+    _block();
+    
 }
 
 
