@@ -32,10 +32,38 @@ CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGIma
 * 同理，在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文）。所以在drawRect：或者drawlayer：inContext：方法中是可以直接获取上下文的，但是使用desplayLayer：则没法获取上下文，而是得手动创建一个上下文。
 
 #### 排版
+##### 布局
+视图有三个比较重要的布局属性：frame、bounds、center。视图对应的layer也是这三个属性，可能center变成了position。
+* frame：相对于父视图的坐标空间；它实际是根据bounds、position、transform计算而来，所以它们之间都是相互影响的；
+
+* bounds：自身内部坐标空间，{0，0}表示左上角；
+
+* center：CALayer对应position，代表相对于父视图anchorPoint所在位置；
+
+  默认情况下(anchorPoint的默认值为 {0.5,0.5})，`position`的值便可以用下面的公式计算：
+
+  ```
+  position.x = frame.origin.x + 0.5 * bounds.size.width；  
+  position.y = frame.origin.y + 0.5 * bounds.size.height；
+  ```
+
+* anchorPoint：锚点就是视图在执行变化的支点。通常情况下，锚点是在视图的正中心，值是{0.5,0.5}。（假设一张纸被一个图钉钉住，纸张围绕图钉做动画，那么这个图钉就是这个锚点）。总结来说：position 用来设置CALayer在父层中的位置，anchorPoint 决定着CALayer身上的哪个点会在position属性所指的位置。
+  `frame、position与anchorPoint`有以下关系：
+
+  ```
+  frame.origin.x = position.x - anchorPoint.x * bounds.size.width；  
+  frame.origin.y = position.y - anchorPoint.y * bounds.size.height；  
+  ```
+
+#### 视觉效果
+* 圆角
+	
+* 
 
 
 
 ### 动画
+
 ### image I/O
 
 

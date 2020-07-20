@@ -186,21 +186,12 @@ end
 
 3、对development pod库的修改，修改后回到对应的库的Example里执行pod update。更新到对应pod的代码库中。
 
-4、
-
-
-
-
-
 
 
 #### 存在的问题
 
 1、pod里不知道怎么使用OC和swift混编，貌似一个pod只能是一种语言；
-
 2、pch没法共用；
-
-
 
 #### 实战：
 
@@ -208,8 +199,22 @@ end
 
 
 
+#### 处理的问题：
+* source文件的打包问题：
+正常来说，对应pod的资源放入到对应的Asset文件里面，pod库打出来时，会自动包含里面的资源。其次对于没有放到Assets文件里的资源，可以在podspesc中设置：
+```
+   s.resource_bundles = {
+     'BTCoreKitDemo' => ['BTCoreKitDemo/Assets/*.png']
+     'SVProgressHUD' => ['BTCoreKit/BTCoreKit/Classes/ThirdParty/HUB/SVProgressHUD/*.png']
+   }
+```
+这样打出来的pod就对应两个bundle，但是在使用过程中，类似SVProgressHUD.bundle不一定能够找得到，所以其实可以直接使用资源名称。因为podxx.framework中会包含对应的资源文件，可以直接被访问到。
+* 各个pod的桥接文件使用：
+  * 如果pod库B是一个swift和OC混编的，那么在B库中是没法生成B-bridge-header.h文件夹的。所以，如果要在OC中使用swift代码，可以直接使用#import <B/B-Swift.h>,这样就能在里面找到对应的编译成OC的swift类。如果要在swift中使用 OC代码，则可以直接创建一个xx.h的头文件，然后将OC文件的头文件索引放进去，这样在swift项目中就能够直接使用OC文件。
 
+  * 如果两个另一个pod库A的swift文件中需要使用该混编的库B中的OC文件，则使用同样的套路：在A中创建一个xxx.h的OC头文件，然后将B库中的OC文件导入进去，但是要注意是名称，比如：#import "B/HUBManager.h"；如果A中的OC文件要是有B中的Swift文件，则同样导入#import <B/B-Swift.h>，就能访问编译成OC的swift类。
 
+同样这里要注意的是外部的类要是有pod库里的swift，则swift类必须得是public访问权限，如果OC要访问swift类，则swift类必须是@objc public访问权限。
 
 
 
