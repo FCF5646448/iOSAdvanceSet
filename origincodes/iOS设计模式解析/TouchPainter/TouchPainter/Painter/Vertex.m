@@ -9,7 +9,6 @@
 #import "Vertex.h"
 
 @interface Vertex()
-@property (nonatomic, assign) CGPoint location_;
 @end
 
 @implementation Vertex
@@ -28,8 +27,9 @@
 - (id<Mark>) childMarkAtIndex:(NSUInteger) index {
     return nil;
 }
+//这里之所以用[self class]是为了让子类也能够直接继承使用
 - (id) copyWithZone:(NSZone *)zone {
-    Vertex * vertexCopy = [[[self class] allocWithZone:zone] initWithLocation:_location_];
+    Vertex * vertexCopy = [[[self class] allocWithZone:zone] initWithLocation:_location];
     return vertexCopy;
 }
 @end

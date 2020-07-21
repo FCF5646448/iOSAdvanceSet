@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		311528BA24C6683000E547DD /* Dot.m in Sources */ = {isa = PBXBuildFile; fileRef = 311528B924C6683000E547DD /* Dot.m */; };
+		311528BD24C66ABE00E547DD /* Stroke.m in Sources */ = {isa = PBXBuildFile; fileRef = 311528BC24C66ABE00E547DD /* Stroke.m */; };
 		3115C89824C3D27200D0ECB0 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3115C89724C3D27200D0ECB0 /* AppDelegate.m */; };
 		3115C89B24C3D27200D0ECB0 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 3115C89A24C3D27200D0ECB0 /* SceneDelegate.m */; };
 		3115C89E24C3D27200D0ECB0 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 3115C89D24C3D27200D0ECB0 /* ViewController.m */; };
@@ -18,6 +20,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		311528B824C6683000E547DD /* Dot.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Dot.h; sourceTree = "<group>"; };
+		311528B924C6683000E547DD /* Dot.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Dot.m; sourceTree = "<group>"; };
+		311528BB24C66ABE00E547DD /* Stroke.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Stroke.h; sourceTree = "<group>"; };
+		311528BC24C66ABE00E547DD /* Stroke.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Stroke.m; sourceTree = "<group>"; };
 		3115C89324C3D27200D0ECB0 /* TouchPainter.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TouchPainter.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3115C89624C3D27200D0ECB0 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		3115C89724C3D27200D0ECB0 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -87,6 +93,10 @@
 				31B7877B24C518E20008E8A2 /* Mark.h */,
 				31B7877C24C51C400008E8A2 /* Vertex.h */,
 				31B7877D24C51C400008E8A2 /* Vertex.m */,
+				311528B824C6683000E547DD /* Dot.h */,
+				311528B924C6683000E547DD /* Dot.m */,
+				311528BB24C66ABE00E547DD /* Stroke.h */,
+				311528BC24C66ABE00E547DD /* Stroke.m */,
 			);
 			path = Painter;
 			sourceTree = "<group>";
@@ -164,7 +174,9 @@
 				3115C89E24C3D27200D0ECB0 /* ViewController.m in Sources */,
 				3115C89824C3D27200D0ECB0 /* AppDelegate.m in Sources */,
 				31B7877E24C51C400008E8A2 /* Vertex.m in Sources */,
+				311528BA24C6683000E547DD /* Dot.m in Sources */,
 				3115C8A924C3D27300D0ECB0 /* main.m in Sources */,
+				311528BD24C66ABE00E547DD /* Stroke.m in Sources */,
 				3115C89B24C3D27200D0ECB0 /* SceneDelegate.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
