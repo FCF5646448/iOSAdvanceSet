@@ -161,14 +161,73 @@ textLayer.contentsScale = [UIScreen mainScreen].scale;
 ```
 但是真正的使用方式，不是直接使用CATextLayer，因为那太复杂了。考虑考虑继承自UILabel，然后添加一个子图层CATextLayer并重写显示文本的方法，但是这也同样需要重写drawRect方法，同时生成一个缓存区。所以也可以考虑直接使用UIView，重写layerClass方法创建一个CATextLayer。
 
-##### CATransformLayer
+##### CAGradientLayer
+渐变图层，CAGradientLayer是两种或更多颜色平滑渐变。它也使用了硬件加速。
+```
+CAGradientLayer * gradientLayer = [CAGradientLayer layer];
+gradientLayer.frame = self.view.bounds;
+[self.view.layer addSublayer:gradientLayer];
+//设置颜色，colors可以是多种颜色，会均匀分布在layer上面
+gradientLayer.colors = @[( _ bridge id )[UIColor redColor].CGColor,( _ bridge id )[UIColor blueColor].CGColor];
+//颜色位置,表示每个颜色的起始位置
+gradientLayer.locations = @[@0.0,@0.5];
+//设置渐变方向
+gradientLayer.startPoint = CGPointMake(0,0);
+gradientLayer.endPoint = CGPointMake(1,1);
+```
+#### CATiledLayer
+如果一张图片太大，那么对其进行解码读取到内存中将是一件很消耗性能的事情。并且加载的过程会非常慢。其次OpenGL也有一个最大纹理尺寸(大概是4096*4096)。如果你要显示一张比这个尺寸还大的图，则会强制CPU进行处理了，那么就更加消耗性能。
+CATiledLayer将大图分解成小片，然后按需加载。
+```
+{
+    //使用ScrollView滚动CATiledLayer进行加载
+	CATiledLayer * tileLayer = [CATiledLayer layer];
+	tileLayer.frame = CGRectMake(0, 0, 2048, 2048);
+	tileLayer.delegate = self; 
+	[self.scrollView.layer addSublayer:tileLayer];
+	//使用
+	self.scrollView.contentSize = tileLayer.frame.size;
+	tileLayer.contentsScale = [UIScreen mainScreen].scale;
+	[tileLayer setNeedsDisplay];
+}
+//实现drawlayer:incontext:代理
+- (void)drawLayer:(CATiledLayer * )layer inContext:(CGContextRef)ctx {
 
-
-
+	CGRect bounds = CGContextGetClipBoundingBox(ctx); 
+	CGFloat scale = [UIScreen mainScreen].scale;
+	NSInteger x = floor(bounds.origin.x / layer.tileSize.width * scale);
+    NSInteger y = floor(bounds.origin.y / layer.tileSize.height * scale);
+	//
+	NSString * imageName = [NSString stringWithFormat: @"Snowman_%02i_%02i", x, y]; 
+	NSString * imagePath = [[NSBundle mainBundle] pathForResource:imageName ofType:@"jpg"]; 
+	UIImage * tileImage = [UIImage imageWithContentsOfFile:imagePath];
+	//draw tile 
+	UIGraphicsPushContext(ctx); 
+	[tileImage drawInRect:bounds]; 
+	UIGraphicsPopContext();
+}
+//
+```
 
 ### 动画
+#### 隐式动画
+Core Animation假设屏幕上的任何东西都可以做动画，动画需要手动关闭，否则它会一直存在。当改变一个CALayer的可做动画属性时，它并不会立刻在屏幕上体现，而是从旧的值平滑过渡到新的值。这就是**隐式动画**。
+* 事务：Core Animation判断隐式动画执行的类型和持续时间是根据事务的设置来的。这里的事务就是指一系列属性动画集合。它是通过栈来管理每个动画的入栈和出栈。Core Animation在每一次RunLoop周期中都会自动开启一次新的事务。UIView的动画函数实际执行的都是CALayer的动画属性。默认情况下UIView禁用了CALayer的动画属性，只有在UIView执行动画函数时，才会恢复动画属性。
+* 呈现与模型：给CALayer设置的动画属性实际没有立即生效，而是过了一段时间才慢慢过渡生效，但是属性值却是在设置的那一刻就已经生效了。实际上在执行动画的时候是展示层在显示，动画停止的时候是模型层在显示。展示层是模型层的复制品。
 
-### image I/O
+#### 显示动画
+##### 属性动画
+* 基础动画：
+* 关键帧动画：
+
+### 绘制
+#### 性能调优
+
+#### 高效绘制
+
+#### 图像 I/O
+
+#### 图层性能
 
 
 
