@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "Mark.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
 /*划线*/
 @interface Stroke : NSObject <Mark, NSCopying>
 @property (nonatomic, strong) UIColor * color;
@@ -25,5 +23,3 @@ NS_ASSUME_NONNULL_BEGIN
 - (id) copyWithZone:(NSZone *)zone;
 
 @end
-
-NS_ASSUME_NONNULL_END

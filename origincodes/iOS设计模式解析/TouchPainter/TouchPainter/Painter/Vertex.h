@@ -9,8 +9,6 @@
 #import <Foundation/Foundation.h>
 #import "Mark.h"
 
-NS_ASSUME_NONNULL_BEGIN
-
 //顶点
 @interface Vertex : NSObject <Mark, NSCopying>
 
@@ -29,5 +27,3 @@ NS_ASSUME_NONNULL_BEGIN
 
 
 @end
-
-NS_ASSUME_NONNULL_END

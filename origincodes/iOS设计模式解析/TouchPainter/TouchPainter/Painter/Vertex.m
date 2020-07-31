@@ -29,7 +29,7 @@
 }
 //这里之所以用[self class]是为了让子类也能够直接继承使用
 - (id) copyWithZone:(NSZone *)zone {
-    Vertex * vertexCopy = [[[self class] allocWithZone:zone] initWithLocation:_location];
+    Vertex * vertexCopy = [[[self class] allocWithZone:zone] initWithLocation:self.location];
     return vertexCopy;
 }
 @end
