@@ -1,0 +1,13 @@
+project 'AlamofireDemo.xcodeproj'
+
+platform :ios, '10.0'
+
+target 'AlamofireDemo' do
+  use_frameworks!
+
+  pod 'Alamofire'
+
+  # 快速更新
+  # pod install --verbose --no-repo-update
+  # pod update --verbose --no-repo-update
+end
