@@ -319,9 +319,114 @@ print(sum)
   * 子类可以用override重写父类的方法、存储属性； 
   * 被class修饰的类方法，可以被子类override重写，被static修饰的类方法，不允许被override重写。
   * 可以在子类中为父类属性增加属性观察器；
+
 * 多态：父类类型指向子类对象就是多态。在OC中使用runtime实现多态，在C++中，使用虚函数表实现多态。
 
   * 上面类中说到，类内存中前8个字节是用来存储类的类型信息，这8个字节实际指向另一个新的内存区域，这个内存区域的内容存储的是类的类型信息及类的方法地址。
   * 也就是说在编译完成时，每个类的类型信息就基本确定了，然后存储在全局区域。当实例化的时候，会根据类的前8个字节先取出类的类型信息及函数信息，然后调用函数的时候就会调用真正类型的函数。也就是使用的是类似C++的虚函数表的方式实现的多态。
 
 * 协议
+  * 协议中属性，需要标识读写属性。协议可以作为传参使用；
+  * CaseIterable 枚举遵循这个协议，可以实现遍历枚举；
+* Any、AnyObject: Any表示任意类型，AnyObject表示任意类类型；
+* X.self、X.type:  
+  * X.self : 是表示原类型的数据。也就是上述说到的堆内存中首8个字节所指向的空间地址，表示当前对象的真实类型；
+  * X.Type表示当前类型，X.self属于X.Type
+  ```
+  protocol  Runnable {
+        func test() -> Self //返回当前类
+  }
+  class Person : Runnable {
+        required init() { }
+        func test() -> Self {
+            type(of: self).init() //这样才能返回最终的类型,Self返回值必须调用required初始化器。
+        }
+  }
+  class Student : Person {}
+  var stu = Student()
+  stu.test()
+  
+  //注意：以下4张方法最终都是调用init()方法初始化，底层其实都没什么区别。
+  var p0 = Person()	
+  var p1 = Person.self() 
+  var p2 = Person.init()
+  var p3 = Person.self.init()
+  var p4 = type(of: p0).init()
+  
+  //获取类型
+  var pType:Person.Type = Person.self
+  
+  ```
+
+* 错误。
+
+  * 如果函数有可能要抛出错误，则在函数上用**throws**关键字声明。然后使用**try**关键字调用可能会抛出异常的函数。使用do{}catch处理最终抛出的错误。
+  ```
+  enum MyError : Error {
+    	case illegalArg(String)
+    	case outOfBounds(Int, Int)
+    	case outOfMemory
+  } 
+  
+  func divide( _ num1: Int, _ num2: Int) throws -> Int {
+    	if num2 == 0 {
+        	throw MyError(msg: "0不能作为除数")
+    	}
+    	return num1 / num2
+  }
+  
+  do {
+     	let result = try  divide(1,0)
+     	print(result)
+  }catch let MyError.illegalArg(msg){
+    	print("参数错误:", msg)
+  }catch let MyError.outOfBounds(size, index){
+    	print("下标越界:", "size=\(size)", "index=\(index)")
+  }catch let MyError.outOfMemory{
+  		print("内存溢出")
+  }catch {
+   		print("其他错误")
+  }
+  ```
+  * rethrows：表明函数本身不会抛出错误，但是调用闭包参数抛出错误，那么它会将错误向上抛。
+  ```
+  func exec(_ fnc: (Int, Int) throws -> Int, _ num1: Int, _ num2: Int) rethrows {
+        print(try fnc(num1, num2))
+  }
+  
+  try exec(divece,20,20)
+  ```
+* defer: 定义以任何方式在离开代码块之前定义必须要执行的代码。 
+* 泛型：将类型参数化，提高代码复用率，减少代码量；
+```
+func swapValue<T>(_ a: inout T, _ b: inout T) {
+    (a, b) = (b, a)
+}
+
+//假设要将泛型函数传递给某个变量
+var fn: (inout Int, inout Int) -> ()  = swapValue
+var n1 = 10
+var n2 = 20
+fn(&n1, &n2)
+
+//定义一个泛型类型
+class Stack<T> {
+    var elements = [T]()
+    
+    init(first: T) {
+        element.append(first)
+    }
+    func push(_ element: T) {
+        elements.append(element)
+    }
+    func pop() -> T {
+        element.reloveLast()
+    }
+}
+
+//如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
+let stack = Stack(first: 10)
+
+```
+
+	* 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。
