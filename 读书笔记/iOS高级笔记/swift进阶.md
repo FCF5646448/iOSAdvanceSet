@@ -48,7 +48,8 @@ description:  这篇文章主要是重新学习swift
 * 可选项Optional：
   * 可选类型初始值为nil。
   * 空合并运算符 ?? ， a ?? b ， a不为nil,返回a，a为nil,返回b;
-  * guard 提前退出使用。
+  * guard 提前退出使用；
+  * 可选型的本质就是枚举；
 ```
 //遍历数组，将遇到的正数相加，遇到负数或非数字，停止遍历
 var strs = ["10","20","abs","30"]
@@ -398,35 +399,70 @@ print(sum)
   ```
 * defer: 定义以任何方式在离开代码块之前定义必须要执行的代码。 
 * 泛型：将类型参数化，提高代码复用率，减少代码量；
-```
-func swapValue<T>(_ a: inout T, _ b: inout T) {
-    (a, b) = (b, a)
-}
+	```
+	func swapValue<T>(_ a: inout T, _ b: inout T) {
+    	(a, b) = (b, a)
+	}
 
-//假设要将泛型函数传递给某个变量
-var fn: (inout Int, inout Int) -> ()  = swapValue
-var n1 = 10
-var n2 = 20
-fn(&n1, &n2)
+	//假设要将泛型函数传递给某个变量
+	var fn: (inout Int, inout Int) -> ()  = swapValue
+	var n1 = 10
+	var n2 = 20
+	fn(&n1, &n2)
 
-//定义一个泛型类型
-class Stack<T> {
-    var elements = [T]()
+	//定义一个泛型类型
+	class Stack<T> {
+    	var elements = [T]()
     
-    init(first: T) {
-        element.append(first)
-    }
-    func push(_ element: T) {
-        elements.append(element)
-    }
-    func pop() -> T {
-        element.reloveLast()
-    }
-}
+    	init(first: T) {
+        	element.append(first)
+    	}
+    	func push(_ element: T) {
+        	elements.append(element)
+    	}
+    	func pop() -> T {
+        	element.reloveLast()
+    	}
+	}
 
-//如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
-let stack = Stack(first: 10)
+	//如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
+	let stack = Stack(first: 10)
+	```
 
-```
-
-	* 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。
+	* 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。   
+	* 使用some关键字声明不透明类型, some限制只能返回一种类型
+	```
+	protocol Runnable {
+        associateType Speed
+        var speed: Speed {get}
+	}
+	class Person : Runnable {
+        var speed: Double {0.0}
+	}
+	class Car : Runnable {
+        var speed: Int {0}
+	}
+	
+	// 如果这里只返回1种类型，可以加上some限制
+	func get1(_ type: Int) -> some Runnable {
+        return Car()
+	}
+	
+	func get(_ type: Int) -> Runnable {
+        if type == 0 {
+            return Person()
+        }
+        return Car()
+	}
+	
+	var r1 = get(0)
+	var r2 = get(1)
+	
+	```
+* 汇编学习String
+	* String： 字面量一旦字符串的长度小于等于15，那么字符串直接存储在16个字节的变量内存里面，类似OC的tag pointer。如果长度超过了15，则存储在常量区；在使用append函数时，如果append之后字符串长度超过了15个字符，则会调用malloc函数开辟堆空间，如果长度依旧小于15，则还是直接存放在变量内存里面。
+	```
+	let str = "0123456789ABCDE" //存储在str的地址里面
+	let str1 = "0123456789ABCDEF" //存储在常量区
+	str1.append("G")			// 存储在堆空间
+	```
