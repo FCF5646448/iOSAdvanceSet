@@ -399,19 +399,19 @@ print(sum)
   ```
 * defer: 定义以任何方式在离开代码块之前定义必须要执行的代码。 
 * 泛型：将类型参数化，提高代码复用率，减少代码量；
-	```
-	func swapValue<T>(_ a: inout T, _ b: inout T) {
+  ```
+  func swapValue<T>(_ a: inout T, _ b: inout T) {
     	(a, b) = (b, a)
-	}
-
-	//假设要将泛型函数传递给某个变量
-	var fn: (inout Int, inout Int) -> ()  = swapValue
-	var n1 = 10
-	var n2 = 20
-	fn(&n1, &n2)
-
-	//定义一个泛型类型
-	class Stack<T> {
+  }
+  
+  //假设要将泛型函数传递给某个变量
+  var fn: (inout Int, inout Int) -> ()  = swapValue
+  var n1 = 10
+  var n2 = 20
+  fn(&n1, &n2)
+  
+  //定义一个泛型类型
+  class Stack<T> {
     	var elements = [T]()
     
     	init(first: T) {
@@ -423,42 +423,54 @@ print(sum)
     	func pop() -> T {
         	element.reloveLast()
     	}
-	}
+  }
+  
+  //如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
+  let stack = Stack(first: 10)
+  ```
 
-	//如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
-	let stack = Stack(first: 10)
-	```
-
-	* 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。   
-	* 使用some关键字声明不透明类型, some限制只能返回一种类型
-	```
-	protocol Runnable {
+  * 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。   
+  * 使用some关键字声明不透明类型, some限制只能返回一种类型
+  ```
+  protocol Runnable {
         associateType Speed
         var speed: Speed {get}
-	}
-	class Person : Runnable {
+  }
+  class Person : Runnable {
         var speed: Double {0.0}
-	}
-	class Car : Runnable {
+  }
+  class Car : Runnable {
         var speed: Int {0}
-	}
-	
-	// 如果这里只返回1种类型，可以加上some限制
-	func get1(_ type: Int) -> some Runnable {
+  }
+  
+  // 如果这里只返回1种类型，可以加上some限制
+  func get1(_ type: Int) -> some Runnable {
         return Car()
-	}
-	
-	func get(_ type: Int) -> Runnable {
+  }
+  
+  func get(_ type: Int) -> Runnable {
         if type == 0 {
             return Person()
         }
         return Car()
-	}
-	
-	var r1 = get(0)
-	var r2 = get(1)
-	
-	```
+  }
+  
+  var r1 = get(0)
+  var r2 = get(1)
+  
+  // 使用some解包可选类型
+  var age: Int? = 10
+  age = 20
+  age = nil
+  
+  switch age{
+  case let .some(v):
+      print("1",v)
+  case .none:
+  	print("2")
+  }
+  
+  ```
 * 汇编学习String
 	* String： 字面量一旦字符串的长度小于等于15，那么字符串直接存储在16个字节的变量内存里面，类似OC的tag pointer。如果长度超过了15，则存储在常量区；在使用append函数时，如果append之后字符串长度超过了15个字符，则会调用malloc函数开辟堆空间，如果长度依旧小于15，则还是直接存放在变量内存里面。
 	```
@@ -466,3 +478,29 @@ print(sum)
 	let str1 = "0123456789ABCDEF" //存储在常量区
 	str1.append("G")			// 存储在堆空间
 	```
+
+* 运算符
+	* 溢出运算符：&+、&-、&*。溢出的话，会重新循环进这个范围。
+	```
+	// UInt8 取值范围在0~255
+	var v: UInt8 = UInt8.max
+	v += 1 //这里就会产生溢出
+	v = v &+ 1 //溢出运算符，溢出的话，会重新回到0，
+	```
+	* 运算符重载：类、结构体、枚举都可以实现运算符重载. （重载 意味着函数名相同，但是功能不一样）
+	```
+	struct Point {
+        var x = 0, y = 0
+        static func +(p1: Point, p2: Point) -> Point {
+    		Point(x: p1.x + p2.x, y: p1.y + p2.y)
+    	}
+	}
+	
+		
+	
+	var p1 = Point(x: 10, y: 20)
+	var p2 = Point(x: 11, y: 22)
+	
+	
+	```
+	* 
