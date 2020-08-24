@@ -655,21 +655,111 @@ print(sum)
 	}
 	```
 	* where 可以使用where为模式匹配增加匹配条件。
+* 字面量
+	* Swift自带类型之所以可以通过修改字面量初始化，是因为它们遵守了对应的协议
+	```
+	Bool: ExpressibleByBooleanLiteral
+	Int: ExpressibleByIntegerLiteral
+	Float、Double: ExpressibleByInterLiteral、ExpressibleByFloatLiteral //所以Float和Double可以使用整型和浮点型进行字面量初始化
+	Dictionary: ExpressibleByDictionaryLiteral
+	String: ExpressibleByStringLiteral
+	Array、Set: ExpressibleByArrayLiteral
+	Optional: ExpressibleByNilLiteral
+	```
+	eg1: 使Int遵守Bool类型协议，使Int可以使用Bool进行字面量初始化
+	```
+	extension Int: ExpressibleByBooleanLiteral {
+        public init(booleanLiteral value: Bool) {
+            self = value ? 1 : 0
+        }
+	}
+	var num: Int = false
+	print(num) //这个时候num是bool类型
+	```
+	eg2: 使用字面量初始化自定义的类型
+	```
+	class Student : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, CustomStringConvertible {
+        var name: String = ""
+        var score: Int = 0
+        required init(floatLiteral value: Double) { self.score = value }
+        required init(integerLiteral value: Int) { self.score = value }
+        required init(stringLiteral value: String) { self.name = value }
+        required init(unicodeScalarLiteral value: String) { self.name = value }
+        required init(extendedGraphemeClusterLiteral value: String) { self.name = value }
+        var description: Sting { "name=\(name), score=\(score)"}
+	}
+	var stu: Student = 90
+	print(stu)
+	stu = 98.5
+	pritn(stu)
+	stu = "Jack"
+	print(stu)
+	```
+	eg3: 字面量初始化结构体
+	```
+	stuct Point {
+        var x = 0.0, y = 0.0
+	}
+	extension Point : ExpressibleByArrayLiteral、ExpressibleByDictionaryLiteral {
+        init(arrayLiteral elements: Double...) {
+            guard elements.count > 0 else { return }
+            self.x = elements[0]
+            guard elements.count > 1 else { return }
+            self.y = elements[1]
+        }
+        init(dictionaryLiteral elements: (String, Double)...) {
+            for (k, v) in elements {
+                if k == "x" { self.x = v }
+                else if k == "y" { self.y = v }
+            }
+        }
+	}
+	var p: Point = [10.5, 20.5]
+	pritn(p)
+	p = ["x" : 11, "y" : 22]
+	pritn(p)
+	```
+	* 可以通过typealias修改字面量的默认类型
+	```
+	typealias FloatLiteralType = Float
+	typealias IntegerLiteralType = UInt8
+	var age = 10 //UInt8
+	var height = 1.68 //Float
+	```
+
+* 代码风格与习惯
+  * 注释： // MARK: 、// MARK: -、// TODO:、// FIXME:
+  * #warning //如果要更加明显地注释，可以使用#warning, eg: #warning("undo")
+  * fetalError() //如果不想写注释，或者遇到暂时不想实现的方法，则可以使用fetalError()先让程序崩溃
+* 程序入口
+  程序入口其实就是在Appdelegate的默认的@UIApplicationMain标记里。
+  * 自定义main程序入口
+  如果要自定义main程序入口，第一步需要把@UIApplicationMain标记注释的，然后重新创建一个main.swift文件。然后重写以下代码：
+  ```
+  import UIKit
+  //自定义UIApplication 这一步是可选的。
+  class MyApplication: UIApplication {}
+  UIApplicationMain(CommandLine.argc,
+  					CommandLine.unsafeArgv,
+  					NSStringFromClass(MyApplication.self),
+  					NSStringFromClass(AppDelegate.self))
+  ```
 * OC 到 swift：
-	* 注释： // MARK: 、// MARK: -、// TODO:、// FIXME:
-	* 条件编译：
-		* 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
-		* log 条件打印
-		```
-		func log<T>(_ msg: T, 
-		file: NSStrign = #file, 
-		line: Int = #line, 
-		fn: String = #function) {
+  * 条件编译：
+  	* 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
+  	* log 条件打印
+  	```
+  	func log<T>(_ msg: T, 
+  	file: NSStrign = #file, 
+  	line: Int = #line, 
+  	fn: String = #function) {
             #if DEBUG
             let prefix = "\(file.lastPathComponent)_\(line)_\(fn):"
             print(prefix, msg)
             #endif
-		}
-		```
-	
+  	}
+  	```
+  * 如果要将类中的某个成员变量暴露给OC，则在成员变量前面加上@objc，如果要将Swift的所有成员都暴露给OC，则给类加上 @objcMembers, 这样就不需要每个成员变量前面都加上@objc
 
+
+  
