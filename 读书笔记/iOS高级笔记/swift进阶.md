@@ -556,6 +556,7 @@ print(sum)
     }
     
     ```
+
 * 内存管理
   swift 也采用基于引用计数的ARC内存管理方案(针对堆空间)。swift的ARC有3种
   * 强引用：默认情况下，都是强引用，strong；
@@ -655,6 +656,7 @@ print(sum)
   }
   ```
   * where 可以使用where为模式匹配增加匹配条件。
+
 * 字面量
   * Swift自带类型之所以可以通过修改字面量初始化，是因为它们遵守了对应的协议
   ```
@@ -729,8 +731,9 @@ print(sum)
 
 * 代码风格与习惯
   * 注释： // MARK: 、// MARK: -、// TODO:、// FIXME:
-  * #warning //如果要更加明显地注释，可以使用#warning, eg: #warning("undo")
+  * warning //如果要更加明显地注释，可以使用#warning, eg: #warning("undo")
   * fetalError() //如果不想写注释，或者遇到暂时不想实现的方法，则可以使用fetalError()先让程序崩溃
+
 * 程序入口
   程序入口其实就是在Appdelegate的默认的@UIApplicationMain标记里。
   * 自定义main程序入口
@@ -744,6 +747,7 @@ print(sum)
   					NSStringFromClass(MyApplication.self),
   					NSStringFromClass(AppDelegate.self))
   ```
+
 * OC 到 swift：
   * 条件编译：
     * 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
@@ -808,8 +812,171 @@ print(sum)
   * 多行String使用三引号："""xxx""" 包裹。
 
 * 多线程
-	* Dispatch_once：swift代码里已经废弃了Dispatch_once. 而是直接用static。static是全局变量，只会初始化一次，且默认就是lazy。其内部其实使用了Dispatch_once。
+	* 使用DispatchWokItem包装任务。DispatchWorkItem可以使用cancel取消。
+	```
+	public typealias Task = ()->Void
+	public struct Async {
+        public static func async(_ task: @escaping Task) {
+        	_async(task)
+		}
+		public static func async(_ task: @escaping Task, 
+		_ mainTask: @escaping Task) {
+        	_async(task, mainTask)
+		}
+		private static func _async(_ task: @escaping Task, 
+		_ mainTask: Task? = nil) {
+        	let item = DispatchWorkItem(block: task)
+        	DispatchQueue.global().async(execute: item)
+        	if let main = mainTask {
+            	item.notify(queue: DispatchQueue.main, execute: main)
+        	}
+		}
+		
+		@discardableResult
+		private static func _aysncDelay(_ seconds: Double, 
+		_ task: @secaping Task, 
+		_ mainTask: @secaping Task? = nil) -> DispatchWorkItem {
+            let item = DispatchWorkItem(block: task)
+            DispatchQueue.global().asyncAfter(deadline: DispatchTime.now() + seconds, execute: item)
+            if let main = mainTask {
+                item.notify(queue: DispatchQueue.main, execute: main)
+            }
+		}
+		
+		@discardableResult
+		public static func asyncDelay(_ seconds: Double, 
+		_ task: @escaping Task) -> DispatchWorkItem {
+            return _aysncDelay(seconds, task)
+		}
+		
+		@discardableResult 
+		public static func asyncDelay(_ seconds: Double,
+        _ task: @escaping Task, 
+		_ mainTask: @escaping Task)
+		return _aysncDelay(seconds, task, mainTask)
+	}
+	```
+	* Dispatch_once：swift代码里已经废弃了Dispatch_once. 而是直接用static。static是全局变量，只会初始化一次，且默认就是lazy。其内部其实使用了Dispatch_once，所以**它也是线程安全的**。 所以**static可以保证线程安全和懒加载**
+	```
+	//单例
+	struct Single {
+		static let share = Single()
+        private init() {
+        }
+	}
+	```
 	* 加锁：线程安全
+	```
+	public struct Cache {
+		//分析：data是一个全局变量，永远只有一份内存，如果有多个线程同时调用set方法，那么就会产生数据安全问题。
+        private static var data = [String: Any]()
+        
+        //01信号量, value 其实可以认为表示允许多少条线程同时访问
+        private static var lock = DispatchSamephone(value: 1)
+        //02 Lock, 递归调用会产生死锁
+        private static var lock = NSLock()
+        //03 递归锁
+        private static var lock = NSRecursiveLock()
+        
+        public static func get(_ key: String) -> Any? {
+            data[key]
+        }
+        public static func set(_ key: String, _ value: Any) {
+        	//01信号量
+        	lock.wait()
+        	defer { lock.signal() }
+        	//02 Lock
+        	lock.lock()
+        	defer { lock.unlock() }
+        	//03 递归锁
+        	lock.lock()
+        	defer { lock.unlock() }
+        	
+            data[key] = value
+        }
+	}
+	
+	```
 
+### 高阶
 
-
+* 函数式编程
+	* Array的常见操作
+		* map: 遍历Array每个元素，block里可以对元素单独处理，最终返回新的Array。返回结果的元素类型就是block里新创建的类型；
+		* filter: 遍历Array每个元素，block里添加条件语句，最终返回符合条件的新Array；
+		* reduce: 遍历Array每一个元素，block里会有两个参数，第一个参数是上一次遍历的结果，第二个参数是当前遍历元素。最后返回一个最终结果值；
+		* flatMap: 和map功能一样，只是会把二维数组压成一维数组；
+		* first: 查找第一个满足条件的元素，block是一个条件语句；
+		* firstIndex: 查找第一个满足条件的元素的索引，block是一个条件语句；
+	```
+	var arr = [1,2,3]
+	_ = arr.map{ $0 * 2 }
+	_ = arr.map{ "abc_\($0)"}
+	//传入函数
+	func blockf = (_ element: Int)->String { "abc_\(element)" }
+	_ = arr.map(blockf)
+	// 处理可选型
+	var score: Int? = 98
+	//老方法
+	var str1 = score != nil ? "score is \(score!)" : "no_score"
+	//新方法
+	var str2 = score.map{ "score is \($0)" } ?? "no_score"
+	
+	/*******************************************************/
+	_ = arr.filter{ $0 % 2 == 0 }
+	/*******************************************************/
+	// $0 是上一次遍历返回的结果，初始值是传进来的那个0.$1是每次遍历的元素
+	_ = arr.resuce(0){ $0 + $1 } // _ = arr.reduce(0,+)
+	/*******************************************************/
+	// flatMap 可选项处理
+	var fmt = DateFormatter()
+	fmt.dateFormat = "yyyy-MM-dd"
+	var str: String? = "2011-11-11" //可能字符串为nil
+	//老方法
+	var date1 = str != nil ? fmt.date(from: str!) : nil
+	// 新方法
+	var date2 = str.flatMap(fmt.date)
+	/*******************************************************/
+	// 重要 —— lazy 优化
+	let arr = [1,2,3]
+	let result = arr.map{
+        (i: Int) -> Int in
+        print("mapping \(i)")
+        return i * 2
+	}
+	print("begin---------")
+	pirnt("mapped", result[0])
+	pirnt("mapped", result[1])
+	pirnt("mapped", result[3])
+	print("end-----------")
+	
+	/*
+	得到的结果：
+	mapping 1
+	mapping 2
+	mapping 3
+	begin---------
+	mapped 2
+	mapped 4
+	mapped 6
+	end-----------
+	解析：也就是说，这里begin之前就会执行一次，然后后续使用的时候，会再调用一次。假设有1000个元素，那么就会非常耗时。
+	*/
+	let result = arr.lazy.map{
+        (i: Int) -> Int in
+        print("mapping \(i)")
+        return i * 2
+	}
+	print("begin---------")
+	pirnt("mapped", result[1])
+	print("end-----------")
+	/*
+	得到的结果：
+	
+	begin---------
+	mapping 2
+	mapped 4
+	end-----------
+	解析：也就是说，这里begin之前就不会执行，然后后续使用的时候，使用到哪个函数，那个函数才会具体执行。
+	*/
+	```
