@@ -282,6 +282,30 @@ print(sum)
     * mutating：值类型（结构体、枚举）在默认情况下，其值类型的属性不能被自身实例方法修改，如果要允许这种修改，则需要加上mutating关键字；
     * @discardableResult 表示可以忽略返回值；
     * 使用subscript可以给任意类型添加下标功能。实例方法和类方法都可以定义下标；
+    * @escaping：逃逸闭包。
+    	* 非逃逸闭包、逃逸闭包，一般都是当做参数传递给函数；
+    	* 非逃逸闭包：闭包调用发生在函数结束之前，闭包调用在函数作用域内；
+     * 逃逸闭包：闭包有可能在函数结束后调用，闭包调用逃离了函数作用域。
+          ```
+            	typealias Fn = () -> ()
+            	//非逃逸
+            	func test1(_ fn: Fn) {
+            fn()
+            	}
+            	//逃逸闭包
+            	var gFn: Fn?
+            	func test2(_ fn: @escaping Fn) {
+            gFn = fn
+            	}
+            	// 多线程下的逃逸闭包。因为fn()可能是在test3函数调用完成后才调用。而且async源码实际也是一个逃逸闭包。所以async闭包里使用了实例成员，编译器会强制要求明确写self。
+            	func test3(_ fn: @escaping Fn) {
+            DispatchQueue.global().async {
+                fn()
+            }
+            	}
+          ```
+
+    	```
 
 * 属性：swift中的属性可以分为实例属性和类型属性，实例属性又可以分为两大类：存储属性和计算属性。类型属性则是类的属性，类似于类方法。
   ```
@@ -399,19 +423,19 @@ print(sum)
   ```
 * defer: 定义以任何方式在离开代码块之前定义必须要执行的代码。 
 * 泛型：将类型参数化，提高代码复用率，减少代码量；
-	```
-	func swapValue<T>(_ a: inout T, _ b: inout T) {
+  ```
+  func swapValue<T>(_ a: inout T, _ b: inout T) {
     	(a, b) = (b, a)
-	}
-
-	//假设要将泛型函数传递给某个变量
-	var fn: (inout Int, inout Int) -> ()  = swapValue
-	var n1 = 10
-	var n2 = 20
-	fn(&n1, &n2)
-
-	//定义一个泛型类型
-	class Stack<T> {
+  }
+  
+  //假设要将泛型函数传递给某个变量
+  var fn: (inout Int, inout Int) -> ()  = swapValue
+  var n1 = 10
+  var n2 = 20
+  fn(&n1, &n2)
+  
+  //定义一个泛型类型
+  class Stack<T> {
     	var elements = [T]()
     
     	init(first: T) {
@@ -423,46 +447,319 @@ print(sum)
     	func pop() -> T {
         	element.reloveLast()
     	}
-	}
+  }
+  
+  //如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
+  let stack = Stack(first: 10)
+  ```
 
-	//如果初始化函数里声明了类型，那么就不要使用<T>标识具体类型。
-	let stack = Stack(first: 10)
-	```
-
-	* 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。   
-	* 使用some关键字声明不透明类型, some限制只能返回一种类型
-	```
-	protocol Runnable {
+  * 关联类型 associatedtype , 给协议中用到的类型定义一个占位名称。遵守协议的时候，可以使用typelias 先设定真实类型，不过其实也可以省略，直接设置具体类型。   
+  * 使用some关键字声明不透明类型, some限制只能返回一种类型
+  ```
+  protocol Runnable {
         associateType Speed
         var speed: Speed {get}
-	}
-	class Person : Runnable {
+  }
+  class Person : Runnable {
         var speed: Double {0.0}
-	}
-	class Car : Runnable {
+  }
+  class Car : Runnable {
         var speed: Int {0}
-	}
-	
-	// 如果这里只返回1种类型，可以加上some限制
-	func get1(_ type: Int) -> some Runnable {
+  }
+  
+  // 如果这里只返回1种类型，可以加上some限制
+  func get1(_ type: Int) -> some Runnable {
         return Car()
-	}
-	
-	func get(_ type: Int) -> Runnable {
+  }
+  
+  func get(_ type: Int) -> Runnable {
         if type == 0 {
             return Person()
         }
         return Car()
+  }
+  
+  var r1 = get(0)
+  var r2 = get(1)
+  
+  // 使用some解包可选类型
+  var age: Int? = 10
+  age = 20
+  age = nil
+  
+  switch age{
+  case let .some(v):
+      print("1",v)
+  case .none:
+  	print("2")
+  }
+  
+  ```
+* 汇编学习String
+  * String： 字面量一旦字符串的长度小于等于15，那么字符串直接存储在16个字节的变量内存里面，类似OC的tag pointer。如果长度超过了15，则存储在常量区；在使用append函数时，如果append之后字符串长度超过了15个字符，则会调用malloc函数开辟堆空间，如果长度依旧小于15，则还是直接存放在变量内存里面。
+  ```
+  let str = "0123456789ABCDE" //存储在str的地址里面
+  let str1 = "0123456789ABCDEF" //存储在常量区
+  str1.append("G")			// 存储在堆空间
+  ```
+
+* 运算符
+  * 溢出运算符：&+、&-、&*。溢出的话，会重新循环进这个范围。
+  ```
+  // UInt8 取值范围在0~255
+  var v: UInt8 = UInt8.max
+  v += 1 //这里就会产生溢出
+  v = v &+ 1 //溢出运算符，溢出的话，会重新回到0，
+  ```
+  * 运算符重载：类、结构体、枚举都可以实现运算符重载. （重载 意味着函数名相同，但是功能不一样）
+  ```
+  struct Point {
+        var x = 0, y = 0
+        static func +(p1: Point, p2: Point) -> Point {
+    		Point(x: p1.x + p2.x, y: p1.y + p2.y)
+    	}
+  }
+  
+  	
+  
+  var p1 = Point(x: 10, y: 20)
+  var p2 = Point(x: 11, y: 22)
+  
+  
+  ```
+### 项目开发
+* 访问权限控制：swift一共提供了5种访问权限控制。下面由高到低
+  * open：允许在定义实体的模块(模块就指一个target)、其他模块中访问，允许其他模块进行继承、重写。但是**open只能用在类、类成员上，不能用在实例成员、结构体、枚举上**；
+
+  * public：允许在定义实体的模块(也就是项目所有文件)、其他模块(包括其他target)中访问，但是不允许其他模块进行继承、重写；比如，我们自己的pod库，如果想要其他pod库访问，则必须显示写清楚public。
+
+  * internal：只允许在定义实体的模块中访问，不允许在其他模块中访问；**系统默认权限**
+
+  * fileprivate：只允许在定义实体的源文件中访问，也就是说只允许在当前文件中访问；
+
+  * private：只允许在定义实体的封闭声明中访问，也就是在{}内允许访问；比如private定义的类在全局作用域里，则表明在当前文件内都可以访问。扩展如果没有另外设置权限，则整个扩展则就默认是原类的访问权限。
+
+    ```
+    //这里private定义在全局作用域里，所以表明它在当前文件实体内都可以访问。所以这里即使person的作用域级别小于Student，也仍然不会报错，因为此时private和fileprivate的作用域是一样的。
+  private class Person{}
+    fileprivate class Student : Person {}
+    
+    // 这里将上面函数放到class内部，那么private的作用域就是在Test{}内部，fileprivate则是当前文件，相当于子类作用域大于父类作用域，所以这样是会报错的。
+    class Test {
+        private class Person{}
+    	fileprivate class Student : Person {}
+    }
+    
+    //这里private(set)表明age的set权限是private，所以外面只能get到age的值，不能对age进行set操作。
+    class Person {
+        private(set) var age = 10
+    }
+    
+    ```
+* 内存管理
+  swift 也采用基于引用计数的ARC内存管理方案(针对堆空间)。swift的ARC有3种
+  * 强引用：默认情况下，都是强引用，strong；
+  * 弱引用：通过weak定义弱引用；但是swift中，
+    * 弱引用必须是可选类型；
+    * 使用var修饰；
+    * 实例销毁后，ARC会自动将弱引用设置为nil；
+    * 另外ARC自动给弱引用设置nil时，是不会触发属性观察器的；
+  * 无主引用：通过unowned修饰。
+    * 不会产生强引用，非可选类型，
+    * 实例销毁后仍然存储着实例的内存地址。类似于OC的unsafe_unretained。所以在实例销毁后访问无主引用，会产生野指针错误；
+  * 循环引用：weak、unowned都能解决循环引用的问题，unowned要比weak少一些性能消耗。
+    * 在生命周期中可能会变为nil，使用weak；
+
+    * 初始化赋值后再也不会变为nil，使用unowned； 
+
+* 模式匹配
+	* 枚举case模式：if case 语句等价于只有一个case的switch语句。
+	```
+	let age = 2
+	// 老式写法
+	if age >= 0 && age <= 9 {
+        print("匹配成功")
+	}
+	//if case 匹配。注意这里的=不是赋值的意思，而是匹配的意思
+	if case 0...9 = age {
+        print("匹配成功")
+	}
+	// guard 样式
+	guard case 0...9 = age else {return}
+	print("匹配成功")
+	
+	// for 循环里使用case
+	let ages: [Int?] = [2,3,nil,5]
+	for case nil in ages {
+        print("有nil值")
+        break
+	}
+	let points = [(1,0),(2,1),(3,0)]
+	for case let (x, 0) in points { //匹配y为0的point 
+        print(x)
 	}
 	
-	var r1 = get(0)
-	var r2 = get(1)
+	```
+	* 自定义表达式模式。可以通过重载运算符~=，自定义表达式模式的匹配规则。
+	```
+	struct Student {
+        var score =0, name = ""
+        static func ~= (pattern: Int, value: Studnt) -> Bool { value.score >= pattern }
+        static func ~= (pattern: CloseRange<Int>, value: Student) -> Bool { pattern.contains(value.score) }
+        static func ~= (pattern: Range<Int>, value: Student) -> Bool { pattern.contains(value.score) }
+	}
 	
+	var stu = Student(score: 75, name: "jack")
+	switch stu {
+    case 100: print(">= 100")
+    case 90: print(">= 90")
+    case 80..<90: print("[80, 90]")
+    case 60...79: print("[60, 79]")
+    case 0: print(">= 0")
+    default: break
+	}
+	
+	// 字符串前后缀匹配
+	func hasPrefix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasPrefix(prefix) } }
+	func hasSuffix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasSuffix(prefix) } }
+	extension String {
+        static func ~=(pattern: ((String) -> Bool, value: String) -> Bool {
+            pattern(value)
+        }
+	}
+	
+	var str = "123456"
+	switch str {
+    case hasPrefix("123"), hasSuffix("456"):
+        print("以123开头")
+        pritn("以456结尾")
+    default: break
+	}
+	
+	//eg: 奇偶数匹配
+	func isEvent(_ i: Int) -> Bool { i % 2 == 0 }
+	func isOdd(_ i: Int) -> Bool { i % 2 != 0 }
+	extension Int {
+        static func ~=(pattern: (Int) -> Bool, value: Int) -> Bool {
+            pattern(value)
+        }
+	}
+	
+	var age = 9
+	switch age {
+    case isEvent:
+        print(age, "是个偶数")
+    case isOdd:
+    	print(age, "是个奇数")
+    default: break
+	}
 	```
-* 汇编学习String
-	* String： 字面量一旦字符串的长度小于等于15，那么字符串直接存储在16个字节的变量内存里面，类似OC的tag pointer。如果长度超过了15，则存储在常量区；在使用append函数时，如果append之后字符串长度超过了15个字符，则会调用malloc函数开辟堆空间，如果长度依旧小于15，则还是直接存放在变量内存里面。
+	* where 可以使用where为模式匹配增加匹配条件。
+* 字面量
+	* Swift自带类型之所以可以通过修改字面量初始化，是因为它们遵守了对应的协议
 	```
-	let str = "0123456789ABCDE" //存储在str的地址里面
-	let str1 = "0123456789ABCDEF" //存储在常量区
-	str1.append("G")			// 存储在堆空间
+	Bool: ExpressibleByBooleanLiteral
+	Int: ExpressibleByIntegerLiteral
+	Float、Double: ExpressibleByInterLiteral、ExpressibleByFloatLiteral //所以Float和Double可以使用整型和浮点型进行字面量初始化
+	Dictionary: ExpressibleByDictionaryLiteral
+	String: ExpressibleByStringLiteral
+	Array、Set: ExpressibleByArrayLiteral
+	Optional: ExpressibleByNilLiteral
 	```
+	eg1: 使Int遵守Bool类型协议，使Int可以使用Bool进行字面量初始化
+	```
+	extension Int: ExpressibleByBooleanLiteral {
+        public init(booleanLiteral value: Bool) {
+            self = value ? 1 : 0
+        }
+	}
+	var num: Int = false
+	print(num) //这个时候num是bool类型
+	```
+	eg2: 使用字面量初始化自定义的类型
+	```
+	class Student : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, CustomStringConvertible {
+        var name: String = ""
+        var score: Int = 0
+        required init(floatLiteral value: Double) { self.score = value }
+        required init(integerLiteral value: Int) { self.score = value }
+        required init(stringLiteral value: String) { self.name = value }
+        required init(unicodeScalarLiteral value: String) { self.name = value }
+        required init(extendedGraphemeClusterLiteral value: String) { self.name = value }
+        var description: Sting { "name=\(name), score=\(score)"}
+	}
+	var stu: Student = 90
+	print(stu)
+	stu = 98.5
+	pritn(stu)
+	stu = "Jack"
+	print(stu)
+	```
+	eg3: 字面量初始化结构体
+	```
+	stuct Point {
+        var x = 0.0, y = 0.0
+	}
+	extension Point : ExpressibleByArrayLiteral、ExpressibleByDictionaryLiteral {
+        init(arrayLiteral elements: Double...) {
+            guard elements.count > 0 else { return }
+            self.x = elements[0]
+            guard elements.count > 1 else { return }
+            self.y = elements[1]
+        }
+        init(dictionaryLiteral elements: (String, Double)...) {
+            for (k, v) in elements {
+                if k == "x" { self.x = v }
+                else if k == "y" { self.y = v }
+            }
+        }
+	}
+	var p: Point = [10.5, 20.5]
+	pritn(p)
+	p = ["x" : 11, "y" : 22]
+	pritn(p)
+	```
+	* 可以通过typealias修改字面量的默认类型
+	```
+	typealias FloatLiteralType = Float
+	typealias IntegerLiteralType = UInt8
+	var age = 10 //UInt8
+	var height = 1.68 //Float
+	```
+
+* 代码风格与习惯
+  * 注释： // MARK: 、// MARK: -、// TODO:、// FIXME:
+  * #warning //如果要更加明显地注释，可以使用#warning, eg: #warning("undo")
+  * fetalError() //如果不想写注释，或者遇到暂时不想实现的方法，则可以使用fetalError()先让程序崩溃
+* 程序入口
+  程序入口其实就是在Appdelegate的默认的@UIApplicationMain标记里。
+  * 自定义main程序入口
+  如果要自定义main程序入口，第一步需要把@UIApplicationMain标记注释的，然后重新创建一个main.swift文件。然后重写以下代码：
+  ```
+  import UIKit
+  //自定义UIApplication 这一步是可选的。
+  class MyApplication: UIApplication {}
+  UIApplicationMain(CommandLine.argc,
+  					CommandLine.unsafeArgv,
+  					NSStringFromClass(MyApplication.self),
+  					NSStringFromClass(AppDelegate.self))
+  ```
+* OC 到 swift：
+  * 条件编译：
+  	* 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
+  	* log 条件打印
+  	```
+  	func log<T>(_ msg: T, 
+  	file: NSStrign = #file, 
+  	line: Int = #line, 
+  	fn: String = #function) {
+            #if DEBUG
+            let prefix = "\(file.lastPathComponent)_\(line)_\(fn):"
+            print(prefix, msg)
+            #endif
+  	}
+  	```
+  * 如果要将类中的某个成员变量暴露给OC，则在成员变量前面加上@objc，如果要将Swift的所有成员都暴露给OC，则给类加上 @objcMembers, 这样就不需要每个成员变量前面都加上@objc
+
+
+  
