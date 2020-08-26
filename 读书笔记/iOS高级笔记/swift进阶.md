@@ -573,112 +573,112 @@ print(sum)
     * 初始化赋值后再也不会变为nil，使用unowned； 
 
 * 模式匹配
-	* 枚举case模式：if case 语句等价于只有一个case的switch语句。
-	```
-	let age = 2
-	// 老式写法
-	if age >= 0 && age <= 9 {
+  * 枚举case模式：if case 语句等价于只有一个case的switch语句。
+  ```
+  let age = 2
+  // 老式写法
+  if age >= 0 && age <= 9 {
         print("匹配成功")
-	}
-	//if case 匹配。注意这里的=不是赋值的意思，而是匹配的意思
-	if case 0...9 = age {
+  }
+  //if case 匹配。注意这里的=不是赋值的意思，而是匹配的意思
+  if case 0...9 = age {
         print("匹配成功")
-	}
-	// guard 样式
-	guard case 0...9 = age else {return}
-	print("匹配成功")
-	
-	// for 循环里使用case
-	let ages: [Int?] = [2,3,nil,5]
-	for case nil in ages {
+  }
+  // guard 样式
+  guard case 0...9 = age else {return}
+  print("匹配成功")
+  
+  // for 循环里使用case
+  let ages: [Int?] = [2,3,nil,5]
+  for case nil in ages {
         print("有nil值")
         break
-	}
-	let points = [(1,0),(2,1),(3,0)]
-	for case let (x, 0) in points { //匹配y为0的point 
+  }
+  let points = [(1,0),(2,1),(3,0)]
+  for case let (x, 0) in points { //匹配y为0的point 
         print(x)
-	}
-	
-	```
-	* 自定义表达式模式。可以通过重载运算符~=，自定义表达式模式的匹配规则。
-	```
-	struct Student {
+  }
+  
+  ```
+  * 自定义表达式模式。可以通过重载运算符~=，自定义表达式模式的匹配规则。
+  ```
+  struct Student {
         var score =0, name = ""
         static func ~= (pattern: Int, value: Studnt) -> Bool { value.score >= pattern }
         static func ~= (pattern: CloseRange<Int>, value: Student) -> Bool { pattern.contains(value.score) }
         static func ~= (pattern: Range<Int>, value: Student) -> Bool { pattern.contains(value.score) }
-	}
-	
-	var stu = Student(score: 75, name: "jack")
-	switch stu {
+  }
+  
+  var stu = Student(score: 75, name: "jack")
+  switch stu {
     case 100: print(">= 100")
     case 90: print(">= 90")
     case 80..<90: print("[80, 90]")
     case 60...79: print("[60, 79]")
     case 0: print(">= 0")
     default: break
-	}
-	
-	// 字符串前后缀匹配
-	func hasPrefix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasPrefix(prefix) } }
-	func hasSuffix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasSuffix(prefix) } }
-	extension String {
+  }
+  
+  // 字符串前后缀匹配
+  func hasPrefix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasPrefix(prefix) } }
+  func hasSuffix(_ prefix: String) -> ((Strign) -> Bool) { { $0.hasSuffix(prefix) } }
+  extension String {
         static func ~=(pattern: ((String) -> Bool, value: String) -> Bool {
             pattern(value)
         }
-	}
-	
-	var str = "123456"
-	switch str {
+  }
+  
+  var str = "123456"
+  switch str {
     case hasPrefix("123"), hasSuffix("456"):
         print("以123开头")
         pritn("以456结尾")
     default: break
-	}
-	
-	//eg: 奇偶数匹配
-	func isEvent(_ i: Int) -> Bool { i % 2 == 0 }
-	func isOdd(_ i: Int) -> Bool { i % 2 != 0 }
-	extension Int {
+  }
+  
+  //eg: 奇偶数匹配
+  func isEvent(_ i: Int) -> Bool { i % 2 == 0 }
+  func isOdd(_ i: Int) -> Bool { i % 2 != 0 }
+  extension Int {
         static func ~=(pattern: (Int) -> Bool, value: Int) -> Bool {
             pattern(value)
         }
-	}
-	
-	var age = 9
-	switch age {
+  }
+  
+  var age = 9
+  switch age {
     case isEvent:
         print(age, "是个偶数")
     case isOdd:
     	print(age, "是个奇数")
     default: break
-	}
-	```
-	* where 可以使用where为模式匹配增加匹配条件。
+  }
+  ```
+  * where 可以使用where为模式匹配增加匹配条件。
 * 字面量
-	* Swift自带类型之所以可以通过修改字面量初始化，是因为它们遵守了对应的协议
-	```
-	Bool: ExpressibleByBooleanLiteral
-	Int: ExpressibleByIntegerLiteral
-	Float、Double: ExpressibleByInterLiteral、ExpressibleByFloatLiteral //所以Float和Double可以使用整型和浮点型进行字面量初始化
-	Dictionary: ExpressibleByDictionaryLiteral
-	String: ExpressibleByStringLiteral
-	Array、Set: ExpressibleByArrayLiteral
-	Optional: ExpressibleByNilLiteral
-	```
-	eg1: 使Int遵守Bool类型协议，使Int可以使用Bool进行字面量初始化
-	```
-	extension Int: ExpressibleByBooleanLiteral {
+  * Swift自带类型之所以可以通过修改字面量初始化，是因为它们遵守了对应的协议
+  ```
+  Bool: ExpressibleByBooleanLiteral
+  Int: ExpressibleByIntegerLiteral
+  Float、Double: ExpressibleByInterLiteral、ExpressibleByFloatLiteral //所以Float和Double可以使用整型和浮点型进行字面量初始化
+  Dictionary: ExpressibleByDictionaryLiteral
+  String: ExpressibleByStringLiteral
+  Array、Set: ExpressibleByArrayLiteral
+  Optional: ExpressibleByNilLiteral
+  ```
+  eg1: 使Int遵守Bool类型协议，使Int可以使用Bool进行字面量初始化
+  ```
+  extension Int: ExpressibleByBooleanLiteral {
         public init(booleanLiteral value: Bool) {
             self = value ? 1 : 0
         }
-	}
-	var num: Int = false
-	print(num) //这个时候num是bool类型
-	```
-	eg2: 使用字面量初始化自定义的类型
-	```
-	class Student : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, CustomStringConvertible {
+  }
+  var num: Int = false
+  print(num) //这个时候num是bool类型
+  ```
+  eg2: 使用字面量初始化自定义的类型
+  ```
+  class Student : ExpressibleByIntegerLiteral, ExpressibleByFloatLiteral, ExpressibleByStringLiteral, CustomStringConvertible {
         var name: String = ""
         var score: Int = 0
         required init(floatLiteral value: Double) { self.score = value }
@@ -687,20 +687,20 @@ print(sum)
         required init(unicodeScalarLiteral value: String) { self.name = value }
         required init(extendedGraphemeClusterLiteral value: String) { self.name = value }
         var description: Sting { "name=\(name), score=\(score)"}
-	}
-	var stu: Student = 90
-	print(stu)
-	stu = 98.5
-	pritn(stu)
-	stu = "Jack"
-	print(stu)
-	```
-	eg3: 字面量初始化结构体
-	```
-	stuct Point {
+  }
+  var stu: Student = 90
+  print(stu)
+  stu = 98.5
+  pritn(stu)
+  stu = "Jack"
+  print(stu)
+  ```
+  eg3: 字面量初始化结构体
+  ```
+  stuct Point {
         var x = 0.0, y = 0.0
-	}
-	extension Point : ExpressibleByArrayLiteral、ExpressibleByDictionaryLiteral {
+  }
+  extension Point : ExpressibleByArrayLiteral、ExpressibleByDictionaryLiteral {
         init(arrayLiteral elements: Double...) {
             guard elements.count > 0 else { return }
             self.x = elements[0]
@@ -713,19 +713,19 @@ print(sum)
                 else if k == "y" { self.y = v }
             }
         }
-	}
-	var p: Point = [10.5, 20.5]
-	pritn(p)
-	p = ["x" : 11, "y" : 22]
-	pritn(p)
-	```
-	* 可以通过typealias修改字面量的默认类型
-	```
-	typealias FloatLiteralType = Float
-	typealias IntegerLiteralType = UInt8
-	var age = 10 //UInt8
-	var height = 1.68 //Float
-	```
+  }
+  var p: Point = [10.5, 20.5]
+  pritn(p)
+  p = ["x" : 11, "y" : 22]
+  pritn(p)
+  ```
+  * 可以通过typealias修改字面量的默认类型
+  ```
+  typealias FloatLiteralType = Float
+  typealias IntegerLiteralType = UInt8
+  var age = 10 //UInt8
+  var height = 1.68 //Float
+  ```
 
 * 代码风格与习惯
   * 注释： // MARK: 、// MARK: -、// TODO:、// FIXME:
@@ -746,20 +746,70 @@ print(sum)
   ```
 * OC 到 swift：
   * 条件编译：
-  	* 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
-  	* log 条件打印
-  	```
-  	func log<T>(_ msg: T, 
-  	file: NSStrign = #file, 
-  	line: Int = #line, 
-  	fn: String = #function) {
+    * 在xcode debug编译标记设置custom DEBUG标记。是的代码可以直接使用#if DEBUG ，但是得放在函数里调用。
+    * log 条件打印
+    ```
+    func log<T>(_ msg: T, 
+    file: NSStrign = #file, 
+    line: Int = #line, 
+    fn: String = #function) {
             #if DEBUG
             let prefix = "\(file.lastPathComponent)_\(line)_\(fn):"
             print(prefix, msg)
             #endif
+    }
+    ```
+
+  * 如果要将类中的某个成员变量暴露给OC，则在成员变量前面加上@objc，如果要将Swift的所有成员都暴露给OC，则给类加上 @objcMembers, 这样就不需要每个成员变量前面都加上@objc；
+
+  * 可以通过@objc重命名swift暴露给OC的符号名（类名，属性名，函数名等）
+  ```
+  @objc(FCFCar) //重命名类
+  @objcMembers class Car: NSObject {
+  	@objc(name) //重命名属性
+  	var band: String
+  	@objc(drive) //重命名方法
+  	func run() {
+            print(band, "run")
   	}
-  	```
-  * 如果要将类中的某个成员变量暴露给OC，则在成员变量前面加上@objc，如果要将Swift的所有成员都暴露给OC，则给类加上 @objcMembers, 这样就不需要每个成员变量前面都加上@objc
+  }
+  ```
 
+  * selector选择器必须是被@objc或@objcMembers修饰。因为选择器都是在runtime中使用，而swift的runtime还是使用OC的runtime，所以必须加上@objc暴露成OC的方法；
 
+* 代码细节
+  * swift类无论是否继承NSObject或是否被@objc修饰，如果在swift类中调用，那么就是走swift 虚表调用机制，如果在OC中调用，那么就是走OC的objc_messageSend机制。swift要实现KVO和KVC，则必须是@objc dynamic修饰的。
+  ```
+  class Person: NSObject {
+  		@objc dynamic var age: Int = 0
+  		var observation: NSKeyValueObservation?
+  		funt test() {
+      		observation = observe(\Person.age, options: .new) {
+                (person, change) in
+                print(change.newValue as Any)
+      		}
+  		}
+  }
   
+  ```
+
+  * Substring：Substring不是一个String类型，Substring是一个单独的类型，String的子串可以通过小标、prefix、suffix截取。Substring可以通过String强转为String类型，substring可以调用.base方法获取其对应的原始String。注意：**实际上Substring与原理String共用一块内存区域，所以可以调用base获取原来的string。如果对substring进行修改，那么此时才会拷贝一份新的内存，然后将substring放进去**。
+  ```
+  var str = "123456"
+  var subStr1 = str.prefix(2)
+  var subStr2 = str.suffix(3)
+  var range = str.startIndex..<str.index(str.startIndex, offsetBy: 3)
+  var subStr3 = str[range]
+  //送substring中获取原理的string
+  var originStr = subStr3.base
+  //转成String
+  var str1 = String(subStr3)
+  ```
+  * 多行String使用三引号："""xxx""" 包裹。
+
+* 多线程
+	* Dispatch_once：swift代码里已经废弃了Dispatch_once. 而是直接用static。static是全局变量，只会初始化一次，且默认就是lazy。其内部其实使用了Dispatch_once。
+	* 加锁：线程安全
+
+
+
