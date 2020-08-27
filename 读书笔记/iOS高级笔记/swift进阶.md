@@ -901,82 +901,109 @@ print(sum)
 ### 高阶
 
 * 函数式编程
-	* Array的常见操作
-		* map: 遍历Array每个元素，block里可以对元素单独处理，最终返回新的Array。返回结果的元素类型就是block里新创建的类型；
-		* filter: 遍历Array每个元素，block里添加条件语句，最终返回符合条件的新Array；
-		* reduce: 遍历Array每一个元素，block里会有两个参数，第一个参数是上一次遍历的结果，第二个参数是当前遍历元素。最后返回一个最终结果值；
-		* flatMap: 和map功能一样，只是会把二维数组压成一维数组；
-		* first: 查找第一个满足条件的元素，block是一个条件语句；
-		* firstIndex: 查找第一个满足条件的元素的索引，block是一个条件语句；
-	```
-	var arr = [1,2,3]
-	_ = arr.map{ $0 * 2 }
-	_ = arr.map{ "abc_\($0)"}
-	//传入函数
-	func blockf = (_ element: Int)->String { "abc_\(element)" }
-	_ = arr.map(blockf)
-	// 处理可选型
-	var score: Int? = 98
-	//老方法
-	var str1 = score != nil ? "score is \(score!)" : "no_score"
-	//新方法
-	var str2 = score.map{ "score is \($0)" } ?? "no_score"
-	
-	/*******************************************************/
-	_ = arr.filter{ $0 % 2 == 0 }
-	/*******************************************************/
-	// $0 是上一次遍历返回的结果，初始值是传进来的那个0.$1是每次遍历的元素
-	_ = arr.resuce(0){ $0 + $1 } // _ = arr.reduce(0,+)
-	/*******************************************************/
-	// flatMap 可选项处理
-	var fmt = DateFormatter()
-	fmt.dateFormat = "yyyy-MM-dd"
-	var str: String? = "2011-11-11" //可能字符串为nil
-	//老方法
-	var date1 = str != nil ? fmt.date(from: str!) : nil
-	// 新方法
-	var date2 = str.flatMap(fmt.date)
-	/*******************************************************/
-	// 重要 —— lazy 优化
-	let arr = [1,2,3]
-	let result = arr.map{
+  * Array的常见操作
+  	* map: 遍历Array每个元素，block里可以对元素单独处理，最终返回新的Array。返回结果的元素类型就是block里新创建的类型；
+  	* filter: 遍历Array每个元素，block里添加条件语句，最终返回符合条件的新Array；
+  	* reduce: 遍历Array每一个元素，block里会有两个参数，第一个参数是上一次遍历的结果，第二个参数是当前遍历元素。最后返回一个最终结果值；
+  	* flatMap: 和map功能一样，只是会把二维数组压成一维数组；
+  	* first: 查找第一个满足条件的元素，block是一个条件语句；
+  	* firstIndex: 查找第一个满足条件的元素的索引，block是一个条件语句；
+  ```
+  var arr = [1,2,3]
+  _ = arr.map{ $0 * 2 }
+  _ = arr.map{ "abc_\($0)"}
+  //传入函数
+  func blockf = (_ element: Int)->String { "abc_\(element)" }
+  _ = arr.map(blockf)
+  // 处理可选型
+  var score: Int? = 98
+  //老方法
+  var str1 = score != nil ? "score is \(score!)" : "no_score"
+  //新方法
+  var str2 = score.map{ "score is \($0)" } ?? "no_score"
+  
+  /*******************************************************/
+  _ = arr.filter{ $0 % 2 == 0 }
+  /*******************************************************/
+  // $0 是上一次遍历返回的结果，初始值是传进来的那个0.$1是每次遍历的元素
+  _ = arr.resuce(0){ $0 + $1 } // _ = arr.reduce(0,+)
+  /*******************************************************/
+  // flatMap 可选项处理
+  var fmt = DateFormatter()
+  fmt.dateFormat = "yyyy-MM-dd"
+  var str: String? = "2011-11-11" //可能字符串为nil
+  //老方法
+  var date1 = str != nil ? fmt.date(from: str!) : nil
+  // 新方法
+  var date2 = str.flatMap(fmt.date)
+  /*******************************************************/
+  // 重要 —— lazy 优化
+  let arr = [1,2,3]
+  let result = arr.map{
         (i: Int) -> Int in
         print("mapping \(i)")
         return i * 2
-	}
-	print("begin---------")
-	pirnt("mapped", result[0])
-	pirnt("mapped", result[1])
-	pirnt("mapped", result[3])
-	print("end-----------")
-	
-	/*
-	得到的结果：
-	mapping 1
-	mapping 2
-	mapping 3
-	begin---------
-	mapped 2
-	mapped 4
-	mapped 6
-	end-----------
-	解析：也就是说，这里begin之前就会执行一次，然后后续使用的时候，会再调用一次。假设有1000个元素，那么就会非常耗时。
-	*/
-	let result = arr.lazy.map{
+  }
+  print("begin---------")
+  pirnt("mapped", result[0])
+  pirnt("mapped", result[1])
+  pirnt("mapped", result[3])
+  print("end-----------")
+  
+  /*
+  得到的结果：
+  mapping 1
+  mapping 2
+  mapping 3
+  begin---------
+  mapped 2
+  mapped 4
+  mapped 6
+  end-----------
+  解析：也就是说，这里begin之前就会执行一次，然后后续使用的时候，会再调用一次。假设有1000个元素，那么就会非常耗时。
+  */
+  let result = arr.lazy.map{
         (i: Int) -> Int in
         print("mapping \(i)")
         return i * 2
-	}
-	print("begin---------")
-	pirnt("mapped", result[1])
-	print("end-----------")
-	/*
-	得到的结果：
-	
-	begin---------
-	mapping 2
-	mapped 4
-	end-----------
-	解析：也就是说，这里begin之前就不会执行，然后后续使用的时候，使用到哪个函数，那个函数才会具体执行。
-	*/
-	```
+  }
+  print("begin---------")
+  pirnt("mapped", result[1])
+  print("end-----------")
+  /*
+  得到的结果：
+  
+  begin---------
+  mapping 2
+  mapped 4
+  end-----------
+  解析：也就是说，这里begin之前就不会执行，然后后续使用的时候，使用到哪个函数，那个函数才会具体执行。
+  */
+  ```
+
+  * 函数式编程：函数式编程是一种编程范式(也就是如何编程的一种方法论)。主要思想就是把计算过程尽可能分解成一系列可复用函数的调用。函数式编程里，函数是“第一等公民”；
+  	* 接收一个或多个函数作为输入或者返回一个函数的函数是高阶函数；
+  	* 柯里化：将接收多个参数的函数变成一系列接收单个参数的函数； 
+  	```
+  	//柯里化实际的编写过程中，参数的传递顺序正好和传统方式是相反的。
+  	func add1(_ v1: Int, _ v2: Int) -> Int {v1 + v2}
+  	func add10(_ v1: Int) -> (Int) -> Int { { $0 + V1 } }
+  	
+  	func reduce1(_ v1: Int, _ v2: Int, _ v3: Int) -> {
+        return v1 - v2 - v3
+  	}
+  	func reduce10(_ v3: Int) -> (Int) -> (Int) -> Int {
+        return {v2 in
+        	return {v1 in
+        		v1 - v2 - v3
+        	}
+        }
+  	}
+  	reduce1(10)(20)(30)
+  	/***************************************************/
+  	//给定任何一个格式为 (Int, Int) -> Int 的函数，实现柯里化 (prefix表示给任意函数前加上~)
+  	prefix ~<A,B,C>(_ fn: @escaping (A, B) -> C) -> (B) -> (A) -> C { {b in { a in fn(a,b) } } }
+  	//调用
+  	(~add1)(10)(20)
+  	
+  	```
