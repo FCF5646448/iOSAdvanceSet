@@ -10,7 +10,7 @@ description:  这篇文章主要是重新学习swift
 
 * 常量只能赋值1次，不要求在编译时期确定，使用之前必须赋值1次。
 
-* 常见数据类型：(注意：swift就两种基本数据类型值类型和引用类型，不存在什么基本数据类型，比如Int不算是基本数据类型，Int是结构体)
+* 常见数据类型：(注意：**swift就两种基本数据类型值类型和引用类型，不存在什么基本数据类型，比如Int不算是基本数据类型，Int是结构体**)
   * 值类型： 枚举Enum（Optional）；结构体 ( Bool，Int，Float，Double，Character，String，Array，Dictionary，Set )
   * 引用类型：类Class
 
@@ -1007,3 +1007,102 @@ print(sum)
   	(~add1)(10)(20)
   	
   	```
+  	* 函子：像Array、Optional这样支持map运算的类型，成为函子。
+  	```
+  	public func map<T>(_ transform: (Element) -> T) -> Array<T>
+  	public func map<T>(_ transform: (Wrapped) -> U) -> Optional<U>
+  	//对于任意一个函子，如果能支持以下运算，该函子就是一个适用函子
+  	func pure<A>(_ value: A) -> F<A>
+  	func <*><A, B>(fn: F<(A) -> B>, value: F<A>) -> F<B>
+  	infix operator <*>: AdditionPrecedence
+  	func <*><A, B>(fn: ((A) -> B)?, value: A?) -> B? {
+        guard let f = fn , let v = value else {return nil}
+        return f(v)
+  	}
+  	```
+* 面向协议编程
+  * 面向对象就是将事务抽象成对象的概念，然后给对象赋予属性和方法，让对象去执行自己的方法。它的核心思想就是使用封装、继承将一系列的相关内容放到一起。但是由于事务往往不是一脉相承的，而是由多种特质的组合，所以导致面向对象很多时候没法很好地对事务进行抽象。面向对象存在一定的问题
+    * 横切关注点：也就是说如果两个在不同继承关系中的类（没有继承关系）使用了同样的代码（比如都实现了一个method()函数），那么这个代码没法共用。（解决方案可以给它们搞个父类，或者实现多继承等）。
+        ```
+        @interface c1: NSObject
+            func method() {}
+        @end
+        @interface c2 : NSObject
+            func method() {}
+        @end
+        ```
+
+      * 菱形缺陷：比如上述问题，我们给两个类施加一个共同的父类（比如c0）,此时又有一个类c3同时继承于c1和c2。那么c3在使用的时候对于使用哪个父类的method方法就会很难确定，导致不安全。这就是菱形缺陷；
+
+      * 动态派发安全性：比如动态类型，动态调用方法，该方法没有实现，就会导致崩溃。比如：
+
+        ```
+        C1 *c1 = ...
+        C2 *c2 = ...
+        NSObject *c3 = ...
+        NSArray * arr = @[c1, c2, c3]
+        for (id obj) in arr {
+            [obj method];
+        }
+        ```
+
+  * 面向协议就是通过协议来定义事务的实现。通过遵守不同的协议，来对类或结构体进行定制。它只需要实现协议里规定的属性和方法就可以。相对于面向对象，其耦合性更低，维护和扩展更灵活。其次其正好可以解决面向对象的三大缺陷问题。
+
+    ```
+    /// 定义前缀类型
+    struct FCF<Base> {
+        var base: Base
+        init(_ base: Base) {
+            self.base = base
+        }
+    }
+    /// 利用前缀扩展前缀属性
+    protocol FCFCompatible {
+        var fcf: FCF<Self> {
+            set{}
+            get{ FCF<self> }
+        }
+        static var fcf: FCF<Self>.Type {
+            set{}
+            get{ FCF<Self>.self }
+        }
+    }
+    
+    // 给String.fcf、String().fcf 前缀扩展功能
+    extension FCF where Base: ExpressibleByStringLiteral {
+    	// 扩展一个字符串数字个数的实例方法
+    	var numCount: Int {
+            var count = 0
+            for c in (base as String) where ("0"..."9").contains(c) {
+                count += 1
+            }
+            return count
+        }
+        
+        // 扩展一个类方法
+        static func test() { }
+        
+        // 扩展一个mutating方法
+        mutating func test1() { }
+    }
+    
+    
+    // 让String、NSString拥有前缀属性
+    extension String: FCFCompatible {}
+    extension NSString: FCFCompatible {}
+    
+    // 使用
+    var str1 = "123"
+    var str2: NSString = "123"
+    var str3: NSMutableString = "123"
+    print(str1.fcf.numCount)
+    print(str2.fcf.numCount)
+    print(str3.fcf.numCount)
+    ```
+
+* 响应式编程
+响应式编程(Reactive Programming， RP)， 也是一种编程范式，可以简化异步编程，提供更优雅的数据绑定。比较成熟的响应式框架：ReactiveCocoa（简称RAC，有OC和Swift版本）、ReactiveX（简称Rx, 很多语言都有Rx版本，比如RxJave、RxKotlin、RxGo、RxSwift等）。
+	* RxSwift 包含两部分RxSwift和RxCocoa。RxSwift是Rx标准API的Swift实现，不包括任何iOS相关内容；RxCocoa是基于RxSwift给iOS UI控件扩展了很多Rx特性。
+		* Observable: 负责发送事件(Event)
+		* Observer: 负责订阅（subscribe）Observable，监听Observable发送的事件（3种Event: next(携带具体数据)\error(携带错误信息，表明Observable终止，不会再发出事件)\completed(表明Observable终止，不会再发出事件)）；
+
