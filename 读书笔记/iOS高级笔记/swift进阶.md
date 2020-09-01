@@ -797,7 +797,7 @@ print(sum)
   
   ```
 
-  * Substring：Substring不是一个String类型，Substring是一个单独的类型，String的子串可以通过小标、prefix、suffix截取。Substring可以通过String强转为String类型，substring可以调用.base方法获取其对应的原始String。注意：**实际上Substring与原理String共用一块内存区域，所以可以调用base获取原来的string。如果对substring进行修改，那么此时才会拷贝一份新的内存，然后将substring放进去**。
+  * Substring：Substring不是一个String类型，**Substring是一个单独的类型**，String的子串可以通过小标、prefix、suffix截取。Substring可以通过String强转为String类型，substring可以调用.base方法获取其对应的原始String。注意：**实际上Substring与原理String共用一块内存区域，所以可以调用base获取原来的string。如果对substring进行修改，那么此时才会拷贝一份新的内存，然后将substring放进去**。
   ```
   var str = "123456"
   var subStr1 = str.prefix(2)
