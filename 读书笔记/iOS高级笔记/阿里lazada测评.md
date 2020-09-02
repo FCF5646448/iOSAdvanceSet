@@ -14,17 +14,52 @@ Class GlobalSys {
 }
 
 @implementation GlobalSys {
-	+(instance)shareInstance {
-		
-
-​```
-}
-​```
-
+	//使用Dispatch_once实现的单例
+	+(instancetype)shareInstance {
+		static GlobalSys * instance = nil;
+		static dispatch_noce_t onceToken;
+		dispatch_once(&token, ^{
+           instance = [GlobalSys new]; 
+		});
+		return instance;
+	}
+	// 使用锁的单例
+	+(instancetype)shareInstance {
+        static GlobalSys * instance;
+        @synchronized(self) {
+        	if (!instance) {
+             	instance = [GlobalSys new];   
+        	}
+        }
+        return instance;
+	}
+	// 使用Dispatch_semaphone 加锁
+	+(instancetype)shareInstance {
+		static GlobalSys * instance;
+		static dispatch_semaphore_t semaphore;
+    	static dispatch_once_t onceToken;
+    	dispatch_once(&onceToken, ^{
+        	semaphore = dispatch_semaphore_create(1);
+    	});
+    	
+    	dispatch_semaphore_wait(semaphore, DISPATCH_TIME_FOREVER);
+    	if (instance.class != self.class) {
+        	self = [super init];
+        	if (self.class == GlobalSys.class) {
+            	SEL sel = NSSelectorFromString(@"singletonInit");
+            	if ([self respondsToSelector:sel]) {
+                	[self performSelector:sel];
+            	}
+            	instance = self;
+        	}
+    	}
+    	dispatch_semaphore_signal(semaphore);
+    	return self;
+	}
 }
 ```
 
-
+[写好一个单例](https://juejin.im/post/6844903818216341517)
 
 
 已知两个升序列表,L1,L2,请将两个有序列表合并成一个升序列表
@@ -87,14 +122,12 @@ Class GlobalSys {
       if (q.val != p.val) {
       	return false;
       }
-      
-
-  ```
   return [self isSameTree:p.left with:q.left] && 
   [self isSameTree:p.right with:q.right];
-  ```
-
   }
  }
 ```
+
+
+
 
