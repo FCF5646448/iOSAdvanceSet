@@ -167,6 +167,7 @@ VIPER在代码分配、测试覆盖率上为所有架构之冠。缺点就是由
 ##### 组件通信
 组件通信是中间层的主要内容，是为了解耦各个组件的。
 组件通信方案一般有三种：
+
 * URL Router：
   在前端，一个url表示一个web页面，在后端，一个url也表示一个接口请求；在iOS中，也会使用官方提供url去打开一个系统设置。所以同样的，
 	* 对于带UI属性的独立模块，我们可以使用url来标记一个Controller；不仅方便本地跳转，还能支撑Server下发跳转指令。所以它也存在一定局限性，比如无法传递UIImage这种数据；
@@ -198,13 +199,6 @@ UIViewController *vc = [[Router sharedInstance] openURL:@"myapp://good/detail"]
 [组件化及其通讯方案](https://juejin.im/entry/5baaf45cf265da0afb334b25)
 
 * 面试题：组件化有什么好处，两个组件通信如何协议解耦？
-
-
-#### 实践
-#### 如何实现一个图片缓存模块
-#### 如何实现一个使用时长统计模块
-
-
 
 ### 图片与SDWebImage
 #### 图片 内存、解码相关：
@@ -309,7 +303,7 @@ iOS 10之后，UITableView和CollectionView都提供了一个预加载的接口:
 
 
 
-#### SDWebImage：
+#### SDWebImage源码细节：
 
 ##### 源码架构与基础流程
 * 架构简述：
@@ -514,6 +508,12 @@ https://www.jianshu.com/p/b3c209f6a709
 <https://www.jianshu.com/p/479986e9ae80>
 
 ### 进程间通信
+
+
+
+### 敏捷开发
+
+https://juejin.im/post/6844904039822409735#heading-3
 
 
 
