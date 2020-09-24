@@ -110,6 +110,7 @@ Model —— View —— Controller。Model负责处理数据；view负责处理
 #### MVVM
 MVVM也是在MVC的基础上添加了ViewModel层级，MVVM框架则表示Model--ViewModel--（View Controller）。它将业务逻辑、网络请求和数据解析放在了ViewModel层，大大简化了Controller层的逻辑代码，也让model 、view的功能更加独立单一。
 ViewModel主要作用：
+
 * 视图层的真正数据提供者：一般视图层展示的数据经常是一个或多个model的属性组合。ViewModel就可以将这些数据整合，使得视图直接调用单个数据就能展示所要的效果。简单来说，就是可以对模型层的数据进行包装；
 * 视图层的交互响应者：所有的交互都会传递给ViewModel，ViewModel会依次更新视图层需要的属性，同时相应修改model层的数据。不过这里最好依赖响应式架构或属性观察器；
 
@@ -142,6 +143,15 @@ VIPER由5个部分组成：View、Interactor、Presenter、Entity、Router。
 VIPER在代码分配、测试覆盖率上为所有架构之冠。缺点就是由于分工精细，不同层级之间交互的代码太多，总体代码量很大。
 
 #### 模块化、组件化：路由化
+
+
+
+https://www.jianshu.com/p/3d50e5665841
+
+
+
+
+
 ##### 模块化
 项目的整体架构不止是MVC、MVP这种代码层面的东西，而应该是更高维度的规划。比如说对项目进行分层，分层的意义在意是项目模块化。从底层到上层一次是：独立于APP的通用层、通用业务层、中间层、业务层：
 * 独立于APP的通用层：这一层主要是放一些跟APP耦合不是很大的模块，比如我们BT学院的BTCore模块，包括网络请求封装模块、各种category、自定义的一些UI组件等；
