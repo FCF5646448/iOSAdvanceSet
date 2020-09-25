@@ -10,14 +10,18 @@
 #import "ReuseTableViewController.h"
 
 @interface ViewController ()
-@property (strong, nonatomic) AsyncDrawing
+
 @end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    UIImage * img = [UIImage imageNamed:@""];
+    NSMutableDictionary * dic = [NSMutableDictionary dictionary];
+    [dic setObject:img forKey:@"img"];
+    
+
 }
 
 - (IBAction)tbAction:(id)sender {
