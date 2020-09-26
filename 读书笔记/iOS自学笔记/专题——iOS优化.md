@@ -6,16 +6,162 @@ categories: iOS进阶
 description: 总结了iOS学习中卡顿、常见的Crash的学习，及其他性能优化相关。
 ---
 
-### Crash 及 APP 性能监控相关
+### APP 性能监控相关
+#### 卡顿
+##### 卡顿产生的原理
+产生卡顿的原因：CPU和GPU没有在16.7ms之内合作完成一帧画面，导致视图控制器无法获取到将要显示的内容，形成丢帧，继而卡顿。总之就是在主线程做了大量耗时操作(UI的显示原理有详解)。
+导致卡顿的若干原因：
+* 复杂UI、图文混排的绘制量过大；
+* 在主线程做网络同步请求；
+* 在主线程做IO操作；
+* 运算量太大，CPU使用太高
+* 死锁
+##### 卡顿检测
+###### 方案一：检测帧率FPS。
+一般来说不满60帧就是卡顿。但是很难确定界定多少帧才算卡住了。所以通过FPS检测不是最好的方案，只能算是一种简单的方案。
+FPS原理：通常的做法是基于CADisplayLin做帧率回调次数计算，CADisplayLink是Core Animation提供的一个类似NSTimer的定时器，它会在屏幕每次刷新回调一次，所以它也是以runloop的帧率为标准。所以只需统计每秒方法执行的次数，次数/时间就可以得出帧率了。但是它无法真正定位到性能。
 
-#### 卡顿处理 具体实践流程 (结合各种实际demo的总结)
+```
+-(void)starRecord{
+    if(_link) {
+        _link.paused = NO;
+    }else{
+        _link = [CADisplayLink displayLinkWithTarget:self selector:@selector(trigger:)];
+        [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
+    }
+}
+- (void)trigger:(CADisplayLink * link) {
+    if ( lastTime == 0 ){
+       	lastTime = link.timestamp;
+        return;
+    }
+    
+    count ++;
+    NSTimeInterval delta = link.timestamp - lastTime;
+    if (delta < 1) return;
+    lastTime = link.timestamp;
+    CGFloat fps = count / delta;
+    count = 0;
+}
+```
+###### 方案二：检测主线程是否可以及时处理消息
+重写一个NSThread的子类，设置一个时间间隔和时间阈值。然后重写她的main函数，在函数里开启一个while循环，然后在时间间隔内查看主线程是否能够及时处理事件，如果主线程能及时处理消息，则说明不卡顿。如果不能处理，则获取主线程的线程堆栈，然后在主线程操作信号量发出之后或者超过时间阈值，则将获取到的线程堆栈及卡顿时长进行记录，视为一次卡顿，如果超过一个阈值则可以视为一次卡顿崩溃，先暂时存起来。 **但是这种方案创建需要额外创建子线程还是会消耗性能**
 
+```
+- (void)main {
+  //在main函数里，只要没有取消当前子线程，就while循环，查看主线程是否可以响应事件。每次循环都sleep一个阈值的时间。
+      while (!self.cancelled) {
+          printf("\n");
+          //查看线程是否活跃
+          if (_isApplicationInActive) {
+              //标志位，用于查看主线程是否有处理的标志
+              self.mainThreadBlock = YES;
+              //主线程堆栈信息
+              self.reportInfo = @"";
+              self.startTimeValue = [[NSDate date] timeIntervalSince1970];
+              printf("1开始查看\n");
+              dispatch_async(dispatch_get_main_queue(), ^{
+                  self.mainThreadBlock = NO;
+                  printf("2执行了主线程，发出信号\n");
+                  verifyReport();
+                  //如果主线程能够响应，则对信号量进行加一
+                  dispatch_semaphore_signal(self.semaphore);
+              });
+              //阻塞当前线程threshold秒
+              [NSThread sleepForTimeInterval:self.threshold];
+              printf("3sleep醒来\n");
+              if (self.isMainThreadBlock) {
+                  printf("4主线程未来得急执行\n");
+                  //如果发生了卡顿，则在threshold秒后，上面主线程肯定是没有执行的。
+                  self.reportInfo = [DoraemonBacktraceLogger doraemon_backtraceOfMainThread]; //这里包含堆栈的查看信息
+              }
+              //如果信号量小于等于0，则阻塞，如果大于0，则先对信号量减一，再执行block操作。或者到最大卡顿崩溃时间之后自动执行，下面这个300可以视为watch Dog的查杀时间
+              dispatch_semaphore_wait(self.semaphore, dispatch_time(DISPATCH_TIME_NOW, 300.0 * NSEC_PER_SEC));
+              {
+                  //卡顿超时情况;
+                  if self.isMainThreadBlock {
+                      //说明是超过了300.0秒
+                      printf("5超过最大Watch Dog时间阈值：%f\n",[[NSDate date] timeIntervalSince1970]);
+                  }else{
+                      printf("5刚收到信号：%f\n",[[NSDate date] timeIntervalSince1970]);
+                  }
+                  verifyReport();
+              }
+              //如果不卡顿，执行顺序是1、2、3、5；如果卡顿了，则执行顺序是1、3、4、2、5。主线程卡顿多长时间，wait就等待多长时间，或者主线程卡顿的时间超过了300秒。等主线程反应过来之后，对信号量进行加1，则就可以走之后的流程了。但是这也存在一个问题，如果是卡顿太久，导致了崩溃呢！这里就收不到信号了。
+          } else {
+              //阻塞当前线程threshold秒
+              [NSThread sleepForTimeInterval:self.threshold];
+          }
+      }
+  }
+```
+###### 方案三：通过监控RunLoop的状态来判断是否出现卡顿。
+根据RunLoop的显示原理，在RunLoop进入睡眠之前KCFRunLoopBeforeSources和唤醒之后KCFRunLoopAfterWaiting这两个状态是RunLoop处理消息的主要状态，如果在这两个状态停滞的时间过长的话，那么可以认为是线程受阻了。 **这个方案是性能最好的方案**
+```
+- (void)beginObserver {
+    if (runloopObserver) { return;}
+    _dispatchSamphore = dispatch_semaphore_create(0); //信号量保持同步
+    //观察主线程状态
+    CFRunLoopObserverContext context = {0,(_ _bridge void*)self, NULL, NULL};
+    _runloopObserver = CFRunLoopObserverCreate(kCFAllocatorDefault,kCFRunLoopAllActivities,YES,0,&runloopCassBack,&context);
+	//将观察者添加到主线程runloop的common模式下
+	CFRunLoopAddObserve(CFRunLoopGetMain(), _runloopObserver, kCFRunLoopCommonModes);
+	//创建子线程监控
+	dispatch_async(dispatch_get_global_queue(0,0),^{
+       while(YES) {
+       		//设置信号量的等待时间为50毫秒，在50毫秒后对信号进行减一
+           long semaphoneWait = dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 50*NSEC_PER_MSEC));
+           // 如果信号量不为0，说明堵塞了
+           if (semaphoneWait != 0) {
+           		if (!_runloopObserver) {
+           			_timeoutCount = 0;
+           			_dispatchSamphore = 0;
+           			runLoopActivity = 0
+                    return;
+           		}
+           		//
+           		if (runLoopActivity == kCFRunLoopBeforeSource || runLoopActivity == kCFRunLoopAfterWaiting) {
+                    if (++_timeoutCount < 5) {
+                        continue;
+                    }else{
+                        NSLog(@"卡顿了");
+                    }
+           		}
+           }
+           _timeoutCount = 0;
+       } 
+	});
+}
+
+// 在runloop的
+statiic CFRunLoopActivity runLoopActivity;
+static void runLoopObserverCallBack(CFRunLoopObserverRef observer, CFRunLoopActivity activity, void *info){
+    runLoopActivity = activity;
+    
+    dispatch_semaphore_t semaphore = _dispatchSemaphore; //这个传参不是这样传，简单意思一下。
+    dispatch_semaphore_signal(semaphore); //每次runloop回调，发送信号，信号量+1。
+}
+```
+
+#### 卡顿定位
+* 使用Instrument的TimeProfile来检测耗时函数；(略)
+* 获取卡顿堆栈信息：直接调用系统函数，但是其没法配合DSYM来获取具体代码。
+* 使用[PLCrashReporter](https://github.com/microsoft/plcrashreporter)这个开源的第三方库来获取堆栈信息。**(推荐使用)**
+```
+// 获取数据
+NSData *lagData = [[[PLCrashReporter alloc] initWithConfiguration:[[PLCrashReporterConfig alloc] initWithSignalHandlerType:PLCrashReporterSignalHandlerTypeBSD symbolicationStrategy:PLCrashReporterSymbolicationStrategyAll]] generateLiveReport];
+// 转换成 PLCrashReport 对象
+PLCrashReport *lagReport = [[PLCrashReport alloc] initWithData:lagData error:NULL];
+// 进行字符串格式化处理
+NSString *lagReportString = [PLCrashReportTextFormatter stringValueForCrashReport:lagReport withTextFormat:PLCrashReportTextFormatiOS];
+//将字符串上传服务器
+NSLog(@"lag happen, detail below: \n %@",lagReportString);
+```
+
+#### 卡顿处理方案  (结合各种实际demo的总结)
 针对不同的列表样式，使用不同的优化策略
-
 ##### 预排版+预渲染+异步绘制
-
 这种主要针对比较复杂的cell，比如富文本较多的类似微博这种列表。
-
 - 首先**预排版**：拿到json之后先计算主要控件的布局，比如头像、内容、按钮等frame， 将其放到内存中。这里计算布局也可以使用Core Text的CTFramesetterRef来进行计算，性能消耗更小：
 
 ```
@@ -229,11 +375,9 @@ static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, 
 
 解析一下：这里刚拿到数据的时候，主线程RunLoop就是defaultMode。所以不会影响第一屏数据的绘制。这也是为什么RunLoop可以用来优化UITableView的原因。只不过在滑动的时候，同样会出现图片位置空白的情况。可以结合第一种方案来一起用。
 
+#### Crash崩溃
 
-
-#### Crash处理
-
-面试常考题：介绍你碰到过的印象较深刻的外网crash，并介绍发现、定位、解决的过程。
+面试常考题：介绍你碰到过的印象较深刻的外网crash，并介绍发现、定位、解决的过程。举例两个遇到过印象深刻的外网Crash，并介绍如何发现、定位、解决。
 
 ##### 常见的Crash及处理
 
@@ -348,26 +492,26 @@ static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, 
 
 [iOS中常见Crash总结](https://juejin.im/post/5c617b85e51d45015e0475ac#heading-3)
 
-#### Crash捕获
+##### Crash捕获
+###### 开发过程中的捕获
+当iOS设备发生APP闪退时，操作系统会生成一个crash日志。
+* 如果用户愿意让设备与iTunes同步，则可以在电脑路径(~/Library/Logs/CrashReporter/MobileDevice/)下下载对应日志文件，然后发送给我们;
+* 有xcode,可以使用xcode —— product —— devices logs查看crash 日志;
+* 其次也可以去iTunes connect上获取部分崩溃日志;
 
-当iOS设备发生APP闪退时，操作系统会生成一个crash日志，如果用户愿意让设备与iTunes同步，则可以在电脑路径(~/Library/Logs/CrashReporter/MobileDevice/)下下载对应日志文件，然后发送给我们；如果崩溃设备就在身边，则可以使用xcode，在Device Logs下下载到对应的崩溃日志；其次也可以去iTunes connect上获取部分崩溃日志。最后则是通过crash收集工具进行收集，比如Bugly。
-
-iOS的主要崩溃分为三大类，一类是OC抛出的Exception异常，可以通过注册NSUncaugthExceptionHandler来捕获；一类是Mach异常，比如说野指针访问、线程问题，这一类异常会被转换成Signal信号，可以通过注册signalHandler来捕获。还有一类则是无法使用信号和Exception捕获的，比如像后台任务超时、内存被爆、主线程卡顿超阈值等。
-
-前两类异常的捕获：
-
-这里需要注意的是，避免与Bugly这种工具冲突覆盖掉handler的问题，所以使用之前要先进行判断。再处理完自己的handler之后再抛出去。
-
+###### 使用第三方，如Bugly或PLCrashReport。
+PLCrashReport的好处就是可以把日志发送到自己服务器中。
+* 检测原理：iOS的主要崩溃分为三大类，一类是OC抛出的Exception异常，可以通过注册NSUncaugthExceptionHandler来捕获；一类是Mach异常，比如说野指针访问、线程问题，这一类异常会被转换成Signal信号，可以通过注册signalHandler来捕获。还有一类则是无法使用信号和Exception捕获的，比如像后台任务超时、内存被爆、主线程卡顿超阈值等。
+* Exception异常:
 ```
-//一、OC异常处理函数
-// OC层中未被捕获的异常，通过注册NSUncaughtExceptionHandler捕获异常信息
+	// OC层中未被捕获的异常，通过注册NSUncaughtExceptionHandler捕获异常信息
 void InstallUncaughtExceptionHandler(void) {
 //注册
     if(NSGetUncaughtExceptionHandler() != custom_exceptionHandler)
     oldhandler = NSGetUncaughtExceptionHandler();   
     uncaught_exception_handler(&custom_exceptionHandler);
 }
-static void uncaught_exception_handler (NSException *exception) {
+static void uncaught_exception_handler (NSException * exception) {
 	//获取exception的异常堆栈，NSThread也对应一个类方法的callStackSymbols
     NSArray *stackArray = [exception callStackSymbols]; 
     //出现异常的原因
@@ -386,10 +530,10 @@ static void uncaught_exception_handler (NSException *exception) {
                       encoding:NSUTF8StringEncoding
                          error:nil];
 }
-
-//二、Unix标准的signal机制处理函数
-// 内存访问错误，重复释放等错误就无能为力了，因为这种错误它抛出的是Signal，所以必须要专门做Signal处理。 OC中层不能转换的Mach异常，利用Unix标准的signal机制，注册SIGABRT, SIGBUS, SIGSEGV等信号发生时的处理函数。
-void registerSignalHandler(void) { 
+```
+* Signal信号异常：
+```
+	void registerSignalHandler(void) { 
 	signal(SIGSEGV, handleSignalException);    
 	signal(SIGFPE, handleSignalException);    
 	signal(SIGBUS, handleSignalException);   
@@ -418,56 +562,32 @@ void handleSignalException(int signal) {
     return YES;
 }
 ```
+* 无法捕获的崩溃信息
+  * 后台崩溃 
+    当程序被退到后台后，只有几秒的时间可以执行代码，接着会被挂起，挂起后会暂停所有线程。但是如果是数据读写的线程则无法暂停只能被中断，中断的话，系统会主动杀掉APP，而且中断时数据容易被损坏，。
+    APP退到后台后，默认是使用Background Task方式，就是系统提供了beginBackgroundTaskWithExpirationHandler方法来延长后台执行时间，可以给到3分钟左右时间去处理退到后台还需处理的任务。3分钟未执行完成的话，还是会被杀掉。
 
-##### 对于无法捕获的崩溃怎么处理
+    **如何避免呢**？对于要在后台处理的数据要严格把控大小，太大的数据可以考虑下次启动的时候处理。
 
-- 后台崩溃：
-  当程序被退到后台后，只有几秒的时间可以执行代码，接着会被挂起，挂起后会暂停所有线程。但是如果是数据读写的线程则无法暂停只能被中断，中断的话，系统会主动杀掉APP，而且中断时数据容易被损坏，。
-  APP退到后台后，默认是使用Background Task方式，就是系统提供了beginBackgroundTaskWithExpirationHandler方法来延长后台执行时间，可以给到3分钟左右时间去处理退到后台还需处理的任务。3分钟未执行完成的话，还是会被杀掉。
-  - 如何避免呢？对于要在后台处理的数据要严格把控大小，太大的数据可以考虑下次启动的时候处理。
-  - 怎么监控呢？在Background Task里进行计时，如果时间接近3分钟，任务还在执行，那么就可以判断它即将后台崩溃，然后记录下内容，进行上报。
-- 内存被爆 和 主线程超时：
-  内存被爆和主线程超时，都是由于Watch Dog检测到超时，而向系统杀掉导致的。那这类监控和后台崩溃一样，需要先找到它的阈值，然后临近阈值时进行收集和上报。
+    **怎么监控呢**？在Background Task里进行计时，如果时间接近3分钟，任务还在执行，那么就可以判断它即将后台崩溃，然后记录下内容，进行上报。
 
+  * 内存被爆和主线程超时
 
+    都是由于Watch Dog检测到超时，而向系统杀掉导致的。那这类监控和后台崩溃一样，需要先找到它的阈值，然后临近阈值时进行收集和上报。
+
+##### Crash分析和定位
+###### 分析crash日志
+crash日志里有各种崩溃信息：进程信息、基本信息、异常信息、线程堆栈；
+通常的做法是先查看异常信息，然后定位到对应线程，在线程堆栈中找到对应线程，然后分析调用栈。如果是符号化的日志，则可以直接看到调用函数；
+通常的第三方Bugly、PLCrashReport也都含有崩溃捕获和定位的功能。
 
 
 #### 各种检测
-
 ##### 子线程UI检测
 
 原理：Hook UIView的三个必须在主线程操作的绘制方法：setNeedsDisplay、setNeedsLayout、setNeedsDisplayRect。然后判断他们是否在子线程中操作，如果是在子线程中进行的话，打印出当前代码调用堆栈。
 
-##### 帧率监测
-
-原理：帧率FPS检测主要是检测APP的界面卡顿，判断流畅性。通常的做法是基于CADisplayLin做FPS计算，CADisplayLink是Core Animation提供的一个类似NSTimer的定时器，它会在屏幕每次刷新回调一次，所以它也是以runloop的帧率为标准。所以只需统计每秒方法执行的次数，次数/时间就可以得出帧率了。但是它无法真正定位到性能。
-
-```
--(void)starRecord{
-    if(_link) {
-        _link.paused = NO;
-    }else{
-        _link = [CADisplayLink displayLinkWithTarget:self selector:@selector(trigger:)];
-        [_link addToRunLoop:[NSRunLoop mainRunLoop] forMode:NSRunLoopCommonModes];
-    }
-}
-- (void)trigger:(CADisplayLink * link) {
-    if ( lastTime == 0 ){
-       	lastTime = link.timestamp;
-        return;
-    }
-    
-    count ++;
-    NSTimeInterval delta = link.timestamp - lastTime;
-    if (delta < 1) return;
-    lastTime = link.timestamp;
-    CGFloat fps = count / delta;
-    count = 0;
-}
-```
-
 ##### CPU使用监测
-
 原理：CPU长时间处于高消耗的状态，会使手机发热，耗电量加剧，导致APP产生卡顿。所以要对APP的CPU使用进行监测；
 方案就是：使用task_threads函数，获取当前APP所有的线程列表，然后遍历每一个线程，通过thread_info函数获取每一个非闲置线程的cpu使用。
 
@@ -493,7 +613,7 @@ void handleSignalException(int signal) {
 	};
 	*/
     thread_basic_info_t basic_info_th;
-    
+  
     /* get threads in the task
 	获取当前进程中 线程列表
 	mach_task_self() 返回 mach_port_t 类型，应该是指当前进程
@@ -519,7 +639,7 @@ void handleSignalException(int signal) {
             ... ...
 		}
 	}
-    
+  
     // 注意方法最后要调用 vm_deallocate，防止出现内存泄漏
     kr = vm_deallocate(mach_task_self(), (vm_offset_t)thread_list, thread_count * sizeof(thread_t));
     assert(kr == KERN_SUCCESS);
@@ -528,9 +648,7 @@ void handleSignalException(int signal) {
 ```
 
 ##### 内存消耗监测：
-
 内存消耗监测与CPU使用监测一样的，通过使用task_info来获取进程的虚拟信息，然后获取到phys_footprint。
-
 ```
 -(NSInterger)useMemoryForApp {
     task_vm_info_data_t vmInfo;
@@ -548,86 +666,6 @@ void handleSignalException(int signal) {
 }
 ```
 
-##### 监测卡顿：
-
-一种检测卡顿的方法是：重写一个NSThread的子类，设置一个时间间隔和最大Watch Dog时间阈值。然后重写她的main函数，在函数里开启一个while循环，然后在时间间隔内查看主线程是否能够及时处理事件，如果主线程能及时处理消息，则说明不卡顿。如果不能处理，则获取主线程的线程堆栈，然后在主线程操作信号量发出之后或者超过最大Watch Dog时间阈值，则将获取到的线程堆栈及卡顿时长进行记录，视为一次卡顿，如果超过一个watch dog阈值则可以视为一次卡顿崩溃，先暂时存起来，如果后续有主线程的信号过来，则把假定的Watch Dog崩溃日志去除。
-
-```
-- (void)main {
-  //在main函数里，只要没有取消当前子线程，就while循环，查看主线程是否可以响应事件。每次循环都sleep一个阈值的时间。
-      while (!self.cancelled) {
-          printf("\n");
-          //查看线程是否活跃
-          if (_isApplicationInActive) {
-              //标志位，用于查看主线程是否有处理的标志
-              self.mainThreadBlock = YES;
-              //主线程堆栈信息
-              self.reportInfo = @"";
-              self.startTimeValue = [[NSDate date] timeIntervalSince1970];
-              printf("1开始查看\n");
-              dispatch_async(dispatch_get_main_queue(), ^{
-                  self.mainThreadBlock = NO;
-                  printf("2执行了主线程，发出信号\n");
-                  verifyReport();
-                  //如果主线程能够响应，则对信号量进行加一
-                  dispatch_semaphore_signal(self.semaphore);
-              });
-              //阻塞当前线程threshold秒
-              [NSThread sleepForTimeInterval:self.threshold];
-              printf("3sleep醒来\n");
-              if (self.isMainThreadBlock) {
-                  printf("4主线程未来得急执行\n");
-                  //如果发生了卡顿，则在threshold秒后，上面主线程肯定是没有执行的。
-                  self.reportInfo = [DoraemonBacktraceLogger doraemon_backtraceOfMainThread]; //这里包含堆栈的查看信息
-              }
-              //如果信号量小于等于0，则阻塞，如果大于0，则先对信号量减一，再执行block操作。或者到最大卡顿崩溃时间之后自动执行，下面这个300可以视为watch Dog的查杀时间
-              dispatch_semaphore_wait(self.semaphore, dispatch_time(DISPATCH_TIME_NOW, 300.0 * NSEC_PER_SEC));
-              {
-                  //卡顿超时情况;
-                  if self.isMainThreadBlock {
-                      //说明是超过了300.0秒
-                      printf("5超过最大Watch Dog时间阈值：%f\n",[[NSDate date] timeIntervalSince1970]);
-                  }else{
-                      printf("5刚收到信号：%f\n",[[NSDate date] timeIntervalSince1970]);
-                  }
-                  verifyReport();
-              }
-              //如果不卡顿，执行顺序是1、2、3、5；如果卡顿了，则执行顺序是1、3、4、2、5。主线程卡顿多长时间，wait就等待多长时间，或者主线程卡顿的时间超过了300秒。等主线程反应过来之后，对信号量进行加1，则就可以走之后的流程了。但是这也存在一个问题，如果是卡顿太久，导致了崩溃呢！这里就收不到信号了。
-          } else {
-              //阻塞当前线程threshold秒
-              [NSThread sleepForTimeInterval:self.threshold];
-          }
-      }
-  }
-```
-
-另一种方法是：就是根据RunLoop的事件循环状态，因为RunLoop大部分处理的事件是在KCFRunLoopBeforeSources和KCFRunLoopBeforeWaiting之间以及KCFRunLoopAfterWaiting之后。所以开启一个子线程，监听RunLoop的状态，如果长期处于KCFRunLoopBeforeSources或KCFRunLoopAfterWaiting状态，则可以判断为卡顿状态。大概的模拟操作就是：
-
-```
-// 创建子线程监控
-dispatch_async(dispatch_get_global_queue(0, 0), ^{
-    // 子线程开启一个持续的 loop 用来进行监控
-    while (YES) {
-        long semaphoreWait = dispatch_semaphore_wait(dispatchSemaphore, dispatch_time(DISPATCH_TIME_NOW, 3 * NSEC_PER_SEC));
-        if (semaphoreWait != 0) {
-            if (!runLoopObserver) {
-                timeoutCount = 0;
-                dispatchSemaphore = 0;
-                runLoopActivity = 0;
-                return;
-            }
-            //BeforeSources 和 AfterWaiting 这两个状态能够检测到是否卡顿
-            if (runLoopActivity == kCFRunLoopBeforeSources || runLoopActivity == kCFRunLoopAfterWaiting) {
-                // 将堆栈信息上报服务器的代码放到这里
-            } //end activity
-        }// end semaphore wait
-        timeoutCount = 0;
-    }// end while
-});
-```
-
-
-
 ##### 流量监控
 
 iOS的类NSURLProtocol可以拦截NSURLConnect、NSURLSession、UIWebView中的所有网络请求，获取每一次请求的request和response对象。但是这个类没法拦截TCP请求。可以使用URLProtocol做如下事情：
@@ -640,18 +678,6 @@ iOS的类NSURLProtocol可以拦截NSURLConnect、NSURLSession、UIWebView中的�
 [NSURLProtocol的使用](https://www.jianshu.com/p/ec5d6c204e17)
 
 
-
-#### 堆栈收集与分析。
-
-堆栈获取的话，一种是**直接使用系统函数**，类似使用signal捕获的方式获取堆栈，但是它不太好定位到具体函数，堆栈信息符号化不好处理。还有一种就是直接使用**PLCrashReporter开源库**。PLCrashReporter开源库能够定位到具体代码位置，性能消耗也不是很大。
-
-捕获到的Crash信息，主要包括：
-* crash标识信息，比如crash唯一标识、硬件设备、APP进程相关信息；
-* 基本信息描述：crash发生的时间和系统版本信息；
-* 异常类型描述：crash发生时抛出的异常类型和错误码；
-* 线程回溯信息：包括每个线程每一帧对应的函数调用信息；
-* crash发生时已加载的二进制文件。
-然后使用工具对这些信息解析定位到具体的代码逻辑。这就需要用到符号化解析过程；
 
 
 
@@ -674,36 +700,36 @@ crash崩溃堆栈分析(略)
 ```
 	//
 	CGContextRef context = UIGraphicsGetCurrentContext();
-    //变换坐标
-    CGContextSetTextMatrix(context, CGAffineTransformIdentity);
-    CGContextTranslateCTM(context, 0, self.bounds.size.height);
-    CGContextScaleCTM(context, 1.0, -1.0);
-    //设置绘制的路径
-    CGMutablePathRef path = CGPathCreateMutable();
-    CGPathAddRect(path, NULL, self.bounds);
+	//变换坐标
+	CGContextSetTextMatrix(context, CGAffineTransformIdentity);
+	CGContextTranslateCTM(context, 0, self.bounds.size.height);
+	CGContextScaleCTM(context, 1.0, -1.0);
+	//设置绘制的路径
+	CGMutablePathRef path = CGPathCreateMutable();
+	CGPathAddRect(path, NULL, self.bounds);
 	/创建属性字符串
-    NSMutableAttributedString * attStr = [[NSMutableAttributedString alloc] initWithString:str4];
-
-    //颜色
-    [attStr addAttribute:(__bridge NSString *)kCTForegroundColorAttributeName value:(__bridge id)[UIColor redColor].CGColor range:NSMakeRange(5, 10)];
-
-    //字体
-    UIFont * font = [UIFont systemFontOfSize:25];
-    CTFontRef fontRef = CTFontCreateWithName((__bridge CFStringRef)font.fontName, 25, NULL);
-    [attStr addAttribute:(__bridge NSString *)kCTFontAttributeName value:(__bridge id)fontRef range:NSMakeRange(20, 10)];
-
-    //空心字
-    [attStr addAttribute:(__bridge NSString *)kCTStrokeWidthAttributeName value:@(3) range:NSMakeRange(36, 5)];
-    [attStr addAttribute:(__bridge NSString *)kCTStrokeColorAttributeName value:(__bridge id)[UIColor blueColor].CGColor range:NSMakeRange(37, 10)];
-
-    //下划线
-    [attStr addAttribute:(__bridge NSString *)kCTUnderlineStyleAttributeName value:@(kCTUnderlineStyleSingle | kCTUnderlinePatternDot) range:NSMakeRange(45, 15)];
-
-    CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attStr);
-    CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, attStr.length), path, NULL);
-
-    //绘制内容
-    CTFrameDraw(frame, context);
+	NSMutableAttributedString * attStr = [[NSMutableAttributedString alloc] initWithString:str4];
+	
+	//颜色
+	[attStr addAttribute:(__bridge NSString *)kCTForegroundColorAttributeName value:(__bridge id)[UIColor redColor].CGColor range:NSMakeRange(5, 10)];
+	
+	//字体
+	UIFont * font = [UIFont systemFontOfSize:25];
+	CTFontRef fontRef = CTFontCreateWithName((__bridge CFStringRef)font.fontName, 25, NULL);
+	[attStr addAttribute:(__bridge NSString *)kCTFontAttributeName value:(__bridge id)fontRef range:NSMakeRange(20, 10)];
+	
+	//空心字
+	[attStr addAttribute:(__bridge NSString *)kCTStrokeWidthAttributeName value:@(3) range:NSMakeRange(36, 5)];
+	[attStr addAttribute:(__bridge NSString *)kCTStrokeColorAttributeName value:(__bridge id)[UIColor blueColor].CGColor range:NSMakeRange(37, 10)];
+	
+	//下划线
+	[attStr addAttribute:(__bridge NSString *)kCTUnderlineStyleAttributeName value:@(kCTUnderlineStyleSingle | kCTUnderlinePatternDot) range:NSMakeRange(45, 15)];
+	
+	CTFramesetterRef framesetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef)attStr);
+	CTFrameRef frame = CTFramesetterCreateFrame(framesetter, CFRangeMake(0, attStr.length), path, NULL);
+	
+	//绘制内容
+	CTFrameDraw(frame, context);
 ```
 
 [Core Text编程指南](https://juejin.im/post/5c5154e9e51d4503834dabf4)
@@ -873,6 +899,7 @@ static void LDAPMSignalHandler(int signal, siginfo_t* info, void* context) {
     }
 }
 ```
+
 ```
 //OC 异常
 static NSUncaughtExceptionHandler *previousUncaughtExceptionHandler;
@@ -930,11 +957,7 @@ static void LDAPMUncaughtExceptionHandler(NSException *exception) {
 [FPS及具体定位](https://www.jianshu.com/p/03d51ced4bca)
 //
 [了解和分享Crash Report](https://juejin.im/post/5c5edb37e51d457f926d2290)
-[iOS Crash日志堆栈解析](https://juejin.im/post/5adf15f2518825671775f3e1)
-
-
-
-
+[iOS Crash日志堆栈解析
 
 [iOS CALayer及UI显示原理与优化](<https://luochenxun.com/ios-0directory/>)
 
@@ -945,3 +968,7 @@ static void LDAPMUncaughtExceptionHandler(NSException *exception) {
 
 
 
+
+```
+
+```
