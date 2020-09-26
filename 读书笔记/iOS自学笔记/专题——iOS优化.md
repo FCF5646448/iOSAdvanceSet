@@ -577,9 +577,40 @@ void handleSignalException(int signal) {
 
 ##### Crash分析和定位
 ###### 分析crash日志
-crash日志里有各种崩溃信息：进程信息、基本信息、异常信息、线程堆栈；
+crash日志里有各种崩溃信息：**进程信息、基本信息、异常信息、线程堆栈**；
 通常的做法是先查看异常信息，然后定位到对应线程，在线程堆栈中找到对应线程，然后分析调用栈。如果是符号化的日志，则可以直接看到调用函数；
 通常的第三方Bugly、PLCrashReport也都含有崩溃捕获和定位的功能。
+
+
+
+#### 堆栈符号化相关
+
+https://juejin.im/post/6844903679846252552#heading-22
+
+* 符号化就是将crash log里的内存地址转化成相应的函数调用关系。
+* debug模式下，APP会把符号表存储在编译好的binary里，release模式下，会把符号表存储在dSYM文件中。
+* 系统库的符号化文件是存储在xcode下deviceSupport里。
+##### 符号化方式
+* xcode 方法：
+将.crash文件、.dysm文件、ipa包 放到相同目录下，然后把.crash文件拖到View Device Logs下或者选择下面的import导入.crash文件就可以了。
+* 命令行
+同样先将.crash文件、.dysm文件、ipa包 放到相同目录下，然后使用命令行
+```
+# 找到 symbolicatecrash 工具并拷贝出来
+find /Applications/Xcode.app -name symbolicatecrash -type f
+# 会返回几个路径，拷贝其中一个
+/Applications/Xcode.app/Contents/SharedFrameworks/DVTFoundation.framework/Versions/A/Resources/symbolicatecrash
+
+# 引入环境变量
+export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
+# 符号解析
+./symbolicatecrash appName.crash .dSYM文件路径 > appName.log
+./symbolicatecrash appName.crash appName.app > appName.log
+# 将符号化的 crash log 保存在 appName.log 中
+./symbolicatecrash appName.crash appName.app > appName.log
+
+```
+* 通过命令行工具 atos 符号化 (略)
 
 
 #### 各种检测
