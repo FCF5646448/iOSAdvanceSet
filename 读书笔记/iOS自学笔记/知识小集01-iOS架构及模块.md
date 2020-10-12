@@ -208,170 +208,6 @@ UIViewController *vc = [[Router sharedInstance] openURL:@"myapp://good/detail"]
 
 * 面试题：组件化有什么好处，两个组件通信如何协议解耦？
 
-### 图片与SDWebImage
-#### 图片缓存架构设计：
-##### 图片格式：
-* png
-	png是图片无损压缩格式，支持alpha通道；
-* jpeg
-	jpeg是图片有损压缩格式，可以指定0~100的压缩比；
-	
-
-所以如果要设置透明度就得使用png，如果不在乎质量，要节省内存，则使用jpeg。
-
-##### iOS图片加载方式：
-iOS 提供了UIImage用来加载图片，提供了UIImageView用来显示图片；
-* imageNamed
-	可以缓存已经加载的图片。使用时会根据文件名在系统缓存中寻找图片，如果找到了就返回，如果没有找到就在Bundle内查找文件名，找到后将其放到UIImage里返回，**并没有进行实际的文件读取和解码，当UIImage第一次显示到屏幕上时，其内部解码方法才会被调用，同时解码结果会保存到一个全局的缓存中**。这个全局缓存会在APP第一次退到后台和收到内存警告时才会被清空。
-* imageWithContentsOfFile
-	方法则是直接返回图片，不会进行缓存。但是其解码依然要等到第一次显示该图片的时候；
-
-##### 什么是图片解码
-在UI的显示原理中，CALayer负责显示和动画操作相关内容，其中CALayer的属性contents是对应一张CGImageRef的位图。**位图**实际上就是一个像素数组，数组中的每个像素就代码图片中的一个点。**Image Buffer**就是内存中用来存储位图像素数据的区域；**Data Buffer**就是用来存储JPEG、PNG格式图片的元数据，对应着源图片在磁盘中的大小；
-**解码就是将将不同格式的图片转码成图片的原始像素数据（ImageRef），然后绘制到屏幕上**。
-UIImage就负责解压Data Buffer内容并申请Image Buffer存储解压后的图片信息；
-UIImageView就负责将Image Buffer拷贝至frame Buffer(帧缓存区)，用于屏幕上显示；
-
-```
-ImageBuffer按照每个像素RGBA四个字节大小，一张1080p的图片解码后的位图大小是1920 * 1080 * 4 / 1024 / 1024，约7.9mb，而原图假设是jpg，压缩比1比20，大约350kb，可见解码后的内存占用是相当大的。
-```
-
-##### 开始一步步搭建缓存框架
-TODO：
-https://juejin.im/post/6844903807667666951
-* 单纯的图片下载非常简单，使用URLSession进行下载，然后使用imageWithData生成Image，最后回到主线程显示出来；
-* 但是这样每次重新加载图片时，都需要重新下载，所以加入一个缓存，避免图片多次下载。我们使用一个**NSCache**来缓存已下载好的图片。然后再逻辑里，下载之前先去缓存里查看是否有对应图片，没有就下载，下载完成再次放到缓存里；
-* 因为内存缓存只能局限于APP存活期，如果APP退出，缓存就会被销毁。下次进来还是要重新下载。所以再引入**磁盘缓存**。细节就是使用一个CacheManager专门负责缓存管理；然后缓存查找的时候，先查找内存，再查找磁盘，从磁盘找到后也缓存一份到内存。存入磁盘时，需要注意几点：
-	* 存储位置；
-	* 缓存的key——使用url做MD5加密处理；
-	* 图片存储的时候，使用UIImagePNGRepresentation和UIImageJPEGRepresentation对png和jpeg两个格式转成Data，进行存储；
-	* 对磁盘的读写非常耗时，所以使用一个自定义串行队列，然后将操作放到队列中，异步进行处理。
-	* 内存使用NSCache会在内存紧张时自动回收，因此无需进行太多处理；
-	* 磁盘缓存可以控制文件保存的时间以及文件的总大小。maxAge:根据设置的存活时间计算出文件可保留的最早时间；遍历文件，进行时间对比；若文件被访问时间早于最早时间，删除对应文件。maxSize：遍历文件计算文件总大小；若文件大小超过限制大小，则按文件被访问时间进行排序；然后逐一删除文件，直到总大小小于限制大小的一半为止（删除到一半，是因为如果只删一点，那么可能很快又达到这个值，就得再次删除，而对文件的访问和删除都是非常耗性能的操作）。
-	* 进一步优化的话可以考虑对不同的图片设置不同的缓存大小。比如常用的0~100kb的图片设置100张，100~500kb设置50张，500~1m设置10张，超过1m不进行内存缓存；
-	*  磁盘大小和时间的检测时机，最好是监听到APP进入后台的时候去做。
-* 最后下载完成后要优化成下载完成将图片同步一份到内存和磁盘中；下载完成后进行异步解码。
-
-
-#### 图片相关优化
-##### 降低采样率(DownSampling)
-在视图比较小，但是图片缺较大的场景下，直接显示原图会造成不必要的内存和CPU消耗。这里就可以使用ImageIO的接口，DownSampling，也就是生成缩略图
-```
-	// 获取缩略图
-    func downSample(imageAt url:URL, to size:CGSize, scale:CGFloat) -> UIImage {
-        //避免缓存解码后的数据，因为这个是缩略图，之后的使用场景可能就不一样，所以不要做缓存。
-        let imageSourceOptions = [kCGImageSourceShouldCache : false] as CFDictionary
-        let imgSource = CGImageSourceCreateWithURL(url as CFURL,imageSourceOptions)!
-        
-        let maxDimendionInPixels = max(size.width,size.height) * scale
-        //kCGImageSourceShouldCacheImmediately设为YES，则就立马解码，而不是等到渲染的时候才解码
-        let downsampleOptions = [kCGImageSourceCreateThumbnailFromImageAlways : true,
-                                 kCGImageSourceShouldCacheImmediately : true,
-                                 kCGImageSourceCreateThumbnailWithTransform : true,
-                                 kCGImageSourceThumbnailMaxPixelSize : maxDimendionInPixels] as CFDictionary
-        let downsampledImage = CGImageSourceCreateThumbnailAtIndex(imgSource,0,downsampleOptions)!
-        return UIImage(cgImage:downsampledImage)
-    }
-```
-
-##### 将解码过程放到异步线程
-解码放在主线程一定会造成阻塞，所以应该放到异步线程。
-iOS 10之后，UITableView和CollectionView都提供了一个预加载的接口:tableView( _ : prefetchRowsAt:) 提前为cell加载数据。
-
-```
-	let serailQueue = DispatchQueue(label: "decode queue")
-    func tableView(_ tableView: UITableView, prefetchRowsAt indexPaths: [IndexPath]) {
-        for index in indexPaths {
-            serailQueue.async {
-                let downSampledImg = "" //解码操作
-                DispatchQueue.main.async {
-                    self.update(at:index,with:downSampledImg)
-                }
-            }
-        }
-    }
-    //这里使用串行队列，避免开启多个线程，因为线程消耗也是很大的
-```
-##### 平时UI代码注意的细节点
-* 重写drawRect:UIView是通过CALayer创建FrameBuffer最后显示的。重写了drawRect，CALayer会创建一个backing store，然后在backing store中执行draw函数。而backing store默认大小与UIView大小成正比的。存在的问题：backing store的创建造成不必要的内存开销；UIImage的话先绘制到Backing store，再渲染到frameBuffer，中间多了一层内存拷贝；
-* 更多使用Image Assets：更快地查找图片、运行时对内存管理也有优化；
-* 使用离屏渲染的场景推荐使用UIGraphicsImageRender替代UIGraphicsBeginIMageContext，性能更高，并且支持广色域。
-* 对于图片的实时处理，比如灰色值，这种最好推荐使用CoreImage框架，而不是使用CoreGraphics修改灰度值。因为CoreGraphics是由CPU进行处理，所以使用CoreImage交由GPU去做；
-
-##### 超大图片处理
-如果是非常大的图，比如1902 * 1080，那解码之后的大小就达到了近7.9mb。像上述的图片加载方案或者SDWebImage的加载方式，默认就会自动解码缓存，那么如果有连续多张的情况，那内存将瞬间暴涨，甚至闪退。
-那解决方案就分为两个场景：
-* 如果显示的UIView较小，则应该通过上述降低采样率的方式，加载缩略图；
-* 如果是那种像微信、微博详情那样的大图，则应该全屏加载大图，通过拖动来查看不同位置图片的细节。技术细节就是使用苹果的CATiledLayer去加载，它可以分片渲染，滑动时通过映射原图指定位置的部分图片数据解码渲染。
-
-
-
-#### 面试题
-* 图片占用内存由什么决定？描述图片从磁盘加载到内存再展示发生了几次copy，SDWebImage对这次copy做了哪些优化？
-* 图片从加载到展示全流程描述？
-* UIImageView加载有哪些方法，分别什么特点，imageWithName加载图片的时候，解码发送在什么时候
-* jpg和png加载到内存中后有什么区别
-* 圆角、阴影、光栅化为什么造成卡顿，怎么解决？
-
-[iOS图像最佳实践](<https://juejin.im/post/5c84bd676fb9a049e702ecd8>)
-[周小可—图片的编码与解码](https://hnxczk.github.io/blog/articles/image_decode.html#imagewithcontentsoffile)
-
-[image/io](<https://zhuanlan.zhihu.com/p/30591648>)
-
-[图片渲染相关](<https://lision.me/ios-rendering-process/>)
-
-[ios绘制](<https://segmentfault.com/a/1190000000390012>)
-
-
-
-#### SDWebImage源码细节：
-
-##### 源码架构与基础流程
-* 架构简述：
-  SDWebImage是通过给UIImageView写的一个分类：UIImageView + WebCache；而支撑整个框架的核心类是SDWebImageManager。它通过管理SDWebImageDownloader和SDImageCache来协调异步下载和图片缓存。
-
-* 流程 基于4.3版本，5.0之后的版本改成了面向协议的方式，但是主要流程和类还是没什么大的改变的
-```
-1、入口函数会先把placeholderImage显示，然后根据URL开始处理下载;
-2、进入下载流程后会先使用url作为key值去缓存中查找图片，如果内存中已经有图片，则回调返回展示（这里就不会再管磁盘有没有的情况了）;
-3、如果没有找到，则会生成一个Operation进行磁盘异步查找，如果找到了会进行异步解码，解码完成后将结果回调，同时会同步到缓存中去。
-4、如果没有在本地找到，则会生成一个自定义的Operation开启异步下载。
-5、下载完成后，将下载的结果进行解码处理，然后返回。同时将图片保存到内存和磁盘。
-```
-
-[SDWebImage原理](<https://zhuanlan.zhihu.com/p/64934706>)
-[周小可—SDWebImage源码解析](<https://hnxczk.github.io/blog/articles/sd.html#sdwebimagecache>)
-
-##### 注意的细节与常考点，与上述流程对应
-* 第1步中：会先设置placeholder。然后根据URL开启下载。整个库中的key值默认使用图片URL，比如缓存、下载操作等。URL中可能会含有一部分动态变化的部分（比如获取权限的部分），所以我们可以取url不变的值scheme、host、path作为key值；
-* 第2、3步中：首先会判断是否只使用了内存查找，如果是的话，则不进行磁盘查找，也不将查找的图片存到磁盘；否的话会先生成一个NSOperation赋值给SDWebImageCombinedOperation的cacheOperation，用于cancel。然后会封装一个block来执行磁盘查找，block根据设置来确实是同步还是异步查找，如果是异步查找的话，会放到一个串行的IO队列中。在查找期间会先判断Operation是否取消，如果已经取消则不进行查找。查找的过程中会创建一个@autoreleasePool用来及时释放内存；如果在磁盘中找到了data，那么会将data解码成Image,并同时存一份到内存中，如果内存空间过小，则会先清一波内存缓存；
-* 第4步中：1、每张图片的下载是由自定义的NSOperation的子类进行的，它实现了start方法。start方法中创建了一个NSURLSession开启下载，使用了RunLoop来确保从start到结果响应期间不会被干掉，如果运行后台下载的话，也是在这里进行处理的。2、Operation被放到一个NSOperationQueue中并发执行，队列中的最大并发量是6；DownloadQueue使用了信号量来确保线程安全；3、每个Operation、结果回调block、进度block都是包装存储到一个URLCallBack中的，它以url为key值缓存在一个NSMutableDictionary的字典中，以便cancel及其他操作。但是因为可能存在多个操作同时进行的情况，所以这里就使用了dispatch_barrier来确保NSMutableDictionary的线程安全；4、下载过程中，如果返回了304 not Modified，则表示客户端是有缓存的，则可以直接cancel掉Operation，返回回调返回缓存的image。
-* 第5步：下载完成后，会在URLSessionTaskDelegate的回调方法里使用一个串行队列异步进对下载图片进行解码。解压完成后，如果是JPEG这种可压缩格式的图片则会按照设置进行压缩后再返回。如果有缩略设置，也会对图片进行缩放等；
-* 其他：
-  * SDWebImageCombinedOperation：它实际上不是一个NSOperation，它只是持有了downloadOperation和cacheOperation（真实的NSOperation类型），downloadOpetation对应着SDWebImageDownloadToken类型，它包含着一个SDWebImageDownloaderOperation和url，也就是URLSession的实际下载操作；
-
-  * 内存缓存使用的是NSCache的子类。NSCache是类似NDDictionary的容器，它是线程安全的，所以在任意线程进行添加、删除都不需要加锁，而且在内存紧张时会自动释放一些对象，存储对象时也不会对key值进行copy操作。SDImageCache在收到内存警告或退到后台的时候会清理内存缓存，应用结束时会清理过期一周的图片；内存缓存是缓存解码之后的图片，也就是UIImage。
-
-  * 磁盘缓存使用的是NSFileManager来实现的。图片存储的位置位于Cache文件夹，文件名是对key值进行MD5后的值，SDImageCache定义了一个串行队列来对图片进行异步写操作，不会对主线程造成影响；存到磁盘的同时会检查是jpeg还是png（这里主要是通过alpha通道来判断的），然后将其转成对应的压缩格式进行存储；读取磁盘缓存也会先从沙盒中读取，然后再从bundle中读取，读取成功后才进行转换，转换过程中先转成image，然后根据设备进行@2x、@3x缩放，如果需要解压缩再解压缩，之后才是后续解码操作。
-
-  * 清理磁盘缓存可以选择全部清空和部分清空。全部清空则是把缓存文件夹删除，部分清空会根据参数设置来判断，主要看文件缓存有效期和最大缓存空间，文件默认有效期是1周；文件默认缓存空间大小是0，也就是表示可以随意存储，如果设置了的话，则会先判断总大小是否已经超出最大值，如果超出了，则优先保留最近最先使用的图片，递归删掉其他过早的图片，直到总大小小于最大值。
-
-  * 使用主队列来代替是否在主线程的判断；
-
-  * 后台下载：使用`-[UIApplication beginBackgroundTaskWithExpirationHandler:]` 方法使 app 退到后台时还能继续执行任务, 不再执行后台任务时，需要调用 `-[UIApplication endBackgroundTask:]` 方法标记后台任务结束
-
-  * 框架中使用最多的锁是dispatch_semaphore_t，其次是@synchronized互斥锁；
-
-
-
-[SDWebImage相关面试题](http://cloverkim.com/SDWebImage-interview-question.html)
-
-[SDWebImage源码阅读笔记](https://www.jianshu.com/p/06f0265c22eb)
-
-
-
-### 打造缓存模块
-https://www.infoq.cn/article/V3J6HrWtrzjUmGOz66f5
 
 
 
@@ -404,10 +240,8 @@ https://www.infoq.cn/article/V3J6HrWtrzjUmGOz66f5
 }
 ```
 
-
-
-
 https://juejin.im/post/5da1a30de51d457825210a8c
+
 
 ### 直播框架与实践
 #### 移动端主要框架
@@ -420,15 +254,15 @@ https://juejin.im/post/5da1a30de51d457825210a8c
 * 观看端：
 	* 音视频解码：FFmpeg视频解码，VideoToolBox视频硬解码，AudioToolBox音频硬解码；
 	* 播放：ijkplayer；
-* IM聊天：聊天室、点亮、推送、超过、黑名单、聊天信息、滚动弹幕等；
+* IM聊天：聊天室、点亮、推送、超过、黑名单、聊天信息、滚动弹幕等；(可参考IM框架学习)
 * 礼物相关：各种礼物、红包、排行榜等；
 
 #### 主要是对业务层的搭建
 直播端业务逻辑倒是不是特别复杂，大部分可以直接使用MVC框架即可。主控制器的独立业务太多的话，可以拆分成多个单独的Category；对于Model的数据变化可以采用notification的形式通知，便于做多处绑定；然后对于各种类型消息可以使用面向协议的方式编写；
-礼物：要使用队列存储礼物；
-消息：聊天消息要注意高度计算及卡顿相关问题，然后各种消息的分发也应该使用队列的形式；
-弹幕：也要用队列存储弹幕，同时要限制条数；
-聊天室：聊天室的各种消息类型比较多，尤其是频繁进出房间的时候。导致客户端与服务端之间的消息过多，可能就会产生一些性能问题，可以考虑在用户过多的情况下不发送进出房间消息，或者根据用户优先级来确定是否发送进出房的同步消息；
+* 礼物：要使用队列存储礼物；
+* 消息：聊天消息要注意高度计算及卡顿相关问题，然后各种消息的分发也应该使用队列的形式；
+* 弹幕：也要用队列存储弹幕，同时要限制条数；
+* 聊天室：聊天室的各种消息类型比较多，尤其是频繁进出房间的时候。导致客户端与服务端之间的消息过多，可能就会产生一些性能问题，可以考虑在用户过多的情况下不发送进出房间消息，或者根据用户优先级来确定是否发送进出房的同步消息；
 
 #### 直播协议比较：
 * HLS：苹果退出的流媒体技术，是以点播的技术方式来实现直播，使用HTTP短链接。优势：兼容性、性能和、穿墙和HTTP一样；劣势：高延时、文件碎片；
@@ -457,70 +291,48 @@ HLS与RTMP对比: HLS主要是延时比较大，RTMP主要优势在于延时低H
 
 
 
-### 下载模块与AFNetWorking
+### IM框架
 
-#### 下载框架
+[一个海量在线用户即时通讯系统的设计]（https://cloud.tencent.com/developer/article/1525567）
 
-首先需要一个manager管理整个app的下载事件；它负责管理每一个request。比如说取消、重新加载等操作。其次需要有一个Config配置类，用来配置基础信息，比如配置请求类型、cookie、时间等信息。然后有一个对response进行处理的工具，比如日志的筛选打印、对一些异常错误的处理等等
+#### 整个SDK框架 (IM 架构)
 
-#### AFNetworking
+根据融云IM学习。从里到外，依次是：
 
-整体框架：AFNetWorking整体框架主要是由会话模块(NSURLSession)、网络监听模块、网络安全模块、请求序列化和响应序列化的封装以及UIKit的集成模块(比如原生分类)。
-其中最核心类是AFURLSessionManager，其子类AFHTTPSessionManager包含了AFURLRequestionSerialzation(请求序列化)、AFURLResponseSerialzation(响应序列化)两部分；同时AFURLSessionManager还包含了NSURLSession(会话模块)、AFsecurityPolicy(网络安全模块：证书校验)、AFNetWorkingReachabilityManager(负责对网络连接进行监听)；
-AFURLSessionManager主要工作包括哪些？
-1、负责管理和创建NSURLSession、NSURLSessionTask
-2、实现NSURLSessionDelegate等协议的代理方法
-3、引入AFSecurityPolicy保证请求安全
-4、引入AFNetWorkingReachabilityManager监听网络状态
-https://www.jianshu.com/p/b3c209f6a709
-#### Alamofire：同一个作者写的swift版本的AFNetWorking
+* Protocol：核心协议栈。一般是自己的私有协议。主要特点是轻量化、有序可靠、不丢消息。
+* IMLib：提供基本通信能力库，封装了通信能力和Conversation、Message等各种对象。服务于需要根据自己的产品去实现界面的开发者。
+* IMKit：主要是封装各种界面对象，服务于开发者快速实现自己的产品。能够快速集成，支持丰富的界面定制。
 
-整体框架：Alamofire核心部分都在其Core文件夹内，它包含了核心的2个类、3个枚举、2个结构体；另一个文件夹Feature则包含了对这些核心数据结构的扩展。
-2个类：Manager(提供对外接口，处理NSURLSession的代理方法)；Request(对请求的处理)；
-3枚举：Method(请求方法)；ParameterEncoding(编码方式)；Result(请求成功或失败数据结构)
-2结构体：Response(响应结构体)；Error(错误对象)
-扩展中包括Manager的Upload、Download、Stream扩展、以及Request的扩展Validation和ResponseSerialization。
-怎么处理多并发请求？
-使用NSOperetionQueue！
+#### 业务模块
+* 会话：二人或多人进行消息通讯的聊天场景。一般包括单聊、群聊、聊天室、客服、系统等会话类型；
+* 单聊：一对一通讯。APP后台运行或者APP进程被杀死后，有新消息也会收到推送通知；
+* 群组：两个以上用户进行通讯。APP后台运行或者APP进程被杀死后，有新消息也会收到推送通知；群组有最大人数上限；
+* 聊天室：聊天室不设用户上限，海量消息并发即时到达，用户退出聊天界面既视为离开聊天室，不会再接收到任何聊天消息，没有推送通知；
+* 会话列表：所有的会话列表。排序会依赖于置顶、最新会话、未读会话、时间等因素设置。聊天室类型的会话不会进入到会话列表；
+* 通知：本地通知和远程通知。本地通知是指APP仍然存活，远程通知是APP已完全退出，一般通过APNS系统服务进行推送；
 
+#### 如何实现IM中信息的可靠性传输：消息不丢失、消息不重复；
+首先我们大概看一下消息的发送流程：
 
-
-[AFNetWork图片解码相关]<https://www.jianshu.com/p/90558187932f>
-
-
-
-### AsyncDisplayKit：
-整体框架：
-正常情况下，UIView作为CALayer的delegate，而CALayer作为UIView的一个成员变量，负责视图展示工作。ASDK则是在此之上封装了一个ASNod类，它有点view的成员变量，可以生成一个UIView，同时UIView有一个.node成员属性，可以获取到它所对应的Node。而ASNode是线程安全的，它可以放到后台线程创建和修改。所以平时我们对UIView的一些相关修改就可以落地到对ASNode的属性的修改和提交，同时模仿Core Animation提交setneeddisplayer的这种形式把对ASNode的修改进行封装提交到一个全局容器中，然后监听runloop的beforewaiting的通知，当runloop进入休眠时，ASDK则可以从全局容器中把ASNode提取出来，然后把对应的属性设置一次性设置给UIView。
-
-主要解决的问题：布局的耗时运算(文本宽高、视图布局运算)、渲染(文本渲染、图片解码、图形绘制)、UIKit的对象处理(对象创建、对象调整、对象销毁)。因为这些对象基本都是在UIKit和Core Animation框架下，而UIKit和Core Animation相关操作必须在主线程中进行。所以ASDK的任务就是把这些任务从主线挪走，挪不走的就尽量优化。
-
-
-
-
-
-### IM
-* IM中信息的可靠性传输：消息不丢失、消息不重复；
-  首先我们大概看一下消息的发送流程：
-  * 步骤1：用户A发送信息到达IM服务器；
-  * 步骤2：服务器进行消息暂存；
-  * 步骤3：暂存成功后，将成功的消息返回给A；
-  * 步骤4：返回确认消息的同时将消息推送给用户B；
-  这些步骤中1~3步任一失败的话，用户A会被提示发送失败。后面步骤中，可能出现消息未能推送给B导致失败，也可能出现B写入本地数据库失败导致消息丢失。
-  解决方案：
-  基本原理就是：ACK确认机制+消息重传+消息完整性校验，来解决消息丢失的问题。
-  ACK确认机制就是TCP的ACK确认回复，在三次握手、四次挥手中都有使用到。首先TCP报文字节都是有数据序列号的。ACK报文每次回复确认都会带上序列号，告诉发送方接收到了哪些数据，所以这也保证了消息的有序性。然后如果ACK确认报文丢失，那么可能是发送数据丢失位到底IM服务器，也可能是到底了服务器，但是返回的确认报文丢失了。无论是这两种的那种情况，TCP都可以使用超时重传的策略解决，只是如果是ACK确认丢失了，则服务器会先忽略掉新的数据，然后发送ACK应答。其次IM业务层也基本参考了ACK确认机制和超时重传机制。比如推送消息给B时，会携带一个标识，然后将退出去的消息添加到“待ACK确认消息队列”，用户B收到消息后会回复一条ACK包，然后服务器把消息从待确认队列中删除。否则进行重新推送。之所以要加业务层的ACK确认机制，是因为TCP只能保证传输层的消息是否到底，但是业务层可能到底之后还需要进行处理，比如说存入本地数据库。
-  消息完整性校验：则是可以通过每一条消息带上时间戳的形式，然后每次重连后对比时间戳，则可以知道大概哪些消息没有到达，然后将待确认队列的时间戳之后的数据都按序发送一遍。
-  如何确保消息不重复？
-  同样是给每个消息带上一个ID，接收方接到消息后，先进行业务去重，然后才考虑是否使用这个消息。
+* 步骤1：用户A发送信息到达IM服务器；
+* 步骤2：服务器进行消息暂存；
+* 步骤3：暂存成功后，将成功的消息返回给A；
+* 步骤4：返回确认消息的同时将消息推送给用户B；
+这些步骤中1~3步任一失败的话，用户A会被提示发送失败。后面步骤中，可能出现消息未能推送给B导致失败，也可能出现B写入本地数据库失败导致消息丢失。
+解决方案：
+基本原理就是：ACK确认机制+消息重传+消息完整性校验，来解决消息丢失的问题。
+ACK确认机制就是TCP的ACK确认回复，在三次握手、四次挥手中都有使用到。首先TCP报文字节都是有数据序列号的。ACK报文每次回复确认都会带上序列号，告诉发送方接收到了哪些数据，所以这也保证了消息的有序性。然后如果ACK确认报文丢失，那么可能是发送数据丢失位到底IM服务器，也可能是到底了服务器，但是返回的确认报文丢失了。无论是这两种的那种情况，TCP都可以使用超时重传的策略解决，只是如果是ACK确认丢失了，则服务器会先忽略掉新的数据，然后发送ACK应答。其次IM业务层也基本参考了ACK确认机制和超时重传机制。比如推送消息给B时，会携带一个标识，然后将退出去的消息添加到“待ACK确认消息队列”，用户B收到消息后会回复一条ACK包，然后服务器把消息从待确认队列中删除。否则进行重新推送。之所以要加业务层的ACK确认机制，是因为TCP只能保证传输层的消息是否到底，但是业务层可能到底之后还需要进行处理，比如说存入本地数据库。
+消息完整性校验：则是可以通过每一条消息带上时间戳的形式，然后每次重连后对比时间戳，则可以知道大概哪些消息没有到达，然后将待确认队列的时间戳之后的数据都按序发送一遍。
+如何确保消息不重复？
+同样是给每个消息带上一个ID，接收方接到消息后，先进行业务去重，然后才考虑是否使用这个消息。
 
 * IM数据库如何设计表
-	* 会话表：用于存储所有会话。
-	* 聊天详情表：主要用于存储消息
-	* 群组表：存储每个群组相关数据
-	* 群组信息表：用于关联群组表和群成员表
-	* 群成员表：存储群成员信息
-	* 联系人表：存储所有联系人。
+  * 会话表：用于存储所有会话。
+  * 聊天详情表：主要用于存储消息
+  * 群组表：存储每个群组相关数据
+  * 群组信息表：用于关联群组表和群成员表
+  * 群成员表：存储群成员信息
+  * 联系人表：存储所有联系人。
 
 
 ### 单元测试与可持续集成

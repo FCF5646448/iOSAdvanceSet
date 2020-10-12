@@ -400,7 +400,7 @@ static void Callback(CFRunLoopObserverRef observer, CFRunLoopActivity activity, 
 
   其次，尽量少使用performselector这种API；
 
-- KCV造成的Crash ：
+- KVC造成的Crash ：
   eg:给NSObject添加KVC；key为nil；key不存在。一句话：**给不存在的key（包括nil）设置value**；
   解决方案：重写类的setValue:forUndinedKey:和valueForUndefinedKey:
 
@@ -582,6 +582,8 @@ crash日志里有各种崩溃信息：**进程信息、基本信息、异常信�
 通常的第三方Bugly、PLCrashReport也都含有崩溃捕获和定位的功能。
 
 
+
+[iOS Crash](<https://www.infoq.cn/article/zPlL678QOiKFT5uiW9Mq>)
 
 #### 堆栈符号化相关
 
@@ -991,15 +993,3 @@ static void LDAPMUncaughtExceptionHandler(NSException *exception) {
 [iOS Crash日志堆栈解析
 
 [iOS CALayer及UI显示原理与优化](<https://luochenxun.com/ios-0directory/>)
-
-
-
-
-
-
-
-
-
-```
-
-```
