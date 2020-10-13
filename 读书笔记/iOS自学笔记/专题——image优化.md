@@ -175,6 +175,8 @@ __weak typeof(self) ws = self;
 ### Core Graphic学习
 [Core Graphic框架学习](https://www.jianshu.com/c/ad35684395a5)
 
+[Core Graphics学习](https://juejin.im/post/6880774803553255432)
+
 ### GPUImage
 [GPU源码解读](https://philm.gitbook.io/philm-ios-wiki/mei-zhou-yue-du/gpuimage-yuan-ma-jie-du-yi)
 [落影GPUImage使用](https://www.jianshu.com/nb/4268718)
