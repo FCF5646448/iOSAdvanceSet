@@ -125,10 +125,11 @@ typedef void(^Block)(void);
 //    [self blockTest];
 //    self.age = 1;
     
-    [self classClusters];
+//    [self classClusters];
     
 //    [self interview];
     
+    [TestObjc resolveMethod];
     
 }
 

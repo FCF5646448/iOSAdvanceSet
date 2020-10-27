@@ -12,6 +12,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface TestObjc : NSObject
 - (void)resolveMethod;
++ (void)resolveMethod;
 @end
 
 NS_ASSUME_NONNULL_END

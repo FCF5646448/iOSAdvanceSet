@@ -10,6 +10,7 @@
 #import <UIKit/UIKit.h>
 
 @implementation TestObjc
+
 - (void)resolveMethod {
     NSLog(@"TestObjc xxxxxx");
 }
