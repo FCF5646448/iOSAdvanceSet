@@ -9,6 +9,7 @@
 #import "ViewController.h"
 #import "TestObjc.h"
 #import "ORMTestObjc.h"
+#import "Person.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -61,11 +62,6 @@
 
 typedef void(^Block)(void);
 
-@interface ViewController ()
-@property (nonatomic, copy)Block block;
-@property (nonatomic, assign)int a;
-@property (nonatomic, assign) int age;
-@end
 
 @interface NSObject(category)
 + (void)foo;
@@ -97,6 +93,13 @@ typedef void(^Block)(void);
 }
 @end
 
+@interface ViewController ()
+@property (nonatomic, copy)Block block;
+@property (nonatomic, assign)int a;
+@property (nonatomic, assign) int age;
+@property (nonatomic, strong) Person * p1;
+@property (nonatomic, strong) Person * p2;
+@end
 
 @implementation ViewController
 
@@ -129,7 +132,9 @@ typedef void(^Block)(void);
     
 //    [self interview];
     
-    [TestObjc resolveMethod];
+//    [TestObjc resolveMethod];
+    
+    [self kvoTest];
     
 }
 
@@ -369,8 +374,55 @@ void dynamicResoleMethod(id sf,SEL _cmd) {
 }
 
 
+// KVO底层实现
+- (void)kvoTest {
+    
+    self.p1 = [Person new];
+    self.p1.age = 1;
+    
+    self.p2 = [Person new];
+    self.p2.age = 2;
+    
+    [self.p1 addObserver:self forKeyPath:@"age" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
+    
+//    NSLog(@"真实类：%@,%@", object_getClass(self.p1), object_getClass(self.p2));
+//
+//    NSLog(@"表面类：%@,%@", [self.p1 class], [self.p2 class]);
+    
+    [self printMethodNameOfClass:object_getClass(self.p1)]; // NSKVONotifying_Person setAge: ,class ,dealloc ,_isKVOA
+    [self printMethodNameOfClass:object_getClass(self.p2)]; // Person age ,setAge: 
+    
+}
 
+//打印一个类对象的所有方法
+- (void) printMethodNameOfClass: (Class) cls {
+    unsigned int count;
+    Method *methLists = class_copyMethodList(cls, &count);
+    
+    //保存所有方法
+    NSMutableString * methodNames = [NSMutableString string];
+    
+    for (int i = 0; i < count; i++) {
+        //获取方法名
+        NSString * methodName = NSStringFromSelector(method_getName(methLists[i]));
+        
+        [methodNames appendFormat:@"%@ ,",methodName];
+    }
+    
+    free(methLists);
+    
+    //
+    NSLog(@"%@ %@",cls, methodNames);
+}
 
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSKeyValueChangeKey,id> *)change context:(void *)context {
+    NSLog(@"%@,%@,%@",keyPath,object,change);
+}
+
+- (void)dealloc
+{
+    [self.p1 removeObserver:self forKeyPath:@"age"];
+}
 
 
 @end

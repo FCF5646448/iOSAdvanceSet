@@ -22,6 +22,7 @@
 		1967428021F70EA300105790 /* ORMTestObjc.m in Sources */ = {isa = PBXBuildFile; fileRef = 1967427F21F70EA300105790 /* ORMTestObjc.m */; };
 		1979414B21E746FA0066AD24 /* ViewController+Statistics.m in Sources */ = {isa = PBXBuildFile; fileRef = 1979414A21E746FA0066AD24 /* ViewController+Statistics.m */; };
 		198EC53421F2FBA3009B0802 /* NSArray+Category.m in Sources */ = {isa = PBXBuildFile; fileRef = 198EC53321F2FBA3009B0802 /* NSArray+Category.m */; };
+		3119CBF62548716F00D8A50B /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 3119CBF52548716F00D8A50B /* Person.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -53,6 +54,8 @@
 		1979414A21E746FA0066AD24 /* ViewController+Statistics.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "ViewController+Statistics.m"; sourceTree = "<group>"; };
 		198EC53221F2FBA3009B0802 /* NSArray+Category.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSArray+Category.h"; sourceTree = "<group>"; };
 		198EC53321F2FBA3009B0802 /* NSArray+Category.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSArray+Category.m"; sourceTree = "<group>"; };
+		3119CBF42548716F00D8A50B /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		3119CBF52548716F00D8A50B /* Person.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -112,6 +115,8 @@
 				19478B9B21E33EEC00E2AB79 /* TestObjc.m */,
 				19467988254828A2003A5E6E /* NSObject+Test.h */,
 				19467989254828A2003A5E6E /* NSObject+Test.m */,
+				3119CBF42548716F00D8A50B /* Person.h */,
+				3119CBF52548716F00D8A50B /* Person.m */,
 			);
 			path = RuntimeDemos;
 			sourceTree = "<group>";
@@ -195,6 +200,7 @@
 				1979414B21E746FA0066AD24 /* ViewController+Statistics.m in Sources */,
 				192F257E21DF8A3700088BCB /* ViewController+category01.m in Sources */,
 				191AC7F82223D25700E7697C /* NSMutableArray+Category.m in Sources */,
+				3119CBF62548716F00D8A50B /* Person.m in Sources */,
 				19478B9C21E33EEC00E2AB79 /* TestObjc.m in Sources */,
 				192F258121DF8A4100088BCB /* ViewController+category02.m in Sources */,
 				192F258421DF8A4C00088BCB /* ViewController+category03.m in Sources */,
