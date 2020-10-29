@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		19520084254A6DA50039B366 /* FCFPerson.m in Sources */ = {isa = PBXBuildFile; fileRef = 19520083254A6DA50039B366 /* FCFPerson.m */; };
 		195EDC302549782C00325E6D /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 195EDC2F2549782C00325E6D /* main.m */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		19520082254A6DA50039B366 /* FCFPerson.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFPerson.h; sourceTree = "<group>"; };
+		19520083254A6DA50039B366 /* FCFPerson.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFPerson.m; sourceTree = "<group>"; };
+		19520085254A6E360039B366 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		19520087254A9DD60039B366 /* FCFPerson.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = FCFPerson.cpp; sourceTree = "<group>"; };
 		195EDC2C2549782C00325E6D /* BlockDemo */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = BlockDemo; sourceTree = BUILT_PRODUCTS_DIR; };
 		195EDC2F2549782C00325E6D /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -57,7 +62,11 @@
 		195EDC2E2549782C00325E6D /* BlockDemo */ = {
 			isa = PBXGroup;
 			children = (
+				19520085254A6E360039B366 /* main.cpp */,
 				195EDC2F2549782C00325E6D /* main.m */,
+				19520087254A9DD60039B366 /* FCFPerson.cpp */,
+				19520082254A6DA50039B366 /* FCFPerson.h */,
+				19520083254A6DA50039B366 /* FCFPerson.m */,
 			);
 			path = BlockDemo;
 			sourceTree = "<group>";
@@ -119,6 +128,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19520084254A6DA50039B366 /* FCFPerson.m in Sources */,
 				195EDC302549782C00325E6D /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
