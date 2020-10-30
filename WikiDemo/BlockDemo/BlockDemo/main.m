@@ -61,55 +61,64 @@ void practice() {
 
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
-        /*
-         下面的age变量最终编译成了一个结构体：
-         struct __Block_byref_age_0 {
-           void *__isa;
-         __Block_byref_age_0 *__forwarding; 
-          int __flags;
-          int __size;
-          int age;
-         };
-         下面FCFPerson对象也被编译成了一个结构体：
-         struct __Block_byref_p_1 {
-           void *__isa;
-         __Block_byref_p_1 *__forwarding;
-          int __flags;
-          int __size;
-          void (*__Block_byref_id_object_copy)(void*, void*);
-          void (*__Block_byref_id_object_dispose)(void*);
-          FCFPerson *p;
-         };
-
-         下面行最终编译成：
-         __Block_byref_age_0 age = {
-                    0,
-                    &age,
-                    0,
-                    sizeof(__Block_byref_age_0),
-                    10
-         };
-         */
-        __block int age = 10;
-        __block FCFPerson * p = [FCFPerson new];
+        FCFPerson * p = [FCFPerson new];
         p.name = @"fcf";
-        void (^block)(void) = ^{
-            // (age->__forwarding->age) = 20;
-            age = 20;
-            /*
-             下面一行被编译成：
-            p = {0,&p, 33554432, sizeof(__Block_byref_p_1), __Block_byref_id_object_copy_131, __Block_byref_id_object_dispose_131, ((objc_msgSend)(objc_getClass("FCFPerson"), sel_registerName("new"))};
-             */
-            p = [FCFPerson new];
-            p.name = @"fcf1";
-            NSLog(@"age=%d, name=%@",age, p.name);
+        p.block = ^{
+            NSLog(@"-----------%@",p.name);
         };
-        block();
-        NSLog(@"%d",age);
+        NSLog(@"------------");
     }
     return 0;
 }
 
+void test3() {
+
+    /*
+     下面的age变量最终编译成了一个结构体：
+     struct __Block_byref_age_0 {
+       void *__isa;
+     __Block_byref_age_0 *__forwarding;
+      int __flags;
+      int __size;
+      int age;
+     };
+     下面FCFPerson对象也被编译成了一个结构体：
+     struct __Block_byref_p_1 {
+       void *__isa;
+     __Block_byref_p_1 *__forwarding;
+      int __flags;
+      int __size;
+      void (*__Block_byref_id_object_copy)(void*, void*);
+      void (*__Block_byref_id_object_dispose)(void*);
+      FCFPerson *p;
+     };
+
+     下面行最终编译成：
+     __Block_byref_age_0 age = {
+                0,
+                &age,
+                0,
+                sizeof(__Block_byref_age_0),
+                10
+     };
+     */
+    __block int age = 10;
+    __block FCFPerson * p = [FCFPerson new];
+    p.name = @"fcf";
+    void (^block)(void) = ^{
+        // (age->__forwarding->age) = 20;
+        age = 20;
+        /*
+         下面一行被编译成：
+        p = {0,&p, 33554432, sizeof(__Block_byref_p_1), __Block_byref_id_object_copy_131, __Block_byref_id_object_dispose_131, ((objc_msgSend)(objc_getClass("FCFPerson"), sel_registerName("new"))};
+         */
+        p = [FCFPerson new];
+        p.name = @"fcf1";
+        NSLog(@"age=%d, name=%@",age, p.name);
+    };
+    block();
+    NSLog(@"%d",age);
+}
 //void test2() {
 //    {
 //        FCFPerson * p = [FCFPerson new];

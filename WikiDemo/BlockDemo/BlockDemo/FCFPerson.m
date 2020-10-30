@@ -31,7 +31,11 @@
     block();
 }
 
+- (void)test2 {
+    
+}
+
 - (void)dealloc {
-    NSLog(@"FCFPerson dealloc");
+    NSLog(@"%s", __func__);
 }
 @end

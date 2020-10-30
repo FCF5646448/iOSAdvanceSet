@@ -10,9 +10,14 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void(^FCFBlock)(void);
+
 @interface FCFPerson : NSObject
 @property (nonatomic, copy) NSString * name;
+@property (nonatomic, copy) FCFBlock block;
+
 - (void)test;
+- (void)test2;
 @end
 
 NS_ASSUME_NONNULL_END
