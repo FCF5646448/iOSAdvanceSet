@@ -9,5 +9,7 @@
 #import "Person.h"
 
 @implementation Person
-
+- (void)run {
+    NSLog(@"%@", __func__);
+}
 @end

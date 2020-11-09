@@ -130,11 +130,11 @@ typedef void(^Block)(void);
     
 //    [self classClusters];
     
-//    [self interview];
+    [self interview];
     
 //    [TestObjc resolveMethod];
     
-    [self kvoTest];
+//    [self kvoTest];
     
 }
 
@@ -142,15 +142,15 @@ typedef void(^Block)(void);
 //面试题
 - (void)interview {
     //2
-//    BOOL res1 = [(id)[NSObject class] isKindOfClass:[NSObject class]];
-//    BOOL res2 = [(id)[NSObject class] isMemberOfClass:[NSObject class]];
-//    BOOL res3 = [(id)[Test2 class] isKindOfClass:[Test2 class]];
-//    BOOL res4 = [(id)[Test2 class] isMemberOfClass:[Test2 class]];
-//
-//    BOOL res5 = [[NSObject new] isKindOfClass:[NSObject class]];
-//    BOOL res6 = [[NSObject new] isMemberOfClass:[NSObject class]];
-//    BOOL res7 = [[Test2 new] isKindOfClass:[Test2 class]];
-//    BOOL res8 = [[Test2 new] isMemberOfClass:[Test2 class]];
+    BOOL res1 = [(id)[NSObject class] isKindOfClass:[NSObject class]]; //YES
+    BOOL res2 = [(id)[NSObject class] isMemberOfClass:[NSObject class]]; //NO
+    BOOL res3 = [(id)[Test2 class] isKindOfClass:[Test2 class]]; //NO
+    BOOL res4 = [(id)[Test2 class] isMemberOfClass:[Test2 class]]; //NO
+
+    BOOL res5 = [[NSObject new] isKindOfClass:[NSObject class]]; //YES
+    BOOL res6 = [[NSObject new] isMemberOfClass:[NSObject class]]; //YES
+    BOOL res7 = [[Test2 new] isKindOfClass:[Test2 class]]; //YES
+    BOOL res8 = [[Test2 new] isMemberOfClass:[Test2 class]]; //YES
     
     //3
 //    [NSObject foo];
