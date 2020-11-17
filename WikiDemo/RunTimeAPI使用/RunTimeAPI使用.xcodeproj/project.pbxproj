@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3113A909255F55BC006CF909 /* NSObject+Json.m in Sources */ = {isa = PBXBuildFile; fileRef = 3113A908255F55BC006CF909 /* NSObject+Json.m */; };
 		316A72F7255B6380000E691F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 316A72F6255B6380000E691F /* main.m */; };
 		316A72FF255B63CA000E691F /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 316A72FE255B63CA000E691F /* Person.m */; };
 		316A7302255B63D3000E691F /* Car.m in Sources */ = {isa = PBXBuildFile; fileRef = 316A7301255B63D3000E691F /* Car.m */; };
@@ -25,6 +26,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3113A907255F55BC006CF909 /* NSObject+Json.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSObject+Json.h"; sourceTree = "<group>"; };
+		3113A908255F55BC006CF909 /* NSObject+Json.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSObject+Json.m"; sourceTree = "<group>"; };
 		316A72F3255B6380000E691F /* RunTimeAPI使用 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "RunTimeAPI使用"; sourceTree = BUILT_PRODUCTS_DIR; };
 		316A72F6255B6380000E691F /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		316A72FD255B63CA000E691F /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
@@ -68,6 +71,8 @@
 				316A72FE255B63CA000E691F /* Person.m */,
 				316A7300255B63D3000E691F /* Car.h */,
 				316A7301255B63D3000E691F /* Car.m */,
+				3113A907255F55BC006CF909 /* NSObject+Json.h */,
+				3113A908255F55BC006CF909 /* NSObject+Json.m */,
 			);
 			path = "RunTimeAPI使用";
 			sourceTree = "<group>";
@@ -132,6 +137,7 @@
 				316A7302255B63D3000E691F /* Car.m in Sources */,
 				316A72FF255B63CA000E691F /* Person.m in Sources */,
 				316A72F7255B6380000E691F /* main.m in Sources */,
+				3113A909255F55BC006CF909 /* NSObject+Json.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
