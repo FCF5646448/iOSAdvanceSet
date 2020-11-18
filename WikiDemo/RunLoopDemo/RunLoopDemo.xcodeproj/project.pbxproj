@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		31647F6225656445001E61A1 /* PermenantThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 31647F6125656445001E61A1 /* PermenantThread.m */; };
+		31647F6625656605001E61A1 /* SubViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31647F6425656605001E61A1 /* SubViewController.m */; };
+		31647F6725656605001E61A1 /* SubViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31647F6525656605001E61A1 /* SubViewController.xib */; };
+		31647F6B25656BF1001E61A1 /* ThreeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31647F6925656BF1001E61A1 /* ThreeViewController.m */; };
+		31647F6C25656BF1001E61A1 /* ThreeViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 31647F6A25656BF1001E61A1 /* ThreeViewController.xib */; };
+		31647F6F25657A05001E61A1 /* PermenantCThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 31647F6E25657A05001E61A1 /* PermenantCThread.m */; };
 		31D15090256404C90069D1AA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D1508F256404C90069D1AA /* AppDelegate.m */; };
 		31D15093256404C90069D1AA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D15092256404C90069D1AA /* SceneDelegate.m */; };
 		31D15096256404C90069D1AA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D15095256404C90069D1AA /* ViewController.m */; };
@@ -14,9 +20,20 @@
 		31D1509B256404CA0069D1AA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 31D1509A256404CA0069D1AA /* Assets.xcassets */; };
 		31D1509E256404CA0069D1AA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 31D1509C256404CA0069D1AA /* LaunchScreen.storyboard */; };
 		31D150A1256404CA0069D1AA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D150A0256404CA0069D1AA /* main.m */; };
+		31D150A9256431B20069D1AA /* FCFThread.m in Sources */ = {isa = PBXBuildFile; fileRef = 31D150A8256431B20069D1AA /* FCFThread.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		31647F6025656445001E61A1 /* PermenantThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PermenantThread.h; sourceTree = "<group>"; };
+		31647F6125656445001E61A1 /* PermenantThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PermenantThread.m; sourceTree = "<group>"; };
+		31647F6325656605001E61A1 /* SubViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SubViewController.h; sourceTree = "<group>"; };
+		31647F6425656605001E61A1 /* SubViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SubViewController.m; sourceTree = "<group>"; };
+		31647F6525656605001E61A1 /* SubViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SubViewController.xib; sourceTree = "<group>"; };
+		31647F6825656BF1001E61A1 /* ThreeViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreeViewController.h; sourceTree = "<group>"; };
+		31647F6925656BF1001E61A1 /* ThreeViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ThreeViewController.m; sourceTree = "<group>"; };
+		31647F6A25656BF1001E61A1 /* ThreeViewController.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ThreeViewController.xib; sourceTree = "<group>"; };
+		31647F6D25657A05001E61A1 /* PermenantCThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PermenantCThread.h; sourceTree = "<group>"; };
+		31647F6E25657A05001E61A1 /* PermenantCThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = PermenantCThread.m; sourceTree = "<group>"; };
 		31D1508B256404C90069D1AA /* RunLoopDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RunLoopDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		31D1508E256404C90069D1AA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		31D1508F256404C90069D1AA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -29,6 +46,8 @@
 		31D1509D256404CA0069D1AA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		31D1509F256404CA0069D1AA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		31D150A0256404CA0069D1AA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		31D150A7256431B20069D1AA /* FCFThread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFThread.h; sourceTree = "<group>"; };
+		31D150A8256431B20069D1AA /* FCFThread.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFThread.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,11 +86,23 @@
 				31D15092256404C90069D1AA /* SceneDelegate.m */,
 				31D15094256404C90069D1AA /* ViewController.h */,
 				31D15095256404C90069D1AA /* ViewController.m */,
+				31647F6325656605001E61A1 /* SubViewController.h */,
+				31647F6425656605001E61A1 /* SubViewController.m */,
+				31647F6525656605001E61A1 /* SubViewController.xib */,
+				31647F6825656BF1001E61A1 /* ThreeViewController.h */,
+				31647F6925656BF1001E61A1 /* ThreeViewController.m */,
+				31647F6A25656BF1001E61A1 /* ThreeViewController.xib */,
 				31D15097256404C90069D1AA /* Main.storyboard */,
 				31D1509A256404CA0069D1AA /* Assets.xcassets */,
 				31D1509C256404CA0069D1AA /* LaunchScreen.storyboard */,
 				31D1509F256404CA0069D1AA /* Info.plist */,
 				31D150A0256404CA0069D1AA /* main.m */,
+				31D150A7256431B20069D1AA /* FCFThread.h */,
+				31D150A8256431B20069D1AA /* FCFThread.m */,
+				31647F6025656445001E61A1 /* PermenantThread.h */,
+				31647F6125656445001E61A1 /* PermenantThread.m */,
+				31647F6D25657A05001E61A1 /* PermenantCThread.h */,
+				31647F6E25657A05001E61A1 /* PermenantCThread.m */,
 			);
 			path = RunLoopDemo;
 			sourceTree = "<group>";
@@ -136,6 +167,8 @@
 				31D1509E256404CA0069D1AA /* LaunchScreen.storyboard in Resources */,
 				31D1509B256404CA0069D1AA /* Assets.xcassets in Resources */,
 				31D15099256404C90069D1AA /* Main.storyboard in Resources */,
+				31647F6C25656BF1001E61A1 /* ThreeViewController.xib in Resources */,
+				31647F6725656605001E61A1 /* SubViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -146,10 +179,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				31647F6F25657A05001E61A1 /* PermenantCThread.m in Sources */,
 				31D15096256404C90069D1AA /* ViewController.m in Sources */,
 				31D15090256404C90069D1AA /* AppDelegate.m in Sources */,
 				31D150A1256404CA0069D1AA /* main.m in Sources */,
 				31D15093256404C90069D1AA /* SceneDelegate.m in Sources */,
+				31647F6625656605001E61A1 /* SubViewController.m in Sources */,
+				31647F6225656445001E61A1 /* PermenantThread.m in Sources */,
+				31D150A9256431B20069D1AA /* FCFThread.m in Sources */,
+				31647F6B25656BF1001E61A1 /* ThreeViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

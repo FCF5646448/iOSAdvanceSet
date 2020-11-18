@@ -9,5 +9,8 @@
 #import "FCFThread.h"
 
 @implementation FCFThread
-
+- (void)dealloc
+{
+    NSLog(@"%s", __func__);
+}
 @end

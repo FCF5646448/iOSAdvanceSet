@@ -7,6 +7,8 @@
 //
 
 #import "ViewController.h"
+#import "SubViewController.h"
+#import "ThreeViewController.h"
 
 @interface ViewController ()
 
@@ -16,7 +18,20 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    
+}
+
+
+
+// 按钮模拟销毁子线程
+- (IBAction)destroyThread:(id)sender {
+    ThreeViewController * subvc = [ThreeViewController new];
+    [self.navigationController pushViewController:subvc animated:YES];
 }
 
 
