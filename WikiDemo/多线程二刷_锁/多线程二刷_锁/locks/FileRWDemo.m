@@ -7,9 +7,31 @@
 //
 
 #import "FileRWDemo.h"
+#import <pthread.h>
+
+/*
+ 读写锁： pthread_rwlock_t
+ 等待锁的线程会进入休眠
+ 
+ API ：
+ // 初始化锁
+ pthread_rwlock_init(&_lock, NULL);
+ // 读-加锁
+ pthread_rwlock_rdlock(&_lock);
+ // 读-尝试加锁
+ pthread_rwlock_tryrdlock(&_lock);
+ // 写-加锁
+ pthread_rwlock_wrlock(&_lock);
+ // 写-尝试加锁
+ pthread_rwlock_trywrlock(&_lock);
+ // 解锁
+ pthread_rwlock_unlock(&_lock);
+ // 销毁
+ pthread_rwlock_destroy(&_lock);
+ */
 
 @interface FileRWDemo()
-@property (nonatomic, strong) dispatch_semaphore_t semaphore;
+@property (nonatomic, assign) pthread_rwlock_t lock;
 @end
 
 @implementation FileRWDemo
@@ -18,30 +40,47 @@
 {
     self = [super init];
     if (self) {
-        // 初始化信号值，设置一次最多只能有一个线程对其进行访问。
-        self.semaphore = dispatch_semaphore_create(1);
-        
+        // 初始化
+        pthread_rwlock_init(&_lock, NULL);
     }
     return self;
 }
 
 - (void)otherTest {
+    
+    dispatch_queue_t queue = dispatch_get_global_queue(0, 0);
+    
     for (int i = 0; i < 10; i++) {
-        [[[NSThread alloc] initWithTarget:self selector:@selector(read) object:nil] start];
-        [[[NSThread alloc] initWithTarget:self selector:@selector(write) object:nil] start];
+        dispatch_async(queue, ^{
+            [self read];
+        });
+        
+        dispatch_async(queue, ^{
+            [self write];
+        });
     }
 }
 
+// 读操作，可以同时多个线程同时执行
 - (void)read {
-    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
+    pthread_rwlock_rdlock(&_lock);
+    sleep(1);
     NSLog(@"%s", __func__);
-    dispatch_semaphore_signal(self.semaphore);
+    pthread_rwlock_unlock(&_lock);
+    
 }
 
+// 写操作，一次只能一个线程执行。
 - (void)write {
-    dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
+    pthread_rwlock_wrlock(&_lock);
+    sleep(1);
     NSLog(@"%s", __func__);
-    dispatch_semaphore_signal(self.semaphore);
+    pthread_rwlock_unlock(&_lock);
+}
+
+- (void)dealloc
+{
+    pthread_rwlock_destroy(&_lock);
 }
 
 @end

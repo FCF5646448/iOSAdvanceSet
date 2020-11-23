@@ -20,6 +20,7 @@
 #import "SemaphoreDemo.h"
 #import "SynchronizedDemo.h"
 #import "FileRWDemo.h"
+#import "FIleRWDemo2.h"
 
 @interface ViewController ()
 
@@ -30,7 +31,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    BaseDemo * demo = [[FileRWDemo alloc] init];
+    BaseDemo * demo = [[FIleRWDemo2 alloc] init];
 //    [demo ATM];
 //    [demo tickets];
     [demo otherTest];

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3115483E256C01B300AFB3F6 /* FIleRWDemo2.m in Sources */ = {isa = PBXBuildFile; fileRef = 3115483D256C01B300AFB3F6 /* FIleRWDemo2.m */; };
 		311A75CB256AB14500A2F808 /* NSConditionLockDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 311A75CA256AB14500A2F808 /* NSConditionLockDemo.m */; };
 		311A75CE256ABA9500A2F808 /* SerialAQueueDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 311A75CD256ABA9500A2F808 /* SerialAQueueDemo.m */; };
 		311A75D1256ABD8000A2F808 /* SemaphoreDemo.m in Sources */ = {isa = PBXBuildFile; fileRef = 311A75D0256ABD8000A2F808 /* SemaphoreDemo.m */; };
@@ -30,6 +31,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3115483C256C01B300AFB3F6 /* FIleRWDemo2.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FIleRWDemo2.h; sourceTree = "<group>"; };
+		3115483D256C01B300AFB3F6 /* FIleRWDemo2.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FIleRWDemo2.m; sourceTree = "<group>"; };
 		311A75C9256AB14500A2F808 /* NSConditionLockDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NSConditionLockDemo.h; sourceTree = "<group>"; };
 		311A75CA256AB14500A2F808 /* NSConditionLockDemo.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NSConditionLockDemo.m; sourceTree = "<group>"; };
 		311A75CC256ABA9500A2F808 /* SerialAQueueDemo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SerialAQueueDemo.h; sourceTree = "<group>"; };
@@ -145,6 +148,8 @@
 				311A75D3256AC24D00A2F808 /* SynchronizedDemo.m */,
 				315D5D9B256B38D3009F82EA /* FileRWDemo.h */,
 				315D5D9C256B38D3009F82EA /* FileRWDemo.m */,
+				3115483C256C01B300AFB3F6 /* FIleRWDemo2.h */,
+				3115483D256C01B300AFB3F6 /* FIleRWDemo2.m */,
 			);
 			path = locks;
 			sourceTree = "<group>";
@@ -223,6 +228,7 @@
 				311A75CB256AB14500A2F808 /* NSConditionLockDemo.m in Sources */,
 				315D5D9D256B38D3009F82EA /* FileRWDemo.m in Sources */,
 				311A75D4256AC24D00A2F808 /* SynchronizedDemo.m in Sources */,
+				3115483E256C01B300AFB3F6 /* FIleRWDemo2.m in Sources */,
 				316E99DD2569FD9B008B16D9 /* OSUnfairLockDemo.m in Sources */,
 				316E99DA2569F66B008B16D9 /* OSSpinlinkDemo.m in Sources */,
 				316E99C32569EB76008B16D9 /* ViewController.m in Sources */,
