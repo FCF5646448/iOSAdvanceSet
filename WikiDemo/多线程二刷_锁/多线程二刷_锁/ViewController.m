@@ -31,14 +31,14 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    BaseDemo * demo = [[FIleRWDemo2 alloc] init];
+    BaseDemo * demo = [[MutexDemo2 alloc] init];
 //    [demo ATM];
 //    [demo tickets];
     [demo otherTest];
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-
+    NSLog(@"1");
 }
 
 

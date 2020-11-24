@@ -23,7 +23,7 @@
     if (self) {
         pthread_mutexattr_t attr;
         pthread_mutexattr_init(&attr);
-        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE); //
         pthread_mutex_init(&_mutex, &attr);
         pthread_mutexattr_destroy(&attr);
     }
@@ -63,11 +63,11 @@
     pthread_mutex_lock(&_mutex);
     NSLog(@"%s", __func__);
     [self otherTest2];
-    static int count = 0;
-    if (count < 10) {
-        count += 1;
-        [self otherTest];
-    }
+//    static int count = 0;
+//    if (count < 10) {
+//        count += 1;
+//        [self otherTest];
+//    }
     pthread_mutex_unlock(&_mutex);
 }
 
