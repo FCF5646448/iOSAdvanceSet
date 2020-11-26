@@ -13,6 +13,7 @@
 		1934DBFE256F6FFA0043D563 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1934DBFC256F6FFA0043D563 /* Main.storyboard */; };
 		1934DC00256F6FFC0043D563 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 1934DBFF256F6FFC0043D563 /* Assets.xcassets */; };
 		1934DC03256F6FFC0043D563 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 1934DC01256F6FFC0043D563 /* LaunchScreen.storyboard */; };
+		1934DC0C256F703F0043D563 /* Demo1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1934DC0B256F703F0043D563 /* Demo1.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -24,6 +25,7 @@
 		1934DBFF256F6FFC0043D563 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		1934DC02256F6FFC0043D563 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		1934DC04256F6FFC0043D563 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		1934DC0B256F703F0043D563 /* Demo1.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Demo1.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,7 @@
 		1934DBF5256F6FFA0043D563 /* 函数式Swift */ = {
 			isa = PBXGroup;
 			children = (
+				1934DC0A256F70310043D563 /* 函数式思想 */,
 				1934DBF6256F6FFA0043D563 /* AppDelegate.swift */,
 				1934DBF8256F6FFA0043D563 /* SceneDelegate.swift */,
 				1934DBFA256F6FFA0043D563 /* ViewController.swift */,
@@ -65,6 +68,14 @@
 				1934DC04256F6FFC0043D563 /* Info.plist */,
 			);
 			path = "函数式Swift";
+			sourceTree = "<group>";
+		};
+		1934DC0A256F70310043D563 /* 函数式思想 */ = {
+			isa = PBXGroup;
+			children = (
+				1934DC0B256F703F0043D563 /* Demo1.swift */,
+			);
+			path = "函数式思想";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -138,6 +149,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1934DC0C256F703F0043D563 /* Demo1.swift in Sources */,
 				1934DBFB256F6FFA0043D563 /* ViewController.swift in Sources */,
 				1934DBF7256F6FFA0043D563 /* AppDelegate.swift in Sources */,
 				1934DBF9256F6FFA0043D563 /* SceneDelegate.swift in Sources */,
