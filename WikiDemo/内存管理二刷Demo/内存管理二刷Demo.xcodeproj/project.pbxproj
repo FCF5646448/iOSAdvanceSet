@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3122517F25707B4000E53661 /* Person.m in Sources */ = {isa = PBXBuildFile; fileRef = 3122517E25707B4000E53661 /* Person.m */; };
 		31F8E3A1256FE0EC000D449F /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F8E3A0256FE0EC000D449F /* AppDelegate.m */; };
 		31F8E3A4256FE0EC000D449F /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F8E3A3256FE0EC000D449F /* SceneDelegate.m */; };
 		31F8E3A7256FE0EC000D449F /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 31F8E3A6256FE0EC000D449F /* ViewController.m */; };
@@ -17,6 +18,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		3122517D25707B4000E53661 /* Person.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Person.h; sourceTree = "<group>"; };
+		3122517E25707B4000E53661 /* Person.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Person.m; sourceTree = "<group>"; };
 		31F8E39C256FE0EC000D449F /* 内存管理二刷Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "内存管理二刷Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		31F8E39F256FE0EC000D449F /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		31F8E3A0256FE0EC000D449F /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -72,6 +75,8 @@
 				31F8E3AD256FE0ED000D449F /* LaunchScreen.storyboard */,
 				31F8E3B0256FE0ED000D449F /* Info.plist */,
 				31F8E3B1256FE0ED000D449F /* main.m */,
+				3122517D25707B4000E53661 /* Person.h */,
+				3122517E25707B4000E53661 /* Person.m */,
 			);
 			path = "内存管理二刷Demo";
 			sourceTree = "<group>";
@@ -148,6 +153,7 @@
 			files = (
 				31F8E3A7256FE0EC000D449F /* ViewController.m in Sources */,
 				31F8E3A1256FE0EC000D449F /* AppDelegate.m in Sources */,
+				3122517F25707B4000E53661 /* Person.m in Sources */,
 				31F8E3B2256FE0ED000D449F /* main.m in Sources */,
 				31F8E3A4256FE0EC000D449F /* SceneDelegate.m in Sources */,
 			);
