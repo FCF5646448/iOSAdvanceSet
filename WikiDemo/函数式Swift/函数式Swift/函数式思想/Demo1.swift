@@ -60,6 +60,14 @@ extension Ship {
      
      */
     func canSafelyEngage(ship target: Ship, friendly: Ship) -> Bool {
+        let dx = target.position.x - position.x
+        let dy = target.position.y - position.y
+        let targetDistance = sqrt(dx*dx + dy*dy)
         
+        let friendlydx = friendly.position.x - target.position.x
+        let friendlydy = friendly.position.y - target.position.y
+        let friendlytargetDistance = sqrt(friendlydx*friendlydx + friendlydy*friendlydy)
+        
+        return targetDistance <= firingRange && targetDistance > unsafeRange && (friendlytargetDistance > unsafeRange)
     }
 }
