@@ -6,8 +6,12 @@ categories: iOS进阶
 description: 总结项目开发中的常用的进阶知识点
 ---
 
+### 架构
+
+
 
 ### 设计模式
+
 设计模式简单地说就是程序开发的套路和模板。主要是 为了代码的可重用性，将某些功能的模块代码规范化，然后尽可能让他人容易理解。
 
 任何一种设计模式都是一种设计原则。设计模式就是实现了设计原则，达到了代码复用和可维护性。设计模式又包含创建型模式、结构型模式、行为型模式。
@@ -100,26 +104,28 @@ https://www.jianshu.com/p/e5c69c7b8c00
 #### MVC
 Model —— View —— Controller。Model负责处理数据；view负责处理UI；Controller负责协调model和View，是它们之间的桥梁，它将数据从Model层传送到View层，并展示出来，同时将View层的交互传到Model层以改变数据；
 * 优点：
-	* 代码总量少、简单易懂；
+  * 代码总量少、简单易懂；
 * 缺点：
-	* 代码过于集中，View和Model高度耦合；
-	* 难以测试：太耦合，单元测试没法配合特定视图进行；
-	* 难于扩展：太耦合，使得增加新功能不仅可能需要修改大量原有代码，也是的Controller愈发笨重；
-	* model层过于简单；
-	* 网络请求逻辑无从安放；
+  * 代码过于集中，View和Model高度耦合；
+  * 难以测试：太耦合，单元测试没法配合特定视图进行；
+  * 难于扩展：太耦合，使得增加新功能不仅可能需要修改大量原有代码，也是的Controller愈发笨重；
+  * model层过于简单；
+  * 网络请求逻辑无从安放；
+#### MVP
+
+MVP是在MVC的基础上，将Controller职责分离开，用它处理View的交互事件、数据绑定等。MVP与MVC的相同点是Model层都是一样的，V还是UIView层。UIController将持有Presenter作为变量，当接收到用户交互时，它会调用Presenter进行处理，也就是说View层不包含任何业务逻辑，它只会将交互交给Presenter，并从Presenter接受结果来更新自己。
+Presenter被用来沟通View和Model之间的联系，Model不能直接作用于View的更新，只能通过Presenter来通知View进行视图刷新，所以View就只专注于视图相关内容，被动接收Presenter的命令。这样的话，View就只显示，不处理逻辑，Presenter持有Model，Model只用于处理数据相关内容；一个View可以对应一个Presenter，UIViewController 可以包含多个Presenter。
+但是Presenter也需要注意循环引用的问题。
+
+- 缺点：
+  - 所有的交互都传给Presenter处理，从而一旦项目功能增加了，View的代码和Presenter的代码都增加了。维护成本就特别高昂；
+
 #### MVVM
-MVVM也是在MVC的基础上添加了ViewModel层级，MVVM框架则表示Model--ViewModel--（View Controller）。它将业务逻辑、网络请求和数据解析放在了ViewModel层，大大简化了Controller层的逻辑代码，也让model 、view的功能更加独立单一。
+MVVM也是在MVC的基础上添加了ViewModel层级，MVVM框架则表示Model--ViewModel--（View Controller）。它将业务逻辑、网络请求和数据解析放在了ViewModel层，大大简化了Controller层的逻辑代码，也让model 、view的功能更加独立单一。它与MVP有点类似，主要的区别是**ViewModel**里的属性监听绑定的操作（主要的做法就是VIew拥有ViewModel，然后通过KVO或者第三方（可以使用Facebook的KVOController）监听ViewModel的属性改变，并对改边进行响应。当然了，还有做的一点是ViewModel的属性要与model的相关属性一一对应起来。）。
 ViewModel主要作用：
 
 * 视图层的真正数据提供者：一般视图层展示的数据经常是一个或多个model的属性组合。ViewModel就可以将这些数据整合，使得视图直接调用单个数据就能展示所要的效果。简单来说，就是可以对模型层的数据进行包装；
 * 视图层的交互响应者：所有的交互都会传递给ViewModel，ViewModel会依次更新视图层需要的属性，同时相应修改model层的数据。不过这里最好依赖响应式架构或属性观察器；
-
-#### MVP
-MVP是在MVC的基础上，将Controller职责分离开，用它处理View的交互事件、数据绑定等。MVP与MVC的相同点是Model层都是一样的，但是MVP的V是表示UIView和UIController。View层持有Presenter作为变量，当接收到用户交互时，它会调用Presenter进行处理，也就是说View层不包含任何业务逻辑，它只会将交互交给Presenter，并从Presenter接受结果来更新自己。
-Presenter被用来沟通View和Model之间的联系，Model不能直接作用于View的更新，只能通过Presenter来通知View进行视图刷新，所以View就只专注于视图相关内容，被动接收Presenter的命令。这样的话，View就只显示，不处理逻辑，Presenter持有Model，Model只用于处理数据相关内容；
-但是Presenter需要注意循环引用的问题。
-* 缺点：
-	* 所有的交互都传给Presenter处理，从而一旦项目功能增加了，View的代码和Presenter的代码都增加了。维护成本就特别高昂；
 
 #### MVC & MVVM & MVP
 * 三种架构的Model层基本相同；

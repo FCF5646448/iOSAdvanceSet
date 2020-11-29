@@ -38,7 +38,68 @@ ImageBuffer按照每个像素RGBA四个字节大小来显示。
  而原图假设是jpg，压缩比1比20，大约350kb，可见解码后的内存占用是相当大的。
 ```
 
+* 图片的通用使用方法
+
+  ```
+  UIImageView * imgeView = [[UIImageView alloc] init];
+  imageView.frame = CGRectMake(100,100,100,50);
+  imageView.image = [UIImage imageNamed:@"xxx"]; //通过imageNamed：加载过来的方法，是不会立马显示到屏幕上的。它加载进来的还是通过压缩的格式。真正要显示出来还得进行解码成屏幕显示的格式，而解码就是发生的显示的那一刻。
+  ```
+
+* 所以最好的做法就是提前进行解码。将解码的操作放到子线程中进行。当要显示的时候，主线程直接去拿到解码结果。
+
+  ```
+  -(void)image {
+      dispatch_async(dispatch_get_global_queue(0,0)^{
+          // 获取CGImage,本地使用：imageNamed:，远程使用：imageWithData:[NSdata dataWithContentOfURL:]。反正这步的目的就是将UIImage编程CGImage。
+          CGImageRef cgImage = [UIImage imageNamed:@"xxx"].CGImage;
+          
+          //alpha
+          CGImageAlphaInfo alphaInfo = CGImageGetAlaphaInfo(cgImage) & KCGBitmapAlaphaInfoMask;
+          BOOL hasAlpha = NO;
+          if (alphaInfo == KCGImageAlphaPremultipliedLast || 
+          alphaInfo == KCGImageAlphaPremultipliedFirst || 
+          alphaInfo == KCGImageAlphaLast || 
+          alphaInfo == KCGImageAlphaLast ) {
+              hasAlpha = YES;
+          }
+          
+          //bitmapInfo
+          CGitmapInfo bitmapInfo = kCGBitmapByteOrder32host;
+          bitmapInfo |= hasAlph ?  kCGImageAlphaPremultiFirst : kCGImageAlphaNoneSkipFirst;
+          
+          //size
+          size_t width = CGImageGetWith(cgimage);
+          size_t height = CGImageGetHeight(cgimage);
+          
+          // context
+          CGContextRef context = CGBitmapContextCreate(NULL,width,height,,0,CGColorSpaceCreateDeviceRGB,bitmapInfo);
+          
+          // draw
+          CGContentDrawImage(context,CGRectMake(0,0,width,height),cgImage);
+          
+          // 获取image
+          cgImage = CGbitmapContextCreateImage(context);
+          
+          UIImage *newImage = [UIImage imageWithCGImage: cgImage]；
+          
+          CGContextRelease(context);
+          CGImageRelease(cgImage);
+          
+          dispatch_async(dispatch_get_main_queue(), ^{
+              self.imageVIew.image = newImage;
+          });
+          
+      });
+  }
+  ```
+
+  
+
+
+
 #### 图片相关优化
+
 ##### 1、避免将图片放在内存里
 
 不显示在屏幕上的图片，尽可能不要放在内存里。解码后的UIImage是非常大的，对于不需要显示的图片是不需要解码的。
