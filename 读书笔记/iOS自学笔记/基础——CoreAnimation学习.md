@@ -21,6 +21,7 @@ CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGIma
 首先每一个UIView都自带一个**只读**属性的CALayer，其主要负责显示和动画操作。然后CALayer有一个可选的delegate属性，它是CALayerDelegate协议的代理。在正常情况下，我们使用UIView的时候，它都是使用自带的Layer来进行绘制，默认是将layer.delegate设置为自身，然后在内部对contents进行赋值。(ps：所以我们想要对cell做异步绘制，是没法通过cell的layer来真实实现的，而是使用其他的UIView按照异步绘制的方式进行实现，比如YYKit中使用UIView的子类，在setText的时候开辟子线程进行绘制流程)。其次UIView开放了drawRect:方法，也可以在这个方法里进行绘制操作。但是这将会更消耗性能（ps:原因看下文）。
 但是如果是直接使用CALayer，则可以通过实现layer.delegate的displayLayer方法来手动设置contents。
 所以，一般的做法是：
+
 * 要么直接使用UIView，如果要自定义绘制，就调用UIView的drawRect方法；
 * 要么使用单独的CALayer，可以实现它的代理方法来实现自定义绘制工作；
 * 或者使用UIView，然后在其他情况下开辟子线程进行绘制，最后给layer.contents进行赋值。
@@ -28,11 +29,11 @@ CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGIma
 ##### 绘制流程：
 当视图层发送变化，或者手动调用了UIView的setNeedsDisplay方法，会调用CALayer的同名方法setNeedsDisplay，但是并不会马上进行绘制，而是将CALayer打上脏标记，放到一个全局容器里，等到Core Animation监听到RunLoop的BeforWaiting或Exit状态后，会将全局容器里的CALayer执行display方法。当执行执行display方法时，其方法内部首先会判断是否实现了layer.delegate的displayLayer：方法，如果实现了，就调用displayLayer：方法，然后在方法里设置contents。否则CALayer会先创建一个后备缓存(backing store)，然后调用displayContext:方法，其方法内部又会判断是否实现了layer.delegate的drawLayer:inContext:方法，如果实现了就执行drawLayer:inContext:方法，在该方法里设置contents；如果没有实现，就还是走系统的drawRect方法。
 但是要注意：
-* 在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文），给drawRect：或者drawlayer：inContext：进行绘制使用，所以在UIView的drawRect方法中进行绘制工作不是最好的选择；
-* 同理，在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文）。所以在drawRect：或者drawlayer：inContext：方法中是可以直接获取上下文的，但是使用desplayLayer：则没法获取上下文，而是得手动创建一个上下文。
 
-#### 排版
-##### 布局
+* 在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文），给drawRect：或者drawlayer：inContext：进行绘制使用，所以在UIView的drawRect方法中进行绘制工作不是最好的选择；
+* 同理，在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文）。所以在drawRect：或者drawlayer：inContext：方法中是可以直接获取上下文的，但是使用displayLayer：则没法获取上下文，而是得手动创建一个上下文。
+
+#### 排版布局
 视图有三个比较重要的布局属性：frame、bounds、center。视图对应的layer也是这三个属性，可能center变成了position。
 * frame：相对于父视图的坐标空间；它实际是根据bounds、position、transform计算而来，所以它们之间都是相互影响的；
 
@@ -57,13 +58,17 @@ CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGIma
 
 #### 视觉效果
 * 圆角：conrnerRadius是指layer的曲率。默认情况下，conrnerRadius只影响背景色而不影响背景图片或子图层。所以如果要让其子图层或背景图片也响应这个曲率，则需要将maskToBounds设置成YES。
-	* 离屏渲染：**正常情况下，如果单纯的对视图设置圆角，并设置maskToBounds是不会导致离屏渲染的，只有为视图添加了一个图片或者是一个有颜色、内容或边框等有图像信息的子视图才会触发离屏渲染。**；不过iOS9之后，苹果也做了一定的优化。如果Layer只设置了contents或者UIImageView只设置了image，次数设置conrnerRadius+maskTobounds是不会产生离屏渲染的。但是如果加上了背景色、边框或者其他图像内容的图层，还是会产生离屏渲染。可以理解为多层内容添加了圆角+裁剪才会触发离屏渲染，单层内容不会触发离屏渲染。所以我们给UIButton设置圆角+裁剪是会触发离屏渲染的，但是如果给UIButton的imageViei设置圆角+裁剪是不会触发离屏渲染。	
+
 * 边框：图片边框由boarderWidth和boardColor定义。如果图层超出了边框，那么实际也是可以绘制出来的。
+
 * 阴影：透明度shadowOpacity在[0,1]之间取值；shadowOffset设置阴影的方向和距离，默认值是(0，-3)，意思是阴影相对y轴有3个点的向上位移；shadowRadius设置阴影的模糊程度。
-	* 阴影裁剪：图层的阴影不是根据边框和圆角来确定的，而是根据内容的外形，设置在layer的边界之外，也就是计算阴影的时候，会将其与寄宿图一起考虑。所以剪裁的时候阴影容易被剪切掉。所以解决方案就是：使用两个图层，一个是只画阴影的空的外图层，一个是使用了剪裁内容的内图层。
-	* shadowPath：上述阴影剪裁的话，外图层其实得实时跟进内图层的形状，所以也是非常消耗资源的方案，尤其是多个子图层的时候。所以可以使用shadowPath来绘制阴影。
+  * 阴影裁剪：图层的阴影不是根据边框和圆角来确定的，而是根据内容的外形，设置在layer的边界之外，也就是计算阴影的时候，会将其与寄宿图一起考虑。所以剪裁的时候阴影容易被剪切掉。所以解决方案就是：使用两个图层，一个是只画阴影的空的外图层，一个是使用了剪裁内容的内图层。
+  * shadowPath：上述阴影剪裁的话，外图层其实得实时跟进内图层的形状，所以也是非常消耗资源的方案，尤其是多个子图层的时候。所以可以使用shadowPath来绘制阴影。
+
 * 图层蒙版：layer的mask属性定义了layer的可见区域，它本身其实也是一个图层，所以可以给mask设置contents。
+
 * 拉伸过滤：拉伸过滤算法就是将原图的像素根据需要生成新的像素显示在屏幕上；CALayer提供了三种拉伸过滤方法：kCAFilterLinear、kCAFilterNearest、kCAFilterTrilinear。
+
 * 组透明：UIView有一个属性alpha，CALayer有一个属性opacity。这两个属性都是能影响子层级的。另外透明度混合叠加会导致子图层的透明度出现问题，可以使用shouldRasterize属性来处理。
 
 #### 变换
@@ -228,6 +233,15 @@ Core Animation假设屏幕上的任何东西都可以做动画，动画需要手
 	* 
 
 
+
+  
+
+#### 离屏渲染：
+* 定义：如果要在显示屏上显示内容，则就至少需要一块与屏幕像素数据量一样的frame buffer(帧缓存区)，作为像素数据存储区域，而这也是GPU存储渲染结果的地方。如果有时面临一些限制，无法把渲染结果直接写入frame buffer,而是先暂存在另外的内存区域，之后再写入frame buffer,那么这个过程被称之为**离屏渲染**; (打开xcode的离屏渲染开关，属于离屏渲染的区域会被标记为黄色)
+* 并不是在frame buffer之外的内存区域进行渲染都是离屏渲染。比如通过drawRect，申请一块后备缓存进行绘画。这只能称作CPU的软件渲染。**真正的离屏渲染发送在GPU**。
+* 为什么需要离屏渲染？
+	
+  **正常情况下，如果单纯的对视图设置圆角，并设置maskToBounds是不会导致离屏渲染的，只有为视图添加了一个图片或者是一个有颜色、内容或边框等有图像信息的子视图才会触发离屏渲染。**；不过iOS9之后，苹果也做了一定的优化。如果Layer只设置了contents或者UIImageView只设置了image，次数设置conrnerRadius+maskTobounds是不会产生离屏渲染的。但是如果加上了背景色、边框或者其他图像内容的图层，还是会产生离屏渲染。可以理解为多层内容添加了圆角+裁剪才会触发离屏渲染，单层内容不会触发离屏渲染。所以我们给UIButton设置圆角+裁剪是会触发离屏渲染的，但是如果给UIButton的imageViei设置圆角+裁剪是不会触发离屏渲染。
 
 
 
