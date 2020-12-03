@@ -293,10 +293,53 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
 	* 对于特殊形状的view，使用layer mask并打开shouldRasterize来对渲染结果进行缓存
 	* 对于模糊效果，不采用系统提供的UIVisualEffect，而是另外实现模糊效果（CIGaussianBlur），并手动管理渲染结果 
 
-
 #### 高效绘制
 
+使用Core Graphics进行简单的素描，画的越多，程序就越慢。因为每次移动手指都会重绘整个UIBezierPath。所以更好的方法是使用专用图层：CAShapLayer绘制多边形、直线和曲线；CATextLayer绘制文本；CAGradientLayer绘制渐变。
+
+设备通常会把屏幕区分为需要重绘的区域和不需要重绘的区域。需要重绘的区域被称作“脏区域”。当一个视图被改动了，TA可能需要重绘。但是通常情况下，脏区域太大了，导致重绘太浪费。所以可以使用**setNeedsDisplayInRect:**来指定脏区域的范围，从而减少不必要的绘制。
+
+* 异步绘制
+
 #### 图像 I/O
+
+* 在子线程中加载图片
+
+  ```
+  - (UICollectionViewCell *)collectionView:(UICollectionView *)collectionView
+                      cellForItemAtIndexPath:(NSIndexPath *)indexPath
+  {
+      UICollectionViewCell *cell = [collectionView dequeueReusableCellWithReuseIdentifier:@"Cell" forIndexPath:indexPath];
+      
+      const NSInteger imageTag = 99;
+      UIImageView *imageView = (UIImageView *)[cell viewWithTag:imageTag];
+      if (!imageView) {
+          imageView = [[UIImageView alloc] initWithFrame: cell.contentView.bounds];
+          imageView.tag = imageTag;
+          [cell.contentView addSubview:imageView];
+      }
+      cell.tag = indexPath.row;
+      imageView.image = nil;
+  
+      dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0), ^{
+          NSInteger index = indexPath.row;
+          NSString *imagePath = self.imagePaths[index];
+          UIImage *image = [UIImage imageWithContentsOfFile:imagePath];
+  
+          dispatch_async(dispatch_get_main_queue(), ^{
+              if (index == cell.tag) {
+                  imageView.image = image; }
+          });
+      });
+      return cell;
+  }
+  ```
+
+* 延迟解压
+
+  
+
+* 
 
 #### 图层性能
 
