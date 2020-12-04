@@ -301,6 +301,11 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
 
 * 异步绘制
 
+  UIKit只可以在主线程上更新。所以就会导致可能会打断用户交互的情况。所以可以考虑在某些情况下，将要显示的内容提前在另一个线程上绘制好，然后将绘制好的图片直接设置为图层内容。
+
+  * CATiledLayer：它会在多个线程中为每个小块同时调用-drawLayer:inContext:方法。
+  * drawsAsynchronously：drawsAsynchronously对传入-drawLayer:inContext:的CGContext进行改动，允许CGContext延缓绘制命令的执行以至于不阻塞用户交互。
+
 #### 图像 I/O
 
 * 在子线程中加载图片
@@ -337,16 +342,3 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
 
 * 延迟解压
 
-  
-
-* 
-
-#### 图层性能
-
-
-
-
-
-```
-
-```
