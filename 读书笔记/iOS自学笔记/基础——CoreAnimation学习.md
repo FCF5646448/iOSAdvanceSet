@@ -11,6 +11,7 @@ UIView及其子视图组成的视图层级关系，称之为**视图树**；与U
 #### CALayer及其属性
 **CALayer怎么进行绘制**
 CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGImageRef指针，它指向一个CGImage结构体，也就是一张位图。实际上UIView的显示最终就是显示这张位图。所有生成UIView的过程实际上就是给contents赋值CGImage的过程。
+
 * contentGravity ： 是指内容的显示方式，与contentMode是对应的值，主要用于图片拉伸；
 * contentsScale：寄宿图的像素尺寸和视图大小的比例；
 * maskToBounds：是否需要显示超出边界的内容；(Q1：为什么会绘制出超出边界的内容？)
@@ -27,7 +28,7 @@ CALayer有一个id类型的**contents**属性，在iOS中实际对应一个CGIma
 * 或者使用UIView，然后在其他情况下开辟子线程进行绘制，最后给layer.contents进行赋值。
 
 ##### 绘制流程：
-当视图层发送变化，或者手动调用了UIView的setNeedsDisplay方法，会调用CALayer的同名方法setNeedsDisplay，但是并不会马上进行绘制，而是将CALayer打上脏标记，放到一个全局容器里，等到Core Animation监听到RunLoop的BeforWaiting或Exit状态后，会将全局容器里的CALayer执行display方法。当执行执行display方法时，其方法内部首先会判断是否实现了layer.delegate的displayLayer：方法，如果实现了，就调用displayLayer：方法，然后在方法里设置contents。否则CALayer会先创建一个后备缓存(backing store)，然后调用displayContext:方法，其方法内部又会判断是否实现了layer.delegate的drawLayer:inContext:方法，如果实现了就执行drawLayer:inContext:方法，在该方法里设置contents；如果没有实现，就还是走系统的drawRect方法。
+当视图层发送变化，或者手动调用了UIView的setNeedsDisplay方法，会调用CALayer的同名方法setNeedsDisplay，但是并不会马上进行绘制，而是将CALayer打上脏标记，放到一个全局容器里，等到Core Animation监听到RunLoop的BeforWaiting或Exit状态后，会将全局容器里的CALayer执行display方法。当执行display方法时，其方法内部首先会判断是否实现了layer.delegate的displayLayer：方法，如果实现了，就调用displayLayer：方法，然后在方法里设置contents。否则CALayer会先创建一个后备缓存(backing store)，然后调用displayContext:方法，其方法内部又会判断是否实现了layer.delegate的drawLayer:inContext:方法，如果实现了就执行drawLayer:inContext:方法，在该方法里设置contents；如果没有实现，就还是走系统的drawRect方法。
 但是要注意：
 
 * 在使用drawInContext之前，系统会开辟一个后备缓存（也就是绘制上下文），给drawRect：或者drawlayer：inContext：进行绘制使用，所以在UIView的drawRect方法中进行绘制工作不是最好的选择；
@@ -235,7 +236,7 @@ Core Animation假设屏幕上的任何东西都可以做动画，动画需要手
 #### GPU
 GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关渲染
 * 什么事情会降低GPU图层绘制？
-	* 太对图层
+	* 太多图层
 	* 重绘
 	* 离屏渲染
 	* 过大图片 (超过4096*4096就会显著降低GPU性能)
@@ -269,7 +270,7 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
   * UIBlurEffect：也是应用到一组图层之上的。
 
 * 离屏渲染为什么会影响性能？
-  GPU的操作是高度流水化的。如果遇到不得不开辟另一块内存，直接渲染操作的情况，则GPU就会终止当前流水线的工作，而切换到额外内存中进行渲染，之后再切回到当前屏幕缓冲区继续流水线工作。
+  GPU的操作是高度流水化的。如果遇到不得不开辟另一块内存进行渲染操作的情况，则GPU就会终止当前流水线的工作，而切换到额外内存中进行渲染，之后再切回到当前屏幕缓冲区继续流水线工作。
   所以频繁的上下文切换是导致性能受影响的主要因素。(比如说cell，滚动的每一帧变化都会触发每个cell的重新绘制。因此一旦存在离屏渲染，那么这种上下文切换就会每秒发生60次，如果一帧画面不止一个图片，每个图片都存在离屏渲染，则切换次数将会更加可观)。
 * 如何优化离屏渲染？
   * 1、利用CPU渲染避免离屏渲染。其实性能优化经常做的一种失去就是平衡CPU和GPU的负载，让它们尽量做自己最擅长的工作。比如文字(CoreText使用CoreGraphics渲染)和图片(ImageIO)渲染，则是由CPU进行处理，之后再将结果传给GPU。所以像给图片加圆角这种操作，就可以考虑用CPU渲染来完成。
