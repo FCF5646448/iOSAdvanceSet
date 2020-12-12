@@ -273,7 +273,7 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
   GPU的操作是高度流水化的。如果遇到不得不开辟另一块内存进行渲染操作的情况，则GPU就会终止当前流水线的工作，而切换到额外内存中进行渲染，之后再切回到当前屏幕缓冲区继续流水线工作。
   所以频繁的上下文切换是导致性能受影响的主要因素。(比如说cell，滚动的每一帧变化都会触发每个cell的重新绘制。因此一旦存在离屏渲染，那么这种上下文切换就会每秒发生60次，如果一帧画面不止一个图片，每个图片都存在离屏渲染，则切换次数将会更加可观)。
 * 如何优化离屏渲染？
-  * 1、利用CPU渲染避免离屏渲染。其实性能优化经常做的一种失去就是平衡CPU和GPU的负载，让它们尽量做自己最擅长的工作。比如文字(CoreText使用CoreGraphics渲染)和图片(ImageIO)渲染，则是由CPU进行处理，之后再将结果传给GPU。所以像给图片加圆角这种操作，就可以考虑用CPU渲染来完成。
+  * 1、利用CPU渲染避免离屏渲染。其实性能优化经常做的一种事情就是平衡CPU和GPU的负载，让它们尽量做自己最擅长的工作。比如文字(CoreText使用CoreGraphics渲染)和图片(ImageIO)渲染，则是由CPU进行处理，之后再将结果传给GPU。所以像给图片加圆角这种操作，就可以考虑用CPU渲染来完成。
   * 2、在离屏渲染无法避免的情况下，则想办法把性能影响降到最低。主要的优化思路就是：**将渲染出来的结果缓存起来**。CALayer提供了一个shouldRasterize。shouldRasterize设置为true，则Render Server就会强制把渲染结果(包括子layer、圆角、阴影、group opacity等)保存在一块内存中，这样在下一帧中就可以被复用，而不会再次触发离屏渲染。但是也需要注意一些细节：
     * shouldRasterise**总是会至少触发一次离屏渲染**，如果你的layer不会产生离屏渲染，切忌不要使用；
 
@@ -286,13 +286,27 @@ GPU主要负责OpenGL渲染管线相关事情。最新的可能对应metal相关
     * 如果layer子视图结构复杂，也可以打开shouldRasterise，把整个layer树绘制到一块缓存。
 
 * 《即刻》app所做的离屏渲染优化
-	* 即刻大量应用AsyncDisplayKit(Texture)作为主要渲染框架，对于文字和图片的异步渲染操作交由框架来处理。关于这方面可以看我之前的一些介绍
-	* 对于图片的圆角，统一采用“precomposite”的策略，也就是不经由容器来做剪切，而是预先使用CoreGraphics为图片裁剪圆角
-	* 对于视频的圆角，由于实时剪切非常消耗性能，我们会创建四个白色弧形的layer盖住四个角，从视觉上制造圆角的效果
-	* 对于view的圆形边框，如果没有backgroundColor，可以放心使用cornerRadius来做
-	* 对于所有的阴影，使用shadowPath来规避离屏渲染
-	* 对于特殊形状的view，使用layer mask并打开shouldRasterize来对渲染结果进行缓存
-	* 对于模糊效果，不采用系统提供的UIVisualEffect，而是另外实现模糊效果（CIGaussianBlur），并手动管理渲染结果 
+  * 即刻大量应用AsyncDisplayKit(Texture)作为主要渲染框架，对于文字和图片的异步渲染操作交由框架来处理。关于这方面可以看我之前的一些介绍
+
+  * 对于图片的圆角，统一采用“precomposite”的策略，也就是不经由容器来做剪切，而是预先使用CoreGraphics为图片裁剪圆角
+
+  * 对于视频的圆角，由于实时剪切非常消耗性能，我们会创建四个白色弧形的layer盖住四个角，从视觉上制造圆角的效果
+
+  * 对于view的圆形边框，如果没有backgroundColor，可以放心使用cornerRadius来做
+
+  * 对于所有的阴影，使用shadowPath来规避离屏渲染
+
+  * 对于特殊形状的view，使用layer mask并打开shouldRasterize来对渲染结果进行缓存
+
+  * 对于模糊效果，不采用系统提供的UIVisualEffect，而是另外实现模糊效果（CIGaussianBlur），并手动管理渲染结果 
+
+* iOS10之后的离屏渲染处理方式
+	* 如果方便的情况下，可以让设计师直接提供裁切好圆角的图片。
+	* 对于UIView，只设置CornerRadius,无需设置ClipToBounds就可以实现圆角效果，不会触发离屏渲染。
+	* 对于UILabel，只设置CornerRadius,无需设置ClipToBounds就可以实现圆角效果，不会触发离屏渲染；如果label有背景色，在iOS10以上系统，可以使用CornerRadius + ClipToBounds组合，10以下的系统，可以设置label.layer.backgroundColor来代替label.backgroundColor。
+	* 对于UIImageView 如果只需要支持iOS10及更新版本的机型，那么大胆的使用cornerRadius + masksToBounds，不会触发离屏渲染； 10以下的机型，可以通过给UIImage添加Category，利用UIBezierPath来实现。
+	* 对于UIButton，如果只需要实现文字 + 圆角效果，那么用ConerRadius就可以了；如果要实现有图片的Button的圆角效果, 可以先参照上述方法先对图片进行处理。
+	* 对于简单阴影，可以使用CGContexRef/UIBezierPath绘制阴影路径并设置给ShadowPath来代替shadowOffset等属性设置阴影，下面是关于shadowPath的官方解释
 
 #### 高效绘制
 
