@@ -62,3 +62,16 @@ description: 学习Core Text 及 YYLabel 对 Core Text的封装 ，为处理卡�
 
 [YYText 源码剖析](https://cloud.tencent.com/developer/article/1403845)
 
+
+
+
+
+https://cloud.tencent.com/developer/article/1403845
+
+
+
+https://juejin.cn/post/6844903466259709960
+
+
+
+https://github.com/ibireme
