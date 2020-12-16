@@ -194,6 +194,8 @@ static CGFloat getWidth(void * ref) {
 
 #### 内容高亮与事件处理
 
+Core Text的点击事件，也是通过获取Touch的地址，然后去查找对应的CTRun。找到后决定是否处理点击事件。
+
 
 
 
