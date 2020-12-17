@@ -20,6 +20,13 @@
 		19343CFA258896B8007E0FEC /* ImageTextData.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CF9258896B8007E0FEC /* ImageTextData.m */; };
 		19343CFD25889796007E0FEC /* ImageTextDataCreator.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CFC25889796007E0FEC /* ImageTextDataCreator.m */; };
 		19343D0025889CF4007E0FEC /* ImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CFF25889CF4007E0FEC /* ImageItem.m */; };
+		193FFCFE258B42FA00BF6F04 /* FCFAsyncView.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */; };
+		193FFD03258B480300BF6F04 /* FCFCTLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFD02258B480300BF6F04 /* FCFCTLine.m */; };
+		193FFD06258B4AEC00BF6F04 /* FCFBaseDataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFD05258B4AEC00BF6F04 /* FCFBaseDataItem.m */; };
+		19418F30258B650000A1F4FA /* FCFTextItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F2F258B650000A1F4FA /* FCFTextItem.m */; };
+		19418F33258B681E00A1F4FA /* FCFLinkItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F32258B681E00A1F4FA /* FCFLinkItem.m */; };
+		19418F36258B688F00A1F4FA /* FCFAttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */; };
+		19418F39258B6FC600A1F4FA /* FCFRichContentData.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F38258B6FC600A1F4FA /* FCFRichContentData.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -46,6 +53,20 @@
 		19343CFC25889796007E0FEC /* ImageTextDataCreator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageTextDataCreator.m; sourceTree = "<group>"; };
 		19343CFE25889CF4007E0FEC /* ImageItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageItem.h; sourceTree = "<group>"; };
 		19343CFF25889CF4007E0FEC /* ImageItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageItem.m; sourceTree = "<group>"; };
+		193FFCFC258B42FA00BF6F04 /* FCFAsyncView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFAsyncView.h; sourceTree = "<group>"; };
+		193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFAsyncView.m; sourceTree = "<group>"; };
+		193FFD01258B480300BF6F04 /* FCFCTLine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFCTLine.h; sourceTree = "<group>"; };
+		193FFD02258B480300BF6F04 /* FCFCTLine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFCTLine.m; sourceTree = "<group>"; };
+		193FFD04258B4AEC00BF6F04 /* FCFBaseDataItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFBaseDataItem.h; sourceTree = "<group>"; };
+		193FFD05258B4AEC00BF6F04 /* FCFBaseDataItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFBaseDataItem.m; sourceTree = "<group>"; };
+		19418F2E258B650000A1F4FA /* FCFTextItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFTextItem.h; sourceTree = "<group>"; };
+		19418F2F258B650000A1F4FA /* FCFTextItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFTextItem.m; sourceTree = "<group>"; };
+		19418F31258B681E00A1F4FA /* FCFLinkItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFLinkItem.h; sourceTree = "<group>"; };
+		19418F32258B681E00A1F4FA /* FCFLinkItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFLinkItem.m; sourceTree = "<group>"; };
+		19418F34258B688F00A1F4FA /* FCFAttachmentItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFAttachmentItem.h; sourceTree = "<group>"; };
+		19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFAttachmentItem.m; sourceTree = "<group>"; };
+		19418F37258B6FC600A1F4FA /* FCFRichContentData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFRichContentData.h; sourceTree = "<group>"; };
+		19418F38258B6FC600A1F4FA /* FCFRichContentData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFRichContentData.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +110,7 @@
 		19343CD325885789007E0FEC /* CoreText学习Demo */ = {
 			isa = PBXGroup;
 			children = (
+				193FFCFF258B430000BF6F04 /* FCFAsyncView */,
 				1903AA852588B0AE007A80AC /* DrawTextDemo */,
 				19343CF725889677007E0FEC /* DrawImageDemo */,
 				19343CED25885821007E0FEC /* GestureDemo */,
@@ -135,6 +157,35 @@
 				19343CFF25889CF4007E0FEC /* ImageItem.m */,
 			);
 			path = DrawImageDemo;
+			sourceTree = "<group>";
+		};
+		193FFCFF258B430000BF6F04 /* FCFAsyncView */ = {
+			isa = PBXGroup;
+			children = (
+				193FFD00258B47D700BF6F04 /* Core */,
+				193FFCFC258B42FA00BF6F04 /* FCFAsyncView.h */,
+				193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */,
+			);
+			path = FCFAsyncView;
+			sourceTree = "<group>";
+		};
+		193FFD00258B47D700BF6F04 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				193FFD01258B480300BF6F04 /* FCFCTLine.h */,
+				193FFD02258B480300BF6F04 /* FCFCTLine.m */,
+				193FFD04258B4AEC00BF6F04 /* FCFBaseDataItem.h */,
+				193FFD05258B4AEC00BF6F04 /* FCFBaseDataItem.m */,
+				19418F2E258B650000A1F4FA /* FCFTextItem.h */,
+				19418F2F258B650000A1F4FA /* FCFTextItem.m */,
+				19418F31258B681E00A1F4FA /* FCFLinkItem.h */,
+				19418F32258B681E00A1F4FA /* FCFLinkItem.m */,
+				19418F34258B688F00A1F4FA /* FCFAttachmentItem.h */,
+				19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */,
+				19418F37258B6FC600A1F4FA /* FCFRichContentData.h */,
+				19418F38258B6FC600A1F4FA /* FCFRichContentData.m */,
+			);
+			path = Core;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,12 +259,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				1903AA992588C433007A80AC /* GestureView.m in Sources */,
+				193FFCFE258B42FA00BF6F04 /* FCFAsyncView.m in Sources */,
+				19418F30258B650000A1F4FA /* FCFTextItem.m in Sources */,
+				19418F36258B688F00A1F4FA /* FCFAttachmentItem.m in Sources */,
 				19343D0025889CF4007E0FEC /* ImageItem.m in Sources */,
+				19418F33258B681E00A1F4FA /* FCFLinkItem.m in Sources */,
 				19343CDC25885789007E0FEC /* ViewController.m in Sources */,
 				19343CF62588817B007E0FEC /* ImageView.m in Sources */,
 				19343CFA258896B8007E0FEC /* ImageTextData.m in Sources */,
+				19418F39258B6FC600A1F4FA /* FCFRichContentData.m in Sources */,
 				19343CF02588583B007E0FEC /* TextView.m in Sources */,
+				193FFD06258B4AEC00BF6F04 /* FCFBaseDataItem.m in Sources */,
 				19343CD625885789007E0FEC /* AppDelegate.m in Sources */,
+				193FFD03258B480300BF6F04 /* FCFCTLine.m in Sources */,
 				19343CE72588578A007E0FEC /* main.m in Sources */,
 				19343CFD25889796007E0FEC /* ImageTextDataCreator.m in Sources */,
 			);
