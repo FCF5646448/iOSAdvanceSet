@@ -20,7 +20,9 @@
 		19343CFA258896B8007E0FEC /* ImageTextData.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CF9258896B8007E0FEC /* ImageTextData.m */; };
 		19343CFD25889796007E0FEC /* ImageTextDataCreator.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CFC25889796007E0FEC /* ImageTextDataCreator.m */; };
 		19343D0025889CF4007E0FEC /* ImageItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CFF25889CF4007E0FEC /* ImageItem.m */; };
-		193FFCFE258B42FA00BF6F04 /* FCFAsyncView.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */; };
+		193B495D258C431A0083C99A /* FCFTrunContentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 193B495C258C431A0083C99A /* FCFTrunContentItem.m */; };
+		193B4961258C94310083C99A /* NSMutableAttributedString+SetAttribute.m in Sources */ = {isa = PBXBuildFile; fileRef = 193B4960258C94310083C99A /* NSMutableAttributedString+SetAttribute.m */; };
+		193B4964258CB7130083C99A /* FCFDrawView.m in Sources */ = {isa = PBXBuildFile; fileRef = 193B4963258CB7130083C99A /* FCFDrawView.m */; };
 		193FFD03258B480300BF6F04 /* FCFCTLine.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFD02258B480300BF6F04 /* FCFCTLine.m */; };
 		193FFD06258B4AEC00BF6F04 /* FCFBaseDataItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 193FFD05258B4AEC00BF6F04 /* FCFBaseDataItem.m */; };
 		19418F30258B650000A1F4FA /* FCFTextItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F2F258B650000A1F4FA /* FCFTextItem.m */; };
@@ -53,8 +55,12 @@
 		19343CFC25889796007E0FEC /* ImageTextDataCreator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageTextDataCreator.m; sourceTree = "<group>"; };
 		19343CFE25889CF4007E0FEC /* ImageItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ImageItem.h; sourceTree = "<group>"; };
 		19343CFF25889CF4007E0FEC /* ImageItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ImageItem.m; sourceTree = "<group>"; };
-		193FFCFC258B42FA00BF6F04 /* FCFAsyncView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFAsyncView.h; sourceTree = "<group>"; };
-		193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFAsyncView.m; sourceTree = "<group>"; };
+		193B495B258C431A0083C99A /* FCFTrunContentItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFTrunContentItem.h; sourceTree = "<group>"; };
+		193B495C258C431A0083C99A /* FCFTrunContentItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFTrunContentItem.m; sourceTree = "<group>"; };
+		193B495F258C94310083C99A /* NSMutableAttributedString+SetAttribute.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSMutableAttributedString+SetAttribute.h"; sourceTree = "<group>"; };
+		193B4960258C94310083C99A /* NSMutableAttributedString+SetAttribute.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSMutableAttributedString+SetAttribute.m"; sourceTree = "<group>"; };
+		193B4962258CB7130083C99A /* FCFDrawView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFDrawView.h; sourceTree = "<group>"; };
+		193B4963258CB7130083C99A /* FCFDrawView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFDrawView.m; sourceTree = "<group>"; };
 		193FFD01258B480300BF6F04 /* FCFCTLine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFCTLine.h; sourceTree = "<group>"; };
 		193FFD02258B480300BF6F04 /* FCFCTLine.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFCTLine.m; sourceTree = "<group>"; };
 		193FFD04258B4AEC00BF6F04 /* FCFBaseDataItem.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFBaseDataItem.h; sourceTree = "<group>"; };
@@ -159,12 +165,22 @@
 			path = DrawImageDemo;
 			sourceTree = "<group>";
 		};
+		193B495E258C93FC0083C99A /* Category */ = {
+			isa = PBXGroup;
+			children = (
+				193B495F258C94310083C99A /* NSMutableAttributedString+SetAttribute.h */,
+				193B4960258C94310083C99A /* NSMutableAttributedString+SetAttribute.m */,
+			);
+			path = Category;
+			sourceTree = "<group>";
+		};
 		193FFCFF258B430000BF6F04 /* FCFAsyncView */ = {
 			isa = PBXGroup;
 			children = (
+				193B495E258C93FC0083C99A /* Category */,
 				193FFD00258B47D700BF6F04 /* Core */,
-				193FFCFC258B42FA00BF6F04 /* FCFAsyncView.h */,
-				193FFCFD258B42FA00BF6F04 /* FCFAsyncView.m */,
+				193B4962258CB7130083C99A /* FCFDrawView.h */,
+				193B4963258CB7130083C99A /* FCFDrawView.m */,
 			);
 			path = FCFAsyncView;
 			sourceTree = "<group>";
@@ -182,6 +198,8 @@
 				19418F32258B681E00A1F4FA /* FCFLinkItem.m */,
 				19418F34258B688F00A1F4FA /* FCFAttachmentItem.h */,
 				19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */,
+				193B495B258C431A0083C99A /* FCFTrunContentItem.h */,
+				193B495C258C431A0083C99A /* FCFTrunContentItem.m */,
 				19418F37258B6FC600A1F4FA /* FCFRichContentData.h */,
 				19418F38258B6FC600A1F4FA /* FCFRichContentData.m */,
 			);
@@ -259,8 +277,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				1903AA992588C433007A80AC /* GestureView.m in Sources */,
-				193FFCFE258B42FA00BF6F04 /* FCFAsyncView.m in Sources */,
+				193B495D258C431A0083C99A /* FCFTrunContentItem.m in Sources */,
 				19418F30258B650000A1F4FA /* FCFTextItem.m in Sources */,
+				193B4964258CB7130083C99A /* FCFDrawView.m in Sources */,
 				19418F36258B688F00A1F4FA /* FCFAttachmentItem.m in Sources */,
 				19343D0025889CF4007E0FEC /* ImageItem.m in Sources */,
 				19418F33258B681E00A1F4FA /* FCFLinkItem.m in Sources */,
@@ -271,6 +290,7 @@
 				19343CF02588583B007E0FEC /* TextView.m in Sources */,
 				193FFD06258B4AEC00BF6F04 /* FCFBaseDataItem.m in Sources */,
 				19343CD625885789007E0FEC /* AppDelegate.m in Sources */,
+				193B4961258C94310083C99A /* NSMutableAttributedString+SetAttribute.m in Sources */,
 				193FFD03258B480300BF6F04 /* FCFCTLine.m in Sources */,
 				19343CE72588578A007E0FEC /* main.m in Sources */,
 				19343CFD25889796007E0FEC /* ImageTextDataCreator.m in Sources */,
