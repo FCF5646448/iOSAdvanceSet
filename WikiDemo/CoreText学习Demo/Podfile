@@ -1,0 +1,5 @@
+target 'CoreText学习Demo' do
+  pod 'Masonry'
+  pod 'BlocksKit'
+
+end

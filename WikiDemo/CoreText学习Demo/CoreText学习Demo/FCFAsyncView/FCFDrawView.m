@@ -18,6 +18,9 @@ const NSInteger COVER_TAG = 100023;
 
 @implementation FCFDrawView
 
+// 不生成set和get方法，通过消息转发，获取FCFRichContentData的对应属性
+@dynamic trunToken, trunActionHandler, text, textColor, font, shadowColor, shadowOffSet, shadowAlpha, lineSpacing, paragrapSpacing, textAlignment;
+
 - (FCFRichContentData *)data {
     if (!_data) {
         _data = [FCFRichContentData new];
@@ -92,6 +95,12 @@ const NSInteger COVER_TAG = 100023;
 }
 
 
+// truncationToken, truncationActionHandler, text, textColor, font, shadowColor, shadowOffset, shadowAlpha, lineSpacing, paragraphSpacing, textAlignment 这些属性走转发流程
+- (id)forwardingTargetForSelector:(SEL)aSelector {
+    return self.data;
+}
+
+
 #pragma MARK - draw
 - (void)drawRect:(CGRect)rect {
     [super drawRect:rect];
@@ -110,6 +119,9 @@ const NSInteger COVER_TAG = 100023;
     [self drawAttachmentInContxt:context];
 }
 
+/**
+绘制文字
+*/
 - (void)drawTextInContext:(CGContextRef)context {
     if (self.data.drawMode == FCFDrawModeFrame) {
         CTFrameDraw(self.data.drawFrame, context);
@@ -121,7 +133,9 @@ const NSInteger COVER_TAG = 100023;
     }
 }
 
-
+/**
+绘制图片
+*/
 - (void)drawAttachmentInContxt:(CGContextRef)context {
     for (int i = 0; i<self.data.attachments.count; i++) {
         FCFAttachmentItem *attachmentItem = self.data.attachments[i];
@@ -139,6 +153,9 @@ const NSInteger COVER_TAG = 100023;
     }
 }
 
+/**
+绘制阴影
+*/
 - (void)drawShadowInContext:(CGContextRef)context {
     if (self.data.shadowColor == nil || CGSizeEqualToSize(self.data.shadowOffSet, CGSizeZero)) {
         return;
@@ -167,10 +184,6 @@ const NSInteger COVER_TAG = 100023;
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-//    if (self.clickedItem.clickActionHandler) {
-//        self.clickedItem.clickActionHandler(_clickedItem);
-//    }
-    
     !self.clickedItem.clickActionHandler ?: self.clickedItem.clickActionHandler(_clickedItem);
     self.clickedItem = nil;
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
@@ -187,7 +200,5 @@ const NSInteger COVER_TAG = 100023;
     self.clickedItem = nil;
     [self touchesEnded:touches withEvent:event];
 }
-
-
 
 @end

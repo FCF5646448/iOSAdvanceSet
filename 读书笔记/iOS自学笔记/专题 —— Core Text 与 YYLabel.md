@@ -11,27 +11,42 @@ description: 学习Core Text 及 YYLabel 对 Core Text的封装 ，为处理卡�
 Core Text是一种高级的底层技术，用于布局文本和处理字体。
 #### 基础
 ##### 基础框架
+**Core Text的布局通常由属性字符串(CFAttributedStringRef)和图形路径(CGPathRef)共同完成。属性字符串包含需要绘制的字符串、字符的样式属性；图形路径定义了文本绘制区域的形状。**
+* 工作流程：
+	CTFramesetterRef通过属性字符串CFAttributedStringRef和图形路径CGPathRef，生成一个或多个CTFrameRef。每个CTFrameRef表示一个段落。
+	在CTFrameRef的生成过程中，CTFramesetterRef会调用CTTypesetterRef将属性字符串及其属性(对齐、行间距、缩进、字体等)转成多个相应的CTRun，并将其填充到CTLine中。(CTRun可以直接绘制在图像上下文中，大多数时候，无需直接操作CTRun)。
+
+##### 主要的类
 * CTFrame
-表示一段内容或一块区域。通常包含一个或多个CTline。
-常用API：
-	* CTFrameGetLines：获取CTFrame中所有的CTLine
-	* CTFrameGetLineOrigins：获取CTFrame中每一行的起始坐标，返回结果
-	* CTFrameDraw: 把CTFrame绘制到Context上下文
+  表示一段内容或一块区域。通常包含一个或多个CTline。
+  常用API：
+  * CTFrameGetLines：获取CTFrame中所有的CTLine
+  * CTFrameGetLineOrigins：获取CTFrame中每一行的起始坐标，返回结果
+  * CTFrameDraw: 把CTFrame绘制到Context上下文
+
 * CTLine
-表示一行内容。通常包含一个或多个CTRun。
-常用API：
-	* CTLineGetGlyphRuns：获取CTLine包含的所有CTRun
-	* CTLineGetOffsetForStringIndex：获取CTRun的起始位置
+  表示一行内容。通常包含一个或多个CTRun。
+  常用API：
+  * CTLineGetGlyphRuns：获取CTLine包含的所有CTRun
+  * CTLineGetOffsetForStringIndex：获取CTRun的起始位置
+
 * CTRun
-表示每一行中，相同格式的一块内容。这个内容可以是文本，也可以是图片。
-常用API：
-	* CTRunGetAttributes：获取CTRun保存的属性，获取到的内容通过CFAttributeStringSetAttribute方法设置给图片属性字符串的NSDictionary，key为KCTRunDelegateAttributeName，指为CTRunDelegateRef
-	* CTRunGetTypographocBounds：获取CTRun的绘制属性 ascent、desent，返回值为CTRun的宽度
-	* CTRunGetStringRange：获取CTRun字符串的Range
+  表示每一行中，相同格式的一块内容。这个内容可以是文本，也可以是图片。
+  常用API：
+  * CTRunGetAttributes：获取CTRun保存的属性，获取到的内容通过CFAttributeStringSetAttribute方法设置给图片属性字符串的NSDictionary，key为KCTRunDelegateAttributeName，指为CTRunDelegateRef
+  * CTRunGetTypographocBounds：获取CTRun的绘制属性 ascent、desent，返回值为CTRun的宽度
+  * CTRunGetStringRange：获取CTRun字符串的Range
+
 * CTRunDelegate
-CTRunDelegate和CTRun是紧密相连的，CTFrame初始化的时候需要用到的图片信息是通过CTRunDelegate的callback获得的
-常用API：
-	* CTRunDelegateCreate 创建CTRunDelegate对象，需要传递CTRunDelegateCallbacks对象，使用CFAttributedStringSetAttribute方法把CTRunDelegate对象和NSAttributedString对象绑定，在CTFrame初始化的时候用CTRunDelegate回调方法返回Ascent、descent、width等信息。
+  CTRunDelegate和CTRun是紧密相连的，CTFrame初始化的时候需要用到的图片信息是通过CTRunDelegate的callback获得的
+  常用API：
+
+  * CTRunDelegateCreate 创建CTRunDelegate对象，需要传递CTRunDelegateCallbacks对象，使用CFAttributedStringSetAttribute方法把CTRunDelegate对象和NSAttributedString对象绑定，在CTFrame初始化的时候用CTRunDelegate回调方法返回Ascent、descent、width等信息。
+
+* CTFont
+
+  字体对象，包含了很多字体直接的东西。比如字号、字形、上下行行高等。
+
 
 * 坐标系
 iOS 开发时，使用的UIKit的坐标系的原点是在**左上角**。Core Text的坐标系原点是**左下角**。
@@ -43,7 +58,8 @@ iOS 开发时，使用的UIKit的坐标系的原点是在**左上角**。Core Te
     CGContextScaleCTM(context, 1, -1);
 ```
 
-####  绘制文本
+#### 简单Demo
+#####  绘制文本
 
 绘制文本流程：
 步骤：1、创建文本绘制区域 ——> 2、创建文本属性 ——> 3、创建CTFrame ——> 4、绘制
@@ -75,8 +91,9 @@ iOS 开发时，使用的UIKit的坐标系的原点是在**左上角**。Core Te
 }
 ```
 
-#### 绘制图片
-其实CoreText不直接参与图片的绘制。图片的绘制工作还是直接调用CoreGraphic的API进行绘制。
+##### 绘制图片
+**其实CoreText不直接参与图片的绘制**。图片的绘制工作还是直接调用CoreGraphic的API进行绘制。
+
 ```
 CGContextDrawImage(context, item.frame, [UIImage imageNamed:item.imgName].CGImage)
 ```
@@ -192,11 +209,9 @@ static CGFloat getWidth(void * ref) {
 }
 ```
 
-#### 内容高亮与事件处理
-
-Core Text的点击事件，也是通过获取Touch的地址，然后去查找对应的CTRun。找到后决定是否处理点击事件。
 
 
+### YYText
 
 
 

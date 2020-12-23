@@ -18,12 +18,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, assign) NSInteger numOfLines;
 @property (nonatomic, strong) NSAttributedString *trunToken;
-@property (nonatomic, copy) ClickActionHandler trunActionhandler;
+@property (nonatomic, copy) ClickActionHandler trunActionHandler;
 @property (nonatomic, copy) NSString *text;
 @property (nonatomic, strong) UIColor *textColor;
 @property (nonatomic, strong) UIFont *font;
 @property (nonatomic, strong) UIColor *shadowColor;
-@property (nonatomic, assign) CGFloat shadowOffset;
+@property (nonatomic, assign) CGSize shadowOffSet;
 @property (nonatomic, assign) CGFloat shadowAlpha;
 @property (nonatomic, assign) CGFloat lineSpacing;
 @property (nonatomic, assign) CGFloat paragrapSpacing;

@@ -43,6 +43,11 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
         _textColor = [UIColor blackColor];
         _font = [UIFont systemFontOfSize:14];
         _lineBreakMode = kCTLineBreakByTruncatingTail;
+        _attachments = [NSMutableArray array];
+        _links = [NSMutableArray array];
+        _trun = [NSMutableArray array];
+        _drawLines = [NSMutableArray array];
+        _attributeString = [NSMutableAttributedString new];
     }
     return self;
 }
@@ -140,7 +145,6 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
     _ctFrame = [self composeCTFrameWithAttributeString:self.attributeStringToDraw frame:bounds];
     [self calculateContentPositionWithBounds:bounds];
     [self calculateTruncatedLinesWithBounds:bounds];
-    
 }
 
 // 获取view点击位置的数据
@@ -184,8 +188,7 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
     CTFramesetterRef ctFrameSetter = CTFramesetterCreateWithAttributedString((CFAttributedStringRef) attributeString);
     CTFrameRef ctFrame = CTFramesetterCreateFrame(ctFrameSetter, CFRangeMake(0, attributeString.length), path, NULL);
     
-    CFRelease(ctFrameSetter);
-    CFRelease(ctFrame);
+    CFRelease(path);
     
     return ctFrame;
 }
@@ -225,12 +228,14 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
                 CGFloat width = CTRunGetTypographicBounds(run, CFRangeMake(0, 0), &ascent, &desent, NULL);
                 CGFloat height = ascent + desent;
                 
-                //
+                // 获取CTRun的起始位置
                 CGFloat xOffset = lineOrigins[i].x + CTLineGetOffsetForStringIndex(line, CTRunGetStringRange(run).location, NULL);
                 CGFloat yOffset = bounds.size.height - lineOrigins[i].y - ascent;
                 
                 if ([data isKindOfClass:[FCFBaseDataItem class]]) {
-                    //
+                    /*
+                     优化Core Text和UIKit坐标系不同，所以要做一个转换
+                     */
                     CGRect uiKitClickableFrame = CGRectMake(xOffset, yOffset, width, height);
                     [data addFrame:uiKitClickableFrame];
                 }
@@ -350,7 +355,7 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
                     CGFloat height = ascent + descent;
                     
                     FCFTrunContentItem * trunItem = [FCFTrunContentItem new];
-                    CGRect trunFrame = CGRectMake(width - tokenWidth, bounds.size.width - lineOrigins[lineIndex].y - height, tokenSize.width, tokenSize.height);
+                    CGRect trunFrame = CGRectMake(width - tokenWidth, bounds.size.height - lineOrigins[lineIndex].y - height, tokenSize.width, tokenSize.height);
                     
                     [trunItem addFrame:trunFrame];
                     trunItem.clickActionHandler = self.trunActionHandler;
@@ -443,7 +448,10 @@ typedef NS_ENUM(NSUInteger, FCFDataType) {
 
 
 - (void)updateAttachments {
-    
+    for (FCFAttachmentItem *attachment in self.attachments) {
+        attachment.ascent = CTFontGetAscent((CTFontRef)self.font);
+        attachment.descent = CTFontGetDescent((CTFontRef)self.font);
+    }
 }
 
 

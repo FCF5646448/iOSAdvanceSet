@@ -12,6 +12,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface GestureView : UIView
 
+@property (nonatomic, weak) UIViewController *parentVC;
+
 @end
 
 NS_ASSUME_NONNULL_END

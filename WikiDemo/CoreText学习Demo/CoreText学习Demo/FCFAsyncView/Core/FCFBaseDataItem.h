@@ -15,7 +15,7 @@ typedef void(^ClickActionHandler)(id obj);
 
 @interface FCFBaseDataItem : NSObject
 
-@property (nonatomic, assign) NSMutableArray<NSValue *> * clickableFrames;
+@property (nonatomic, strong) NSMutableArray<NSValue *> * clickableFrames;
 @property (nonatomic, copy) ClickActionHandler clickActionHandler;
 
 // 将frame添加进数组

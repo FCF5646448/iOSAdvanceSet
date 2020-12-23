@@ -25,7 +25,7 @@
 }
 
 - (void)fcf_setFont:(UIFont*)font {
-    [self fcf_setTextColor:font range:NSMakeRange(0, [self length])];
+    [self fcf_setFont:font range:NSMakeRange(0, [self length])];
 }
 
 - (void)fcf_setFont:(UIFont*)font range:(NSRange)range {

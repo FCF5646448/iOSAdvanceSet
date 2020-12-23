@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		1903AA992588C433007A80AC /* GestureView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1903AA982588C433007A80AC /* GestureView.m */; };
+		1920A1A7259361980054126B /* TruncationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1920A1A6259361980054126B /* TruncationView.m */; };
+		1920A1AB25936F0C0054126B /* FontView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1920A1AA25936F0C0054126B /* FontView.m */; };
+		1920A1AF25936FA10054126B /* AutoLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 1920A1AE25936FA10054126B /* AutoLayoutView.m */; };
 		19343CD625885789007E0FEC /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CD525885789007E0FEC /* AppDelegate.m */; };
 		19343CDC25885789007E0FEC /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 19343CDB25885789007E0FEC /* ViewController.m */; };
 		19343CDF25885789007E0FEC /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 19343CDD25885789007E0FEC /* Main.storyboard */; };
@@ -29,11 +32,18 @@
 		19418F33258B681E00A1F4FA /* FCFLinkItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F32258B681E00A1F4FA /* FCFLinkItem.m */; };
 		19418F36258B688F00A1F4FA /* FCFAttachmentItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */; };
 		19418F39258B6FC600A1F4FA /* FCFRichContentData.m in Sources */ = {isa = PBXBuildFile; fileRef = 19418F38258B6FC600A1F4FA /* FCFRichContentData.m */; };
+		763FF470284443CFC2C2AD04 /* libPods-CoreText学习Demo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6878FDCEC1075FBC9A4B9AB7 /* libPods-CoreText学习Demo.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1903AA972588C433007A80AC /* GestureView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GestureView.h; sourceTree = "<group>"; };
 		1903AA982588C433007A80AC /* GestureView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GestureView.m; sourceTree = "<group>"; };
+		1920A1A5259361980054126B /* TruncationView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TruncationView.h; sourceTree = "<group>"; };
+		1920A1A6259361980054126B /* TruncationView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = TruncationView.m; sourceTree = "<group>"; };
+		1920A1A925936F0C0054126B /* FontView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FontView.h; sourceTree = "<group>"; };
+		1920A1AA25936F0C0054126B /* FontView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FontView.m; sourceTree = "<group>"; };
+		1920A1AD25936FA10054126B /* AutoLayoutView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AutoLayoutView.h; sourceTree = "<group>"; };
+		1920A1AE25936FA10054126B /* AutoLayoutView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AutoLayoutView.m; sourceTree = "<group>"; };
 		19343CD125885789007E0FEC /* CoreText学习Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "CoreText学习Demo.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		19343CD425885789007E0FEC /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		19343CD525885789007E0FEC /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -73,6 +83,9 @@
 		19418F35258B688F00A1F4FA /* FCFAttachmentItem.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFAttachmentItem.m; sourceTree = "<group>"; };
 		19418F37258B6FC600A1F4FA /* FCFRichContentData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FCFRichContentData.h; sourceTree = "<group>"; };
 		19418F38258B6FC600A1F4FA /* FCFRichContentData.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = FCFRichContentData.m; sourceTree = "<group>"; };
+		2B14EE5258867A38818B64A8 /* Pods-CoreText学习Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoreText学习Demo.debug.xcconfig"; path = "Target Support Files/Pods-CoreText学习Demo/Pods-CoreText学习Demo.debug.xcconfig"; sourceTree = "<group>"; };
+		6878FDCEC1075FBC9A4B9AB7 /* libPods-CoreText学习Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-CoreText学习Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CB7A51D630AF3CA0687BCE2E /* Pods-CoreText学习Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-CoreText学习Demo.release.xcconfig"; path = "Target Support Files/Pods-CoreText学习Demo/Pods-CoreText学习Demo.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +94,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19343CF325885C37007E0FEC /* CoreText.framework in Frameworks */,
+				763FF470284443CFC2C2AD04 /* libPods-CoreText学习Demo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,12 +110,40 @@
 			path = DrawTextDemo;
 			sourceTree = "<group>";
 		};
+		1920A1A4259361650054126B /* TruncationDemo */ = {
+			isa = PBXGroup;
+			children = (
+				1920A1A5259361980054126B /* TruncationView.h */,
+				1920A1A6259361980054126B /* TruncationView.m */,
+			);
+			path = TruncationDemo;
+			sourceTree = "<group>";
+		};
+		1920A1A825936EF70054126B /* FontDemo */ = {
+			isa = PBXGroup;
+			children = (
+				1920A1A925936F0C0054126B /* FontView.h */,
+				1920A1AA25936F0C0054126B /* FontView.m */,
+			);
+			path = FontDemo;
+			sourceTree = "<group>";
+		};
+		1920A1AC25936F110054126B /* AutolayoutDemo */ = {
+			isa = PBXGroup;
+			children = (
+				1920A1AD25936FA10054126B /* AutoLayoutView.h */,
+				1920A1AE25936FA10054126B /* AutoLayoutView.m */,
+			);
+			path = AutolayoutDemo;
+			sourceTree = "<group>";
+		};
 		19343CC825885789007E0FEC = {
 			isa = PBXGroup;
 			children = (
 				19343CD325885789007E0FEC /* CoreText学习Demo */,
 				19343CD225885789007E0FEC /* Products */,
 				19343CF125885C37007E0FEC /* Frameworks */,
+				1EF0DDADC7B38825C161D7BE /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -120,6 +162,9 @@
 				1903AA852588B0AE007A80AC /* DrawTextDemo */,
 				19343CF725889677007E0FEC /* DrawImageDemo */,
 				19343CED25885821007E0FEC /* GestureDemo */,
+				1920A1A4259361650054126B /* TruncationDemo */,
+				1920A1A825936EF70054126B /* FontDemo */,
+				1920A1AC25936F110054126B /* AutolayoutDemo */,
 				19343CD425885789007E0FEC /* AppDelegate.h */,
 				19343CD525885789007E0FEC /* AppDelegate.m */,
 				19343CDA25885789007E0FEC /* ViewController.h */,
@@ -146,6 +191,7 @@
 			isa = PBXGroup;
 			children = (
 				19343CF225885C37007E0FEC /* CoreText.framework */,
+				6878FDCEC1075FBC9A4B9AB7 /* libPods-CoreText学习Demo.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -206,6 +252,16 @@
 			path = Core;
 			sourceTree = "<group>";
 		};
+		1EF0DDADC7B38825C161D7BE /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				2B14EE5258867A38818B64A8 /* Pods-CoreText学习Demo.debug.xcconfig */,
+				CB7A51D630AF3CA0687BCE2E /* Pods-CoreText学习Demo.release.xcconfig */,
+			);
+			name = Pods;
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -213,6 +269,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 19343CEA2588578A007E0FEC /* Build configuration list for PBXNativeTarget "CoreText学习Demo" */;
 			buildPhases = (
+				B2F6821737DC85F657DF1C93 /* [CP] Check Pods Manifest.lock */,
 				19343CCD25885789007E0FEC /* Sources */,
 				19343CCE25885789007E0FEC /* Frameworks */,
 				19343CCF25885789007E0FEC /* Resources */,
@@ -271,17 +328,45 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		B2F6821737DC85F657DF1C93 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-CoreText学习Demo-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		19343CCD25885789007E0FEC /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1920A1AF25936FA10054126B /* AutoLayoutView.m in Sources */,
 				1903AA992588C433007A80AC /* GestureView.m in Sources */,
+				1920A1A7259361980054126B /* TruncationView.m in Sources */,
 				193B495D258C431A0083C99A /* FCFTrunContentItem.m in Sources */,
 				19418F30258B650000A1F4FA /* FCFTextItem.m in Sources */,
 				193B4964258CB7130083C99A /* FCFDrawView.m in Sources */,
 				19418F36258B688F00A1F4FA /* FCFAttachmentItem.m in Sources */,
 				19343D0025889CF4007E0FEC /* ImageItem.m in Sources */,
+				1920A1AB25936F0C0054126B /* FontView.m in Sources */,
 				19418F33258B681E00A1F4FA /* FCFLinkItem.m in Sources */,
 				19343CDC25885789007E0FEC /* ViewController.m in Sources */,
 				19343CF62588817B007E0FEC /* ImageView.m in Sources */,
@@ -431,6 +516,7 @@
 		};
 		19343CEB2588578A007E0FEC /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2B14EE5258867A38818B64A8 /* Pods-CoreText学习Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -449,6 +535,7 @@
 		};
 		19343CEC2588578A007E0FEC /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = CB7A51D630AF3CA0687BCE2E /* Pods-CoreText学习Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
