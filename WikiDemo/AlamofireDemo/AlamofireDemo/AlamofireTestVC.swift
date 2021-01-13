@@ -45,6 +45,6 @@ extension AlamofireTestVC {
          * requestModifier: RequestModifier // 封装了一个闭包，可以在闭包里对URLRequest进行处理；
          * return: DataRequest //最终返回一个DataRequest，它是对整个请求过程封装的一个组合类，可以理解为一次请求就生成一个DataRequest，然后它包含了整个请求过程的几乎所有数据。
          */
-         AF.request(URLConvertible, method: HTTPMethod, parameters: <#T##Encodable?#>, encoder: ParameterEncoder, headers: HTTPHeaders?, interceptor: RequestInterceptor?, requestModifier: <#T##Session.RequestModifier?##Session.RequestModifier?##(inout URLRequest) throws -> Void#>) -> DataRequest?
+//         AF.request(URLConvertible, method: HTTPMethod, parameters: <#T##Encodable?#>, encoder: ParameterEncoder, headers: HTTPHeaders?, interceptor: RequestInterceptor?, requestModifier: <#T##Session.RequestModifier?##Session.RequestModifier?##(inout URLRequest) throws -> Void#>) -> DataRequest?
     }
 }
