@@ -26,10 +26,10 @@
     self.view.backgroundColor = [UIColor whiteColor];
 //    [self drawText];
 //    [self drawImageAndText];
-    [self drawGestureView];
+//    [self drawGestureView];
 //    [self truncationView];
 //    [self fontView];
-//    [self autolayout];
+    [self autolayout];
 }
 
 // 测试纯文本
