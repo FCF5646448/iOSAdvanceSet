@@ -1,0 +1,29 @@
+[0;1;32mTranslationUnitDecl[0m[0;33m 0x7f8a0f81b408[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m
+[0;34m|-[0m[0;1;32mTypedefDecl[0m[0;33m 0x7f8a0f81bca0[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m implicit[0;1;36m __int128_t[0m [0;32m'__int128'[0m
+[0;34m| `-[0m[0;32mBuiltinType[0m[0;33m 0x7f8a0f81b9a0[0m [0;32m'__int128'[0m
+[0;34m|-[0m[0;1;32mTypedefDecl[0m[0;33m 0x7f8a0f81bd08[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m implicit[0;1;36m __uint128_t[0m [0;32m'unsigned __int128'[0m
+[0;34m| `-[0m[0;32mBuiltinType[0m[0;33m 0x7f8a0f81b9c0[0m [0;32m'unsigned __int128'[0m
+[0;34m|-[0m[0;1;32mTypedefDecl[0m[0;33m 0x7f8a0f81bfd8[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m implicit[0;1;36m __NSConstantString[0m [0;32m'struct __NSConstantString_tag'[0m
+[0;34m| `-[0m[0;32mRecordType[0m[0;33m 0x7f8a0f81bdf0[0m [0;32m'struct __NSConstantString_tag'[0m
+[0;34m|   `-[0m[0;1;32mRecord[0m[0;33m 0x7f8a0f81bd58[0m[0;1;36m '__NSConstantString_tag'[0m
+[0;34m|-[0m[0;1;32mTypedefDecl[0m[0;33m 0x7f8a0f81c070[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m implicit[0;1;36m __builtin_ms_va_list[0m [0;32m'char *'[0m
+[0;34m| `-[0m[0;32mPointerType[0m[0;33m 0x7f8a0f81c030[0m [0;32m'char *'[0m
+[0;34m|   `-[0m[0;32mBuiltinType[0m[0;33m 0x7f8a0f81b4a0[0m [0;32m'char'[0m
+[0;34m|-[0m[0;1;32mTypedefDecl[0m[0;33m 0x7f8a0f81c328[0m <[0;33m<invalid sloc>[0m> [0;33m<invalid sloc>[0m implicit[0;1;36m __builtin_va_list[0m [0;32m'struct __va_list_tag [1]'[0m
+[0;34m| `-[0m[0;32mConstantArrayType[0m[0;33m 0x7f8a0f81c2d0[0m [0;32m'struct __va_list_tag [1]'[0m 1 
+[0;34m|   `-[0m[0;32mRecordType[0m[0;33m 0x7f8a0f81c150[0m [0;32m'struct __va_list_tag'[0m
+[0;34m|     `-[0m[0;1;32mRecord[0m[0;33m 0x7f8a0f81c0c0[0m[0;1;36m '__va_list_tag'[0m
+[0;34m|-[0m[0;1;32mImportDecl[0m[0;33m 0x7f8a0f8e1b60[0m <[0;33mhelloworld.c:1:1[0m> [0;33mcol:1[0m implicit Darwin.C.stdio
+[0;34m|-[0m[0;1;32mFunctionDecl[0m[0;33m 0x7f8a0f8e1e00[0m <[0;33mline:2:1[0m, [0;33mline:6:1[0m> [0;33mline:2:5[0m[0;1;36m main[0m [0;32m'int (int, char **)'[0m
+[0;34m| |-[0m[0;1;32mParmVarDecl[0m[0;33m 0x7f8a0f8e1bb0[0m <[0;33mcol:10[0m, [0;33mcol:14[0m> [0;33mcol:14[0m[0;1;36m argc[0m [0;32m'int'[0m
+[0;34m| |-[0m[0;1;32mParmVarDecl[0m[0;33m 0x7f8a0f8e1cc0[0m <[0;33mcol:20[0m, [0;33mcol:31[0m> [0;33mcol:26[0m[0;1;36m argv[0m [0;32m'char **':'char **'[0m
+[0;34m| `-[0m[0;1;35mCompoundStmt[0m[0;33m 0x7f8a0e890600[0m <[0;33mline:3:1[0m, [0;33mline:6:1[0m>
+[0;34m|   |-[0m[0;1;35mCallExpr[0m[0;33m 0x7f8a0f8e2370[0m <[0;33mline:4:2[0m, [0;33mcol:25[0m> [0;32m'int'[0m[0;36m[0m[0;36m[0m
+[0;34m|   | |-[0m[0;1;35mImplicitCastExpr[0m[0;33m 0x7f8a0f8e2358[0m <[0;33mcol:2[0m> [0;32m'int (*)(const char *, ...)'[0m[0;36m[0m[0;36m[0m <[0;31mFunctionToPointerDecay[0m>
+[0;34m|   | | `-[0m[0;1;35mDeclRefExpr[0m[0;33m 0x7f8a0f8e22b0[0m <[0;33mcol:2[0m> [0;32m'int (const char *, ...)'[0m[0;36m[0m[0;36m[0m [0;1;32mFunction[0m[0;33m 0x7f8a0f8e1f08[0m[0;1;36m 'printf'[0m [0;32m'int (const char *, ...)'[0m
+[0;34m|   | `-[0m[0;1;35mImplicitCastExpr[0m[0;33m 0x7f8a0f8e23b0[0m <[0;33mcol:9[0m> [0;32m'const char *'[0m[0;36m[0m[0;36m[0m <[0;31mNoOp[0m>
+[0;34m|   |   `-[0m[0;1;35mImplicitCastExpr[0m[0;33m 0x7f8a0f8e2398[0m <[0;33mcol:9[0m> [0;32m'char *'[0m[0;36m[0m[0;36m[0m <[0;31mArrayToPointerDecay[0m>
+[0;34m|   |     `-[0m[0;1;35mStringLiteral[0m[0;33m 0x7f8a0f8e2308[0m <[0;33mcol:9[0m> [0;32m'char [14]'[0m[0;36m lvalue[0m[0;36m[0m[0;1;36m "hello World!\n"[0m
+[0;34m|   `-[0m[0;1;35mReturnStmt[0m[0;33m 0x7f8a0f8e23e8[0m <[0;33mline:5:2[0m, [0;33mcol:9[0m>
+[0;34m|     `-[0m[0;1;35mIntegerLiteral[0m[0;33m 0x7f8a0f8e23c8[0m <[0;33mcol:9[0m> [0;32m'int'[0m[0;36m[0m[0;36m[0m[0;1;36m 0[0m
+[0;34m`-[0m[0;1;32m<undeserialized declarations>[0m
