@@ -1,0 +1,15 @@
+Segment __PAGEZERO: 0x100000000 (vmaddr 0x0 fileoff 0)
+Segment __TEXT: 0x1000 (vmaddr 0x100000000 fileoff 0)
+	Section __text: 0x31 (addr 0x100000f50 offset 3920)
+	Section __stubs: 0x6 (addr 0x100000f82 offset 3970)
+	Section __stub_helper: 0x1a (addr 0x100000f88 offset 3976)
+	Section __cstring: 0xe (addr 0x100000fa2 offset 4002)
+	Section __unwind_info: 0x48 (addr 0x100000fb0 offset 4016)
+	total 0xa7
+Segment __DATA: 0x1000 (vmaddr 0x100001000 fileoff 4096)
+	Section __nl_symbol_ptr: 0x8 (addr 0x100001000 offset 4096)
+	Section __got: 0x8 (addr 0x100001008 offset 4104)
+	Section __la_symbol_ptr: 0x8 (addr 0x100001010 offset 4112)
+	total 0x18
+Segment __LINKEDIT: 0x1000 (vmaddr 0x100002000 fileoff 8192)
+total 0x100003000
