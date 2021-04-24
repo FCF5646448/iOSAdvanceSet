@@ -176,24 +176,8 @@ clang xx.o -o xx
 ```
 
 [LLVM and Clang](https://www.jianshu.com/p/037fb5002b77)
-#### MachO文件
-MachO文件是iOS和OS X操作系统的可执行文件格式。
-因为不同的CPU平台支持的指令集不一样，所以通常不同的CPU对应不同格式的MachO文件，比如arm64和x86。**通用二进制文件**则是指多种架构下的Mach-O文件"打包"在一起。
-通用二进制文件常用命令：
-```
-//查看通用二进制文件中的MachO文件信息
-$ file bq 
-$ otool -f -V bq
 
-//lipo命令增、删、提取指定的MachO文件
-//提取
-$ lipo bq -extract armv7 -o bq_v7
-//删除
-$ lipo bq -remove armv7 -o bq_V7
-//瘦身
-$ lipo bq -thin armv7 -o bq_V7
-```
-MachO文件里主要就是代码和数据（全局变量）。而代码段和数据段是存在不一样的内存地址的，所以这个就需要**链接器**将其关联起来。
+##### 5、最后生成的是一个Mach-O文件。请移步至《专题——Mach-O与启动优化》
 
 #### 静态库与动态库
 * 静态库：以.a和.framework为后缀；链接是会被完整复制到可执行文件中，被多次使用就有多份拷贝；
