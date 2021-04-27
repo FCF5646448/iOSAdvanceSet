@@ -260,6 +260,8 @@ segment和section只是Mach-O的基础组成部分。为了更高效地加载，
 
     * 4、二进制重排。也就是将**启动时需要调用的函数**放到一个page中（或者说放到相同或相邻的page里）。其实就是说**调整启动时用到的方法列表的顺序**。
 
+      [iOS 启动优化与二进制重排](https://juejin.cn/post/6844904165773328392)
+
       * 1、检测：可以通过Instrument的System Trace查看虚拟内存的File Back Page in，这个就是page fault的数量。（注意要使用真机）
 
       * 2、Link Map file。在xcode的setting中设置Write Link Map File，就在编译期间自动生成这个排序好的文件。它包含了路径、section、Segment等内容。所以我们可以通过这个文件来查看到原来的符号顺序（这个顺序可能并不是我们实际代码的执行顺序，所以可以调整这个东西）。
@@ -274,7 +276,84 @@ segment和section只是Mach-O的基础组成部分。为了更高效地加载，
 
       * 6、编译期插桩：
 
-        https://juejin.cn/post/6844904165773328392
+        实践步骤：
+
+        * 1、Other C Flags` 添加 `-fsanitize-coverage=trace-pc-guard；Other Swift Flags 添加 -sanitize-coverage=func 和 -sanitize=undeined
+
+        * 2、在启动最早的VC中添加函数：
+
+          ```
+          #import "dlfcn.h"
+          #import <libkern/OSAtomic.h>
+          
+          void __sanitizer_cov_trace_pc_guard_init(uint32_t *start, uint32_t *stop) {
+               static uint64_t N;  // Counter for the guards.
+               if (start == stop || *start) return;  // Initialize only once.
+               printf("INIT: %p %p\n", start, stop);
+               for (uint32_t *x = start; x < stop; x++)
+                 *x = ++N;  // Guards should start from 1.
+          }
+          
+          
+          //初始化原子队列
+          static OSQueueHead list = OS_ATOMIC_QUEUE_INIT;
+          //定义节点结构体
+          typedef struct {
+              void *pc;   //存下获取到的PC
+              void *next; //指向下一个节点
+          } Node;
+          
+          
+          void __sanitizer_cov_trace_pc_guard(uint32_t *guard) {
+               void *PC = __builtin_return_address(0);
+               Node *node = malloc(sizeof(Node));
+               *node = (Node){PC, NULL};
+               // offsetof() 计算出列尾，OSAtomicEnqueue() 把 node 加入 list 尾巴
+               OSAtomicEnqueue(&list, node, offsetof(Node, next));
+          }
+          
+          - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+               NSMutableArray *arr = [NSMutableArray array];
+               while(1){
+                   //有进就有出，这个方法和 OSAtomicEnqueue() 类比使用
+                   Node *node = OSAtomicDequeue(&list, offsetof(Node, next));
+                   //退出机制
+                   if (node == NULL) {
+                       break;
+                   }
+                   //获取函数信息
+                   Dl_info info;
+                   dladdr(node->pc, &info);
+                   NSString *sname = [NSString stringWithCString:info.dli_sname encoding:NSUTF8StringEncoding];
+                   printf("%s \n", info.dli_sname);
+                   //处理c函数及block前缀
+                   BOOL isObjc = [sname hasPrefix:@"+["] || [sname hasPrefix:@"-["];
+                   //c函数及block需要在开头添加下划线
+                   sname = isObjc ? sname: [@"_" stringByAppendingString:sname];
+                   
+                   //去重
+                   if (![arr containsObject:sname]) {
+                       //因为入栈的时候是从上至下，取出的时候方向是从下至上，那么就需要倒序，直接插在数组头部即可
+                       [arr insertObject:sname atIndex:0];
+                   }
+               }
+                 
+               //去掉 touchesBegan 方法 启动的时候不会用到这个
+               [arr removeObject:[NSString stringWithFormat:@"%s",__FUNCTION__]];
+               //数组合成字符串
+               NSString * funcStr = [arr  componentsJoinedByString:@"\n"];
+               //写入文件
+               NSString * filePath = [NSTemporaryDirectory() stringByAppendingPathComponent:@"link.order"];
+               NSData * fileContents = [funcStr dataUsingEncoding:NSUTF8StringEncoding];
+               NSLog(@"%@", filePath);
+               [[NSFileManager defaultManager] createFileAtPath:filePath contents:fileContents attributes:nil];
+          }
+          
+          ```
+
+        * 3、将order file的路径放到Build Setting -> Linking -> Order File
+        * 4、将添加的代码还原，之后，就会安装重排的二进制进行加载了。
+
   * main函数之后优化策略：
     main函数之后，主要就是指main函数开始到root画面显示出来的时间。(也就是main函数到rootvc的viewdidappear之间的耗时)。这部分代码最主要的就是didFinishLaunchingWithOptions里的逻辑操作。大部分项目都是执行一些项目的基础配置工作。
 
@@ -282,10 +361,48 @@ segment和section只是Mach-O的基础组成部分。为了更高效地加载，
     * 2、按需加载。
     * 3、首屏里的数据可以考虑在首页初始化之前就开始拉取，并且进行缓存，以便后续使用。
 
-  https://zhiyongzou.github.io/2018/03/26/iOS%20App%E5%90%AF%E5%8A%A8%E4%BC%98%E5%8C%96/
 #### 内存优化
-	https://guiyongdong.github.io/2018/10/16/%E3%80%90%E8%BD%AC%E3%80%91iOS-Memory-Deep-Dive/
 
+其实将Mach-O映射进内存，主要就是一种静态的加载。代码加载进Text、已初始化数据加载进已初始化数据区，未初始化数据加载进未初始化数据区。文件使用懒加载的方式、数据使用copy on write的方式。某一个Page如果被添加进内存中，则是会被标记成dirty，没有则是clean。
+
+* 动态分配内存：
+
+  * 隐式内存分配：
+    * 一般是指会自动回收的内存，比如栈内存，在函数执行完毕后会回收掉。
+  * 显示内存分配：
+    * 使用alloc、deep copy等方式进行分配的内存。这些都是分配到堆中的，需要自己手动管理。
+
+* iOS内存方式。
+
+  大多数操作系统，会将不常用的Page写入磁盘，需要使用的时候，再重新跟内存里不用的内容进行空间交换。但是iOS没有这种交换机制，而只是将并不常用的dirty页面进行压缩，需要使用时重新解压缩。所以这也导致了一个问题：解压缩往往需要更多的内存，如果一次性解压太多东西，反而会使内存突增，导致被杀掉。
+
+* 虚拟内存分类：
+
+  * Clean Memory 主要包括：system framework(系统架构)、binary executable(二进制可执行文件)、memory mapped files(内存映射文件);
+  * Dirty Memory 主要包括： Heap allocation(堆分配)、caches(缓存)、decompressed images(解压缩的图像)；
+* 高性能使用内存
+	* 1、自动引用计数的使用;
+	* 2、weak 解决循环引用导致的内存泄漏问题;
+	* 3、使用AutoreleasePool来降低循环中的内存峰值;
+	* 4、cell复用
+	* 5、c/c++new出来的要delete、malloc出来的要free
+	* 6、较大图片资源避免使用imageNamed：
+	* 7、WKWebView代替UIWebView，因为WKWebView是跨进程通信的，不会占用物理内存
+	* 8、尽量少用performSelector，会对ARC内存管理产生错误，导致内存泄漏；
+	* 9、尽量使用懒加载来load大的内存对象；
+	* 10、尽可能使用Cache代替Dictionary，使用NSPurgableData代替NSData。
+	* 11、在子线程手动申请（malloc）大存储的时候，最好先ping一下主线程，因为子线程无法收到内存警告。
+		```
+		- (void)test {  
+    		// current on sub Thread  
+    		// if main thread is memory warning it will blocked  
+    		dispatch_sync(dispatch_get_main_queue(), ^{  
+       			[some description]  
+    		});  
+    		malloc(huge memory);  
+		}  
+		```
+		
 #### 参考(感谢)
 [Mach-O可执行文件](https://objccn.io/issue-6-3/)
 [iOS Memory Deep Dive](https://guiyongdong.github.io/2018/10/16/%E3%80%90%E8%BD%AC%E3%80%91iOS-Memory-Deep-Dive/)
@@ -296,4 +413,6 @@ segment和section只是Mach-O的基础组成部分。为了更高效地加载，
 [Mach-O文件及dyld加载流程](https://www.jianshu.com/p/7ad7b3ba7985)
 
 [美团App冷启动治理](https://www.jianshu.com/p/8e0b38719278)
+
+[iOS App启动优化](https://juejin.cn/post/6844904165773328392)
 
