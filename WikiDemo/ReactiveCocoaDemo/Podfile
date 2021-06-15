@@ -1,0 +1,9 @@
+platform :ios, '10.0'
+use_frameworks!
+
+source 'https://github.com/CocoaPods/specs.git'
+
+target 'ReactiveCocoaDemo' do
+	pod 'ReactiveCocoa', '~> 10.1'
+end
+
