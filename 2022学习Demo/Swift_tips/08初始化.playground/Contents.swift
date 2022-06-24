@@ -32,3 +32,32 @@ class Tiger2: Cat {
 
 debugPrint(Tiger().name)
 debugPrint(Tiger2().height)
+
+
+class CustomView: UIView {
+    let param: Int
+    
+    convenience init(param: Int, frame: CGRect) {
+        self.init(param: param) // 注意必须是自己的
+        // 如果这里调用的是init（frame：）初始化器，则可以在调用init后赋值
+    }
+    
+    init(param: Int) {
+        self.param = param
+        super.init(frame: .zero)
+    }
+    
+    override init(frame: CGRect) {
+        self.param = 0
+        super.init(frame: frame)
+    }
+    
+    required init?(coder: NSCoder) {
+        self.param = 0
+        super.init(coder: coder)
+    }
+}
+ 
+class SubCustomView: CustomView {
+    
+}
