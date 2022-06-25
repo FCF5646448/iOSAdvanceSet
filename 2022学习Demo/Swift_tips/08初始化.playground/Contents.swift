@@ -37,9 +37,16 @@ debugPrint(Tiger2().height)
 class CustomView: UIView {
     let param: Int
     
-    convenience init(param: Int, frame: CGRect) {
-        self.init(param: param) // 注意必须是自己的
-        // 如果这里调用的是init（frame：）初始化器，则可以在调用init后赋值
+    convenience init?(param2: Int) {
+        if param2 > 0 {
+            self.init(param: param2)
+        } else {
+            return nil
+        }
+    }
+    
+    required convenience init(param: Int, frame: CGRect) {
+        self.init(param: param)
     }
     
     init(param: Int) {
@@ -59,5 +66,15 @@ class CustomView: UIView {
 }
  
 class SubCustomView: CustomView {
+    init() {
+        super.init(param: 0) // 如果把父类的override init(frame: CGRect)方法注释掉的话，这里不能直接跨越层级执行super.init(frame: frame)，而是必须执行父类中已有的几个初始化方法，这样父类中的指定初始化器路径才能走全。
+    }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    required convenience init(param: Int, frame: CGRect) {
+        fatalError("init(param:frame:) has not been implemented")
+    }
 }
