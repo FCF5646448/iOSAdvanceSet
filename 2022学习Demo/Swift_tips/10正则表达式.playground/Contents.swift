@@ -99,4 +99,3 @@ if let siteRegex: NSRegularExpression = ~/"^(https?:\\/\\/)?([\\da-z\\.-]+)\\.([
 }
 
 
-
