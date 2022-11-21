@@ -1,0 +1,16 @@
+PODS:
+  - RxSwiftProgra (0.1.0)
+
+DEPENDENCIES:
+  - RxSwiftProgra (from `../`)
+
+EXTERNAL SOURCES:
+  RxSwiftProgra:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  RxSwiftProgra: 57ca40878fe2d5971a49ba7d353989af2b60812c
+
+PODFILE CHECKSUM: 33c47bdfd8dfcebc7118487ab2d1e617c6015bcb
+
+COCOAPODS: 1.11.3
