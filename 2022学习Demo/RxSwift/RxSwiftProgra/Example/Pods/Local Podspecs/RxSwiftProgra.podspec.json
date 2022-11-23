@@ -2,7 +2,7 @@
   "name": "RxSwiftProgra",
   "version": "0.1.0",
   "summary": "A short description of RxSwiftProgra.",
-  "description": "TODO: Add long description of the pod here.",
+  "description": "学习RxSwift的demo",
   "homepage": "https://github.com/fengcaifan/RxSwiftProgra",
   "license": {
     "type": "MIT",
@@ -18,5 +18,14 @@
   "platforms": {
     "ios": "10.0"
   },
-  "source_files": "RxSwiftProgra/Classes/**/*"
+  "source_files": "RxSwiftProgra/Classes/**/*",
+  "public_header_files": "Pod/Classes/**/*",
+  "dependencies": {
+    "RxSwift": [
+      "6.5.0"
+    ],
+    "RxCocoa": [
+      "6.5.0"
+    ]
+  }
 }
