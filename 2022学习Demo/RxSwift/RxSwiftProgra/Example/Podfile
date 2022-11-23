@@ -1,0 +1,14 @@
+use_frameworks!
+
+platform :ios, '10.0'
+
+source 'https://github.com/CocoaPods/specs.git' # 官方源
+
+target 'RxSwiftProgra_Example' do
+  pod 'RxSwiftProgra', :path => '../'
+  
+  target 'RxSwiftProgra_Tests' do
+    inherit! :search_paths
+    
+  end
+end
