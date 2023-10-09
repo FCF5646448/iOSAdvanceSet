@@ -22,7 +22,7 @@ pod 'RxSwiftProgra'
 
 ## Author
 
-fengcaifan, fengcaifan@baidu.com
+fengcaifan, 2998000457@qq.com
 
 ## License
 
