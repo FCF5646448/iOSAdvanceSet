@@ -31,7 +31,7 @@ struct CalculatorButton: View {
 /// 单行
 struct CalculatorButtonRow: View {
 //    @Binding var brain: CalculatorBrain
-    var model: CalculatorModel
+    @EnvironmentObject var model: CalculatorModel
     let row: [CalculatorButtonItem]
     var body: some View {
         HStack {
@@ -48,7 +48,7 @@ struct CalculatorButtonRow: View {
 
 struct CalculatorButtonPad: View {
 //    @Binding var brain: CalculatorBrain
-    var model: CalculatorModel
+//    var model: CalculatorModel
     let pad: [[CalculatorButtonItem]] = [
         [.command(.clear), .command(.flip),
          .command(.percent), .op(.divide)],
@@ -61,7 +61,7 @@ struct CalculatorButtonPad: View {
     var body: some View {
         VStack(spacing: 8) {
             ForEach(pad, id: \.self) { row in
-                CalculatorButtonRow(model: model, row: row)
+                CalculatorButtonRow(row: row)
             }
         }
     }

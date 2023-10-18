@@ -11,7 +11,9 @@ let scale = UIScreen.main.bounds.width / 414
 
 struct ContentView: View {
 //    @State private var brain: CalculatorBrain = .left("0")
-    @ObservedObject var model = CalculatorModel()
+//    @ObservedObject var model = CalculatorModel()
+    @EnvironmentObject var model: CalculatorModel
+    
     @State private var editingHistory = false
     
     var body: some View {
@@ -31,7 +33,7 @@ struct ContentView: View {
                 .frame(minWidth: 0,
                        maxWidth: .infinity,
                        alignment: .trailing)
-            CalculatorButtonPad(model: model)
+            CalculatorButtonPad()
                 .padding(.bottom)
         }
         .scaleEffect(scale)
