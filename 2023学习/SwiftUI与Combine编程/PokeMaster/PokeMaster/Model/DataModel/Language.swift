@@ -22,5 +22,5 @@ protocol LanguageTextEntry {
 
 extension Array where Element: LanguageTextEntry {
     var CN: String { first { $0.language.isCN }?.text ?? EN }
-    var EN: String { first { $0.language.isCN }?.text ?? "Unknown" }
+    var EN: String { first { $0.language.isEN }?.text ?? "Unknown" }
 }

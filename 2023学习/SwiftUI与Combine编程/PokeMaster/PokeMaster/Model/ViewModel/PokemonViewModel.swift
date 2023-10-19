@@ -23,8 +23,8 @@ struct PokemonViewModel: Identifiable, Codable {
     var weight: String { "\(Double(pokemon.weight) / 10)kg" }
     var name: String { species.names.CN }
     var nameEN: String { species.names.EN }
-    var genus: String { species.genus.CN }
-    var genusEN: String { species.genus.EN }
+    var genus: String { species.genera.CN }
+    var genusEN: String { species.genera.EN }
     
     var type: [Type] {
         self.pokemon.types.sorted { $0.slot < $1.slot }.map { Type(pokemonType: $0) }

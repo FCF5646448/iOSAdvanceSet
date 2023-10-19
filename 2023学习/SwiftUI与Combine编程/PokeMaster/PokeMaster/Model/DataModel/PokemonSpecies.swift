@@ -43,6 +43,6 @@ struct PokemonSpecies: Codable {
     
     let color: Color
     let names: [Name]
-    let genus: [Genus]
+    let genera: [Genus]
     let flavorTextEntries: [FlavorTextEntry]
 }
