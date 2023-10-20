@@ -11,7 +11,7 @@ struct PokemonInfoRow: View {
 //    let model = PokemonViewModel.sample(id: 1)
     
     let model: PokemonViewModel
-    @State var expended: Bool
+    let expended: Bool
     
     var body: some View {
         VStack {
@@ -75,17 +75,17 @@ struct PokemonInfoRow: View {
         )
         .padding(.horizontal)
 //        .animation(.default)  隐式动画
-        .onTapGesture {
-            withAnimation( // 显示动画
-                .spring(
-                    response: 0.55,
-                    dampingFraction: 0.425,
-                    blendDuration: 0
-                )
-            ) {
-                self.expended.toggle()
-            }
-        }
+//        .onTapGesture {
+//            withAnimation( // 显示动画
+//                .spring(
+//                    response: 0.55,
+//                    dampingFraction: 0.425,
+//                    blendDuration: 0
+//                )
+//            ) {
+//                self.expended.toggle()
+//            }
+//        }
     }
 }
 
