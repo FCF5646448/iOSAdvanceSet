@@ -33,7 +33,7 @@ extension Ability {
 
 extension PokemonViewModel {
     static var all: [PokemonViewModel] = {
-        (0...30).map { id in
+        (1...30).map { id in
             return sample(id: id)
         }
     }()

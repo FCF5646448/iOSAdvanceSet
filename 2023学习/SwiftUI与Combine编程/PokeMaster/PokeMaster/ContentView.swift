@@ -10,10 +10,10 @@ import SwiftUI
 struct ContentView: View {
     var body: some View {
         VStack {
-//            PokemonInfoRow()
-            PokemonInfoRow(model: .sample(id: 1), expended: false)
-            PokemonInfoRow(model: .sample(id: 21), expended: true)
-            PokemonInfoRow(model: .sample(id: 24), expended: false)
+            PokemonList()
+//            PokemonInfoRow(model: .sample(id: 1), expended: false)
+//            PokemonInfoRow(model: .sample(id: 21), expended: true)
+//            PokemonInfoRow(model: .sample(id: 24), expended: false)
         }
         .padding()
     }

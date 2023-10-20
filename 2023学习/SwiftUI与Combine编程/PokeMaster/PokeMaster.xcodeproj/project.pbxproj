@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1915238E2AE2610200817C44 /* PokemonList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1915238D2AE2610200817C44 /* PokemonList.swift */; };
 		191E4FE62AE0C501008D2AEF /* Ability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191E4FE52AE0C501008D2AEF /* Ability.swift */; };
 		191E4FE82AE0D179008D2AEF /* AbilityViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191E4FE72AE0D179008D2AEF /* AbilityViewModel.swift */; };
 		191E4FEB2AE0D207008D2AEF /* Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191E4FEA2AE0D207008D2AEF /* Helpers.swift */; };
@@ -106,6 +107,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		1915238D2AE2610200817C44 /* PokemonList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PokemonList.swift; sourceTree = "<group>"; };
 		191E4FE52AE0C501008D2AEF /* Ability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ability.swift; sourceTree = "<group>"; };
 		191E4FE72AE0D179008D2AEF /* AbilityViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AbilityViewModel.swift; sourceTree = "<group>"; };
 		191E4FEA2AE0D207008D2AEF /* Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helpers.swift; sourceTree = "<group>"; };
@@ -237,6 +239,7 @@
 			isa = PBXGroup;
 			children = (
 				191E4FF62AE10B8F008D2AEF /* PokemonInfoRow.swift */,
+				1915238D2AE2610200817C44 /* PokemonList.swift */,
 			);
 			path = List;
 			sourceTree = "<group>";
@@ -619,6 +622,7 @@
 				1952491E2AE0005A009CD094 /* PokemonSpecies.swift in Sources */,
 				195249202AE001A6009CD094 /* Language.swift in Sources */,
 				191E4FEB2AE0D207008D2AEF /* Helpers.swift in Sources */,
+				1915238E2AE2610200817C44 /* PokemonList.swift in Sources */,
 				195248E42ADFF497009CD094 /* ContentView.swift in Sources */,
 				191E4FED2AE0D314008D2AEF /* PokemonViewModel.swift in Sources */,
 				195248E22ADFF497009CD094 /* PokeMasterApp.swift in Sources */,
