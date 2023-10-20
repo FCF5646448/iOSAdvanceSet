@@ -8,7 +8,11 @@
 import SwiftUI
 
 struct PokemonInfoRow: View {
-    let model = PokemonViewModel.sample(id: 1)
+//    let model = PokemonViewModel.sample(id: 1)
+    
+    let model: PokemonViewModel
+    @State var expended: Bool
+    
     var body: some View {
         VStack {
             HStack {
@@ -29,7 +33,7 @@ struct PokemonInfoRow: View {
                 })
             }.padding(.top, 12)
             Spacer()
-            HStack(spacing: 20) {
+            HStack(spacing: expended ? 20: -30) {
                 Spacer()
                 Button(action: {
                     print("fav")
@@ -49,8 +53,11 @@ struct PokemonInfoRow: View {
                         .modifier(ToolButtonModifier())
                 })
             }
+            .padding(.bottom, 12)
+            .opacity(expended ? 1.0: 0.0)
+            .frame(maxHeight: expended ? .infinity: 0)
         }
-        .frame(height: 120)
+        .frame(height: expended ? 120: 80)
         .padding(.leading, 23)
         .padding(.trailing, 15)
         .background(
@@ -67,6 +74,18 @@ struct PokemonInfoRow: View {
             }
         )
         .padding(.horizontal)
+//        .animation(.default)  隐式动画
+        .onTapGesture {
+            withAnimation( // 显示动画
+                .spring(
+                    response: 0.55,
+                    dampingFraction: 0.425,
+                    blendDuration: 0
+                )
+            ) {
+                self.expended.toggle()
+            }
+        }
     }
 }
 
@@ -80,5 +99,9 @@ struct ToolButtonModifier: ViewModifier {
 }
 
 #Preview {
-    PokemonInfoRow()
+    VStack {
+        PokemonInfoRow(model: .sample(id: 1), expended: false)
+        PokemonInfoRow(model: .sample(id: 21), expended: true)
+        PokemonInfoRow(model: .sample(id: 24), expended: false)
+    }
 }
