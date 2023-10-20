@@ -26,7 +26,7 @@ struct PokemonViewModel: Identifiable, Codable {
     var genus: String { species.genera.CN }
     var genusEN: String { species.genera.EN }
     
-    var type: [Type] {
+    var types: [Type] {
         self.pokemon.types.sorted { $0.slot < $1.slot }.map { Type(pokemonType: $0) }
     }
     
