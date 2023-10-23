@@ -7,16 +7,18 @@
 
 import SwiftUI
 
+/// 弹窗头部
 extension PokemonInfoPanel {
     struct Header: View {
         let model: PokemonViewModel
         
+        // icon
         var pokemonIcon: some View {
             Image("Pokemon-\(model.id)")
                 .resizable()
                 .frame(width: 68, height: 68)
         }
-        
+        // 名称
         var nameSpecies: some View {
             VStack(spacing: 10) {
                 VStack {
@@ -36,13 +38,13 @@ extension PokemonInfoPanel {
                     .foregroundColor(.gray)
             }
         }
-        
+        // 中间线
         var verticalDivider: some View {
             RoundedRectangle(cornerRadius: 1)
                 .frame(width: 1, height: 44)
                 .opacity(0.1)
         }
-        
+        // 身高体重
         var bodyStatus: some View {
             VStack(alignment: .leading, content: {
                 HStack {
@@ -63,7 +65,7 @@ extension PokemonInfoPanel {
                 }
             })
         }
-        
+        // 类型
         var typeInfo: some View {
             HStack {
                 ForEach(self.model.types) { t in
