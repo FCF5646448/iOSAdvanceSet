@@ -11,6 +11,7 @@ struct PokemonList: View {
     
     // 将选中的展开cell移到列表，以确保每次只有一个cell展开
     @State var enpandingIndex: Int?
+    @State var searchText: String = ""
     
     var body: some View {
         // List构建一个列表，它接受一个数组，数组中的元素需要遵守Identifiable协议，
@@ -22,6 +23,7 @@ struct PokemonList: View {
 //        }
         ScrollView {
             LazyVStack {
+                TextField("搜索", text: $searchText).frame(height: 40).padding(.horizontal, 25)
                 ForEach(PokemonViewModel.all) { pokemon in
                     PokemonInfoRow(model: pokemon, 
                                    expended: self.enpandingIndex == pokemon.id
