@@ -15,6 +15,7 @@
 		19198B922AF118A000CC2AD6 /* SwiftUI__UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198B912AF118A000CC2AD6 /* SwiftUI__UITests.swift */; };
 		19198B942AF118A000CC2AD6 /* SwiftUI__UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198B932AF118A000CC2AD6 /* SwiftUI__UITestsLaunchTests.swift */; };
 		19198BA52AF1272100CC2AD6 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198BA42AF1272100CC2AD6 /* TextView.swift */; };
+		19198BA82AF12CB900CC2AD6 /* SwiftUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -48,6 +49,7 @@
 		19198BA32AF126EA00CC2AD6 /* Agbalumo-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "Agbalumo-Regular.ttf"; sourceTree = "<group>"; };
 		19198BA42AF1272100CC2AD6 /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		19198BA62AF1279600CC2AD6 /* SwiftUI---Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SwiftUI---Info.plist"; sourceTree = SOURCE_ROOT; };
+		19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButton.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,7 @@
 			children = (
 				19198BA42AF1272100CC2AD6 /* TextView.swift */,
 				19198BA32AF126EA00CC2AD6 /* Agbalumo-Regular.ttf */,
+				19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -273,6 +276,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				19198BA52AF1272100CC2AD6 /* TextView.swift in Sources */,
+				19198BA82AF12CB900CC2AD6 /* SwiftUIButton.swift in Sources */,
 				19198B792AF1189F00CC2AD6 /* ContentView.swift in Sources */,
 				19198B772AF1189F00CC2AD6 /* SwiftUI__App.swift in Sources */,
 			);
