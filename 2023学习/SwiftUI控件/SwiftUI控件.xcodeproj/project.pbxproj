@@ -16,6 +16,7 @@
 		19198B942AF118A000CC2AD6 /* SwiftUI__UITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198B932AF118A000CC2AD6 /* SwiftUI__UITestsLaunchTests.swift */; };
 		19198BA52AF1272100CC2AD6 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198BA42AF1272100CC2AD6 /* TextView.swift */; };
 		19198BA82AF12CB900CC2AD6 /* SwiftUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */; };
+		19248DE72AF4DB310090BFCD /* SwiftUIStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -50,6 +51,7 @@
 		19198BA42AF1272100CC2AD6 /* TextView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
 		19198BA62AF1279600CC2AD6 /* SwiftUI---Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "SwiftUI---Info.plist"; sourceTree = SOURCE_ROOT; };
 		19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButton.swift; sourceTree = "<group>"; };
+		19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIStack.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -141,6 +143,7 @@
 				19198BA42AF1272100CC2AD6 /* TextView.swift */,
 				19198BA32AF126EA00CC2AD6 /* Agbalumo-Regular.ttf */,
 				19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */,
+				19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -279,6 +282,7 @@
 				19198BA82AF12CB900CC2AD6 /* SwiftUIButton.swift in Sources */,
 				19198B792AF1189F00CC2AD6 /* ContentView.swift in Sources */,
 				19198B772AF1189F00CC2AD6 /* SwiftUI__App.swift in Sources */,
+				19248DE72AF4DB310090BFCD /* SwiftUIStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
