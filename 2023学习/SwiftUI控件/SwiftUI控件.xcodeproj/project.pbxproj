@@ -18,6 +18,7 @@
 		19198BA82AF12CB900CC2AD6 /* SwiftUIButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */; };
 		19248DE72AF4DB310090BFCD /* SwiftUIStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */; };
 		194CD5732AF9CB3C00DEC22E /* IdineChecoutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194CD5722AF9CB3C00DEC22E /* IdineChecoutView.swift */; };
+		194CD5752AFA0C5800DEC22E /* SwiftUIPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 194CD5742AFA0C5800DEC22E /* SwiftUIPicker.swift */; };
 		196411522AF8D5D400C6171C /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196411512AF8D5D400C6171C /* Helper.swift */; };
 		196411552AF8D6E300C6171C /* menu.json in Resources */ = {isa = PBXBuildFile; fileRef = 196411542AF8D6E300C6171C /* menu.json */; };
 		196411592AF8D78C00C6171C /* Menu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196411582AF8D78C00C6171C /* Menu.swift */; };
@@ -63,6 +64,7 @@
 		19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIButton.swift; sourceTree = "<group>"; };
 		19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIStack.swift; sourceTree = "<group>"; };
 		194CD5722AF9CB3C00DEC22E /* IdineChecoutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdineChecoutView.swift; sourceTree = "<group>"; };
+		194CD5742AFA0C5800DEC22E /* SwiftUIPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIPicker.swift; sourceTree = "<group>"; };
 		196411512AF8D5D400C6171C /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		196411542AF8D6E300C6171C /* menu.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = menu.json; sourceTree = "<group>"; };
 		196411582AF8D78C00C6171C /* Menu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Menu.swift; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 				19198BA32AF126EA00CC2AD6 /* Agbalumo-Regular.ttf */,
 				19198BA72AF12CB900CC2AD6 /* SwiftUIButton.swift */,
 				19248DE62AF4DB310090BFCD /* SwiftUIStack.swift */,
+				194CD5742AFA0C5800DEC22E /* SwiftUIPicker.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -362,6 +365,7 @@
 				194CD5732AF9CB3C00DEC22E /* IdineChecoutView.swift in Sources */,
 				196411622AF8E52700C6171C /* IdineItemDetail.swift in Sources */,
 				196411522AF8D5D400C6171C /* Helper.swift in Sources */,
+				194CD5752AFA0C5800DEC22E /* SwiftUIPicker.swift in Sources */,
 				196411642AF902CE00C6171C /* IdineOrderView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
