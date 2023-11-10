@@ -12,7 +12,7 @@ import SwiftUI
 struct SwiftUIiOS13DemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            SegmentControl()
         }
     }
 }

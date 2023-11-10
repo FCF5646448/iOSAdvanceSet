@@ -15,6 +15,14 @@
 		191877A12AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877A02AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift */; };
 		191877A32AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877A22AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift */; };
 		191877B02AFCC03A00D9656D /* SwiftUIGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */; };
+		191877B82AFCC42400D9656D /* SegmentPickerStyle1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */; };
+		191877B92AFCC42400D9656D /* SegmentPickerStyle2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */; };
+		191877BA2AFCC42400D9656D /* SegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B52AFCC42400D9656D /* SegmentPicker.swift */; };
+		191877BB2AFCC42400D9656D /* SegmentControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B72AFCC42400D9656D /* SegmentControl.swift */; };
+		191877BD2AFCC50C00D9656D /* ScrollViewPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */; };
+		191877BF2AFCFC8300D9656D /* BestFriendGiftPannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */; };
+		191877C12AFD0E6A00D9656D /* BestFirendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877C02AFD0E6A00D9656D /* BestFirendView.swift */; };
+		191877C32AFD0EAC00D9656D /* bestFriendBg@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +54,14 @@
 		191877A02AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIiOS13DemoUITests.swift; sourceTree = "<group>"; };
 		191877A22AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIiOS13DemoUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIGrid.swift; sourceTree = "<group>"; };
+		191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPickerStyle1.swift; sourceTree = "<group>"; };
+		191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPickerStyle2.swift; sourceTree = "<group>"; };
+		191877B52AFCC42400D9656D /* SegmentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPicker.swift; sourceTree = "<group>"; };
+		191877B72AFCC42400D9656D /* SegmentControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentControl.swift; sourceTree = "<group>"; };
+		191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewPager.swift; sourceTree = "<group>"; };
+		191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFriendGiftPannel.swift; sourceTree = "<group>"; };
+		191877C02AFD0E6A00D9656D /* BestFirendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFirendView.swift; sourceTree = "<group>"; };
+		191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bestFriendBg@3x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -96,11 +112,14 @@
 		191877842AFCBE1100D9656D /* SwiftUIiOS13Demo */ = {
 			isa = PBXGroup;
 			children = (
+				191877B12AFCC3F700D9656D /* 自定义控件 */,
 				191877852AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift */,
 				191877872AFCBE1100D9656D /* ContentView.swift */,
 				191877892AFCBE1300D9656D /* Assets.xcassets */,
+				191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */,
 				1918778B2AFCBE1300D9656D /* Preview Content */,
 				191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */,
+				191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */,
 			);
 			path = SwiftUIiOS13Demo;
 			sourceTree = "<group>";
@@ -128,6 +147,35 @@
 				191877A22AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift */,
 			);
 			path = SwiftUIiOS13DemoUITests;
+			sourceTree = "<group>";
+		};
+		191877B12AFCC3F700D9656D /* 自定义控件 */ = {
+			isa = PBXGroup;
+			children = (
+				191877B22AFCC42400D9656D /* CustomPicker */,
+				191877B62AFCC42400D9656D /* SegmentControl */,
+				191877C02AFD0E6A00D9656D /* BestFirendView.swift */,
+			);
+			path = "自定义控件";
+			sourceTree = "<group>";
+		};
+		191877B22AFCC42400D9656D /* CustomPicker */ = {
+			isa = PBXGroup;
+			children = (
+				191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */,
+				191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */,
+				191877B52AFCC42400D9656D /* SegmentPicker.swift */,
+				191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */,
+			);
+			path = CustomPicker;
+			sourceTree = "<group>";
+		};
+		191877B62AFCC42400D9656D /* SegmentControl */ = {
+			isa = PBXGroup;
+			children = (
+				191877B72AFCC42400D9656D /* SegmentControl.swift */,
+			);
+			path = SegmentControl;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -236,6 +284,7 @@
 			files = (
 				1918778D2AFCBE1300D9656D /* Preview Assets.xcassets in Resources */,
 				1918778A2AFCBE1300D9656D /* Assets.xcassets in Resources */,
+				191877C32AFD0EAC00D9656D /* bestFriendBg@3x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -260,9 +309,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				191877C12AFD0E6A00D9656D /* BestFirendView.swift in Sources */,
+				191877B92AFCC42400D9656D /* SegmentPickerStyle2.swift in Sources */,
+				191877BD2AFCC50C00D9656D /* ScrollViewPager.swift in Sources */,
 				191877882AFCBE1100D9656D /* ContentView.swift in Sources */,
 				191877862AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift in Sources */,
 				191877B02AFCC03A00D9656D /* SwiftUIGrid.swift in Sources */,
+				191877B82AFCC42400D9656D /* SegmentPickerStyle1.swift in Sources */,
+				191877BB2AFCC42400D9656D /* SegmentControl.swift in Sources */,
+				191877BF2AFCFC8300D9656D /* BestFriendGiftPannel.swift in Sources */,
+				191877BA2AFCC42400D9656D /* SegmentPicker.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

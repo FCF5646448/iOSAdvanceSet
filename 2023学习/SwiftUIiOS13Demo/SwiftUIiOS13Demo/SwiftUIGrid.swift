@@ -9,9 +9,8 @@ import SwiftUI
 
 struct TPBestFriendGiftViewCell: View {
 //    let model: TPBestFriendGiftModel
-    @State private var giftImage: Image?
-    @State var isSelected: Bool
-    @State var isUsed: Bool
+    let isSelected: Bool
+    let isUsed: Bool
     
     var body: some View {
         VStack {
@@ -85,77 +84,39 @@ struct IconText: View {
     }
 }
 
-
-struct Test: View {
-    var isSelected: Bool = false
-    var isUsed: Bool = false
-    
-    var body: some View {
-        VStack {
-            TPBestFriendGiftViewCell(isSelected: isSelected, isUsed: isUsed)
-            Button {
-//                self.isSelected = !self.isSelected
-//                self.isUsed = !self.isUsed
-            } label: {
-                Text("test btn")
-                    .font(.title)
-                    .fontWeight(.bold)
-                    .foregroundColor(.white)
-                    .background(Color.red)
-            }
-            .cornerRadius(8.0)
-            .padding()
-        }
-    }
-}
-
-
-
 struct GiftCollectionView: View {
+    @State var selectedIndex: Int = 0
+    
     let data = Array(0..<20)
-//    let columns: [GridItem] = Array(repeating: .init(.flexible()), count: 3)
-//
-//    let rows: [GridItem] = Array(repeating: .init(.fixed(146)), count: 2) // 146是每个item的高度
+    let colums: Int = 3
     var body: some View {
         VStack {
             ScrollView {
                 VStack {
                     ForEach(0..<data.count, id:\.self) { index in
-                        
+                        let row = index / colums
+                        if index % colums == 0 {
+                            HStack {
+                                ForEach(0 ..< colums, id:\.self) { colum in
+                                    let currentIndex = row * colums + colum
+                                    let isUsed = colum == 2
+                                    TPBestFriendGiftViewCell(isSelected: self.selectedIndex == currentIndex, 
+                                                             isUsed: isUsed)
+                                        .onTapGesture {
+                                            self.selectedIndex = row * colums + colum
+                                        }
+                                }
+                            }
+                        }
                     }
                 }
-//                LazyVGrid(columns: columns, spacing: 7.0) {
-//                    ForEach(data, id:\.self) { item in
-//                        let isSelected = item == 1
-//                        let isUsed = item == 3
-//                        TPBestFriendGiftViewCell(isSelected: isSelected, isUsed: isUsed)
-//                    }
-//                }
-//                .padding(.horizontal)
+                .padding(10)
             }
-            .frame(maxHeight: 300.0)
-            
-            /*
-            Rectangle()
-                .fill(Color.blue)
-                .frame(height: 20)
-            
-            ScrollView(.horizontal) {
-                LazyHGrid(rows: rows, spacing: 7.0) {
-                    ForEach(data, id:\.self) { item in
-                        let isSelected = item == 1
-                        let isUsed = item == 3
-                        TPBestFriendGiftViewCell(isSelected: isSelected, isUsed: isUsed)
-                    }
-                }
-                .padding(.vertical)
-            }
-             */
+            .frame(maxHeight: 315)
         }
     }
 }
 
 #Preview {
     GiftCollectionView()
-//    TPBestFriendGiftViewCell(isSelected: true, isUsed: true)
 }
