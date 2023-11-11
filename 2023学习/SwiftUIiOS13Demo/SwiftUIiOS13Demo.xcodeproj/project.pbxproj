@@ -7,6 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		19174A3D2AFF14F5005504BE /* TPSegmentControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A362AFF14F5005504BE /* TPSegmentControl.swift */; };
+		19174A3E2AFF14F5005504BE /* TPSegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A372AFF14F5005504BE /* TPSegmentPicker.swift */; };
+		19174A3F2AFF14F5005504BE /* TPLineSegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A382AFF14F5005504BE /* TPLineSegmentPicker.swift */; };
+		19174A402AFF14F5005504BE /* TPSegmentPickerConfig.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A392AFF14F5005504BE /* TPSegmentPickerConfig.swift */; };
+		19174A412AFF14F5005504BE /* TPCapsuleSegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A3A2AFF14F5005504BE /* TPCapsuleSegmentPicker.swift */; };
+		19174A422AFF14F5005504BE /* TPIconTextItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A3B2AFF14F5005504BE /* TPIconTextItem.swift */; };
+		19174A432AFF14F5005504BE /* TPPageScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 19174A3C2AFF14F5005504BE /* TPPageScrollView.swift */; };
 		191877862AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877852AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift */; };
 		191877882AFCBE1100D9656D /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877872AFCBE1100D9656D /* ContentView.swift */; };
 		1918778A2AFCBE1300D9656D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 191877892AFCBE1300D9656D /* Assets.xcassets */; };
@@ -15,11 +22,7 @@
 		191877A12AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877A02AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift */; };
 		191877A32AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877A22AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift */; };
 		191877B02AFCC03A00D9656D /* SwiftUIGrid.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */; };
-		191877B82AFCC42400D9656D /* SegmentPickerStyle1.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */; };
-		191877B92AFCC42400D9656D /* SegmentPickerStyle2.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */; };
-		191877BA2AFCC42400D9656D /* SegmentPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B52AFCC42400D9656D /* SegmentPicker.swift */; };
 		191877BB2AFCC42400D9656D /* SegmentControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877B72AFCC42400D9656D /* SegmentControl.swift */; };
-		191877BD2AFCC50C00D9656D /* ScrollViewPager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */; };
 		191877BF2AFCFC8300D9656D /* BestFriendGiftPannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */; };
 		191877C12AFD0E6A00D9656D /* BestFirendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877C02AFD0E6A00D9656D /* BestFirendView.swift */; };
 		191877C32AFD0EAC00D9656D /* bestFriendBg@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */; };
@@ -43,6 +46,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		19174A362AFF14F5005504BE /* TPSegmentControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPSegmentControl.swift; sourceTree = "<group>"; };
+		19174A372AFF14F5005504BE /* TPSegmentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPSegmentPicker.swift; sourceTree = "<group>"; };
+		19174A382AFF14F5005504BE /* TPLineSegmentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPLineSegmentPicker.swift; sourceTree = "<group>"; };
+		19174A392AFF14F5005504BE /* TPSegmentPickerConfig.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPSegmentPickerConfig.swift; sourceTree = "<group>"; };
+		19174A3A2AFF14F5005504BE /* TPCapsuleSegmentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPCapsuleSegmentPicker.swift; sourceTree = "<group>"; };
+		19174A3B2AFF14F5005504BE /* TPIconTextItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPIconTextItem.swift; sourceTree = "<group>"; };
+		19174A3C2AFF14F5005504BE /* TPPageScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TPPageScrollView.swift; sourceTree = "<group>"; };
 		191877822AFCBE1100D9656D /* SwiftUIiOS13Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftUIiOS13Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		191877852AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIiOS13DemoApp.swift; sourceTree = "<group>"; };
 		191877872AFCBE1100D9656D /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -54,11 +64,7 @@
 		191877A02AFCBE1300D9656D /* SwiftUIiOS13DemoUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIiOS13DemoUITests.swift; sourceTree = "<group>"; };
 		191877A22AFCBE1300D9656D /* SwiftUIiOS13DemoUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIiOS13DemoUITestsLaunchTests.swift; sourceTree = "<group>"; };
 		191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIGrid.swift; sourceTree = "<group>"; };
-		191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPickerStyle1.swift; sourceTree = "<group>"; };
-		191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPickerStyle2.swift; sourceTree = "<group>"; };
-		191877B52AFCC42400D9656D /* SegmentPicker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentPicker.swift; sourceTree = "<group>"; };
 		191877B72AFCC42400D9656D /* SegmentControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SegmentControl.swift; sourceTree = "<group>"; };
-		191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewPager.swift; sourceTree = "<group>"; };
 		191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFriendGiftPannel.swift; sourceTree = "<group>"; };
 		191877C02AFD0E6A00D9656D /* BestFirendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFirendView.swift; sourceTree = "<group>"; };
 		191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bestFriendBg@3x.png"; sourceTree = "<group>"; };
@@ -162,10 +168,13 @@
 		191877B22AFCC42400D9656D /* CustomPicker */ = {
 			isa = PBXGroup;
 			children = (
-				191877B32AFCC42400D9656D /* SegmentPickerStyle1.swift */,
-				191877B42AFCC42400D9656D /* SegmentPickerStyle2.swift */,
-				191877B52AFCC42400D9656D /* SegmentPicker.swift */,
-				191877BC2AFCC50C00D9656D /* ScrollViewPager.swift */,
+				19174A3A2AFF14F5005504BE /* TPCapsuleSegmentPicker.swift */,
+				19174A3B2AFF14F5005504BE /* TPIconTextItem.swift */,
+				19174A382AFF14F5005504BE /* TPLineSegmentPicker.swift */,
+				19174A3C2AFF14F5005504BE /* TPPageScrollView.swift */,
+				19174A362AFF14F5005504BE /* TPSegmentControl.swift */,
+				19174A372AFF14F5005504BE /* TPSegmentPicker.swift */,
+				19174A392AFF14F5005504BE /* TPSegmentPickerConfig.swift */,
 			);
 			path = CustomPicker;
 			sourceTree = "<group>";
@@ -309,16 +318,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				19174A422AFF14F5005504BE /* TPIconTextItem.swift in Sources */,
+				19174A3D2AFF14F5005504BE /* TPSegmentControl.swift in Sources */,
 				191877C12AFD0E6A00D9656D /* BestFirendView.swift in Sources */,
-				191877B92AFCC42400D9656D /* SegmentPickerStyle2.swift in Sources */,
-				191877BD2AFCC50C00D9656D /* ScrollViewPager.swift in Sources */,
 				191877882AFCBE1100D9656D /* ContentView.swift in Sources */,
 				191877862AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift in Sources */,
 				191877B02AFCC03A00D9656D /* SwiftUIGrid.swift in Sources */,
-				191877B82AFCC42400D9656D /* SegmentPickerStyle1.swift in Sources */,
+				19174A412AFF14F5005504BE /* TPCapsuleSegmentPicker.swift in Sources */,
+				19174A3F2AFF14F5005504BE /* TPLineSegmentPicker.swift in Sources */,
+				19174A3E2AFF14F5005504BE /* TPSegmentPicker.swift in Sources */,
 				191877BB2AFCC42400D9656D /* SegmentControl.swift in Sources */,
 				191877BF2AFCFC8300D9656D /* BestFriendGiftPannel.swift in Sources */,
-				191877BA2AFCC42400D9656D /* SegmentPicker.swift in Sources */,
+				19174A432AFF14F5005504BE /* TPPageScrollView.swift in Sources */,
+				19174A402AFF14F5005504BE /* TPSegmentPickerConfig.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9,24 +9,21 @@ import SwiftUI
 
 struct SegmentControl: View {
     @State var selectIndex: Int = 0
-//    @EnvironmentObject var selectIndex: Int
+    let config = TPSegmentControlConfig(alignment: .leading,
+                                        spacing: 0,
+                                        type: .capsule,
+                                        pickerConfig: TPCapsuleSegmentPickerConfig(titles: ["one", "two"], textNormalColor: .gray, textSelectedColor: .red, capsuleColor: .black.opacity(0.87)))
+    //    @EnvironmentObject var selectIndex: Int
     
     var body: some View {
-        VStack(alignment: .leading) {
-            SegmentPickerStyle2(titles: ["one", "two"], selectedIndex: self.$selectIndex)
-                .padding(.horizontal, 12)
-            ScrollViewPager(axis: .horizontal,
-                            numberOfPages: 2,
-                            selectedPageNum: self.$selectIndex) {
-                HStack(spacing: 10) {
-                    GiftCollectionView()
-                    GiftCollectionView()
-                }
-            }
+        TPSegmentControl(numOfPages: 2,
+                         selectIndex: selectIndex,
+                         config: config) { _ in
+            GiftCollectionView()
         }
-        .onAppear {
-            selectIndex = 0
-        }
+                         .onAppear{
+                             selectIndex = 0
+                         }
     }
 }
 

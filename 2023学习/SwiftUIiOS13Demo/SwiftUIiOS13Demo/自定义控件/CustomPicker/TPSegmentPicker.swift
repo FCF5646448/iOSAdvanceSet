@@ -1,22 +1,17 @@
 //
-//  SegmentPicker.swift
-//  SwiftUI控件
+//  TPSegmentPicker.swift
+//  Chat
 //
-//  Created by fengcaifan on 2023/11/9.
+//  Created by fengcaifan on 2023/11/10.
+//  Copyright © 2023 Baidu. All rights reserved.
 //
 
 import SwiftUI
 
-public struct SegmentedPicker<Element, Content, Selection>: View
-    where
-    Content: View,
-    Selection: View {
-
+public struct SegmentedPicker<Element, Content, Selection>: View where Content: View, Selection: View {
     public typealias Data = [Element]
-
     @State private var frames: [CGRect]
     @Binding private var selectedIndex: Int
-
     private let data: Data
     private let selection: () -> Selection
     private let content: (Data.Element, Bool) -> Content
@@ -27,7 +22,6 @@ public struct SegmentedPicker<Element, Content, Selection>: View
                 selectionAlignment: VerticalAlignment = .center,
                 @ViewBuilder content: @escaping (Data.Element, Bool) -> Content,
                 @ViewBuilder selection: @escaping () -> Selection) {
-
         self.data = data
         self.content = content
         self.selection = selection
@@ -97,7 +91,6 @@ extension View {
     @inlinable func alignmentGuide(_ alignment: VerticalAlignment,
                                    isActive: Bool,
                                    computeValue: @escaping (ViewDimensions) -> CGFloat) -> some View {
-
         if isActive {
             alignmentGuide(alignment, computeValue: computeValue)
         } else {

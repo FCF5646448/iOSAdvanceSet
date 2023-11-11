@@ -1,8 +1,9 @@
 //
-//  ScrollViewPager.swift
-//  SwiftUIiOS13Demo
+//  TPPageScrollView.swift
+//  Chat
 //
-//  Created by fengcaifan on 2023/11/9.
+//  Created by fengcaifan on 2023/11/10.
+//  Copyright © 2023 Baidu. All rights reserved.
 //
 
 import SwiftUI
@@ -12,49 +13,36 @@ enum DirectionX {
     case vertical
 }
 
-struct ScrollViewPager<Content: View>: UIViewControllerRepresentable {
-    var content: () -> Content
-    private var axis: DirectionX
-    private var numberOfPages = 0
-    private var pagingEnabled: Bool = true
-    private var pageControlHide: Bool = true
-    private var hideScrollIndicators: Bool = true
-    private var currentPageIndicatorTintColor: UIColor = .white // TODO: fcf 后续缓存Color
-    private var pageIndicatorTintColor: UIColor = .gray
-    private var switchPageCompletion: ((_ pageNum: Int) -> Void)? = nil
+struct TPPageScrollViewConfig {
+    var axis: DirectionX = .horizontal
+    var pagingEnabled: Bool = true
+    var hidePageControl: Bool = true
+    var hideScrollIndicators: Bool = true
+    var currentPageIndicatorTintColor: UIColor = .white
+    var pageIndicatorTintColor: UIColor = .gray
+}
+
+// 按页滚动视图，iOS14可使用系统组件
+struct TPPageScrollView<Content: View>: UIViewControllerRepresentable {
+    private let numOfPages: Int
+    private var content: () -> Content
+    private let config: TPPageScrollViewConfig
     @Binding private var selectedPageNum: Int // 当前选中的页面
     
-    init(axis: DirectionX, 
-         numberOfPages: Int,
-         pagingEnabled: Bool = true,
-         pageControlHide: Bool = true,
-         hideScrollIndicators: Bool = true,
+    init(numOfPages: Int,
+         config: TPPageScrollViewConfig = TPPageScrollViewConfig(),
          selectedPageNum: Binding<Int> = .constant(0),
-         currentPageIndicatorTintColor: UIColor = .white,
-         pageIndicatorTintColor: UIColor = .gray,
-         @ViewBuilder content: @escaping () -> Content,
-         switchPageCompletion: ((_ pageNum: Int) -> Void)? = nil) {
-        self.axis = axis
-        self.content = content
-        self.numberOfPages = numberOfPages
-        self.pagingEnabled = pagingEnabled
-        self.pageControlHide = pageControlHide
-        self.hideScrollIndicators = hideScrollIndicators
+         @ViewBuilder content: @escaping () -> Content) {
+        self.numOfPages = numOfPages
+        self.config = config
         self._selectedPageNum = selectedPageNum
-        self.currentPageIndicatorTintColor = currentPageIndicatorTintColor
-        self.pageIndicatorTintColor = pageIndicatorTintColor
-        self.switchPageCompletion = switchPageCompletion
+        self.content = content
     }
 
     func makeUIViewController(context: Context) -> UIScrollViewController<Content> {
         let vc = UIScrollViewController(rootView: self.content())
-        vc.axis = axis
-        vc.numberOfPages = numberOfPages
-        vc.pagingEnabled = pagingEnabled
-        vc.pageControlHide = pageControlHide
-        vc.hideScrollIndicators = hideScrollIndicators
-        vc.currentPageIndicatorTintColor = currentPageIndicatorTintColor
-        vc.pageIndicatorTintColor = pageIndicatorTintColor
+        vc.numOfPages = numOfPages
+        vc.config = config
         vc.selectedPageIndex = selectedPageNum
         vc.switchPageCompletion = { selectedPageIndex in
             self.selectedPageNum = selectedPageIndex
@@ -70,34 +58,29 @@ struct ScrollViewPager<Content: View>: UIViewControllerRepresentable {
 }
 
 class UIScrollViewController<Content: View>: UIViewController, UIScrollViewDelegate {
-    var axis: DirectionX = .horizontal
-    var numberOfPages: Int = 0
-    var pagingEnabled: Bool = false
-    var pageControlHide: Bool = false
-    var hideScrollIndicators: Bool = false
-    var currentPageIndicatorTintColor: UIColor = .white
-    var pageIndicatorTintColor: UIColor = .gray
+    var numOfPages: Int = 0
+    var config: TPPageScrollViewConfig = TPPageScrollViewConfig()
     var selectedPageIndex: Int = 0
     var switchPageCompletion: ((_ currPageIndex: Int) -> Void)?
 
-    lazy var scrollView: UIScrollView = {
+    private lazy var scrollView: UIScrollView = {
         let view = UIScrollView()
         view.delegate = self
-        view.isPagingEnabled = pagingEnabled
-        view.showsVerticalScrollIndicator = !hideScrollIndicators
-        view.showsHorizontalScrollIndicator = !hideScrollIndicators
+        view.isPagingEnabled = config.pagingEnabled
+        view.showsVerticalScrollIndicator = !config.hideScrollIndicators
+        view.showsHorizontalScrollIndicator = !config.hideScrollIndicators
         return view
     }()
 
-    lazy var pageControl : UIPageControl = {
+    private lazy var pageControl: UIPageControl = {
         let pageControl = UIPageControl()
-        pageControl.numberOfPages = numberOfPages
+        pageControl.numberOfPages = numOfPages
         pageControl.currentPage = selectedPageIndex
         pageControl.tintColor = UIColor.white
-        pageControl.pageIndicatorTintColor = pageIndicatorTintColor
-        pageControl.currentPageIndicatorTintColor = currentPageIndicatorTintColor
+        pageControl.pageIndicatorTintColor = config.pageIndicatorTintColor
+        pageControl.currentPageIndicatorTintColor = config.currentPageIndicatorTintColor
         pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.isHidden = pageControlHide
+        pageControl.isHidden = config.hidePageControl
         return pageControl
     }()
 
@@ -114,7 +97,15 @@ class UIScrollViewController<Content: View>: UIViewController, UIScrollViewDeleg
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        setupViews()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        setDefaultSelectedPage()
+    }
+    
+    private func setupViews() {
         view.addSubview(scrollView)
         self.makefullScreen(of: self.scrollView, to: self.view)
 
@@ -129,33 +120,23 @@ class UIScrollViewController<Content: View>: UIViewController, UIScrollViewDeleg
         pageControl.heightAnchor.constraint(equalToConstant: 60).isActive = true
         pageControl.widthAnchor.constraint(equalToConstant: 200).isActive = true
     }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        setDefaultSelectedPage()
-    }
 
-    func makefullScreen(of viewA: UIView, to viewB: UIView) {
+    private func makefullScreen(of viewA: UIView, to viewB: UIView) {
         viewA.translatesAutoresizingMaskIntoConstraints = false
-        viewB.addConstraints([
-            viewA.leadingAnchor.constraint(equalTo: viewB.leadingAnchor),
-            viewA.trailingAnchor.constraint(equalTo: viewB.trailingAnchor),
-            viewA.topAnchor.constraint(equalTo: viewB.topAnchor),
-            viewA.bottomAnchor.constraint(equalTo: viewB.bottomAnchor),
-        ])
+        viewB.addConstraints([viewA.leadingAnchor.constraint(equalTo: viewB.leadingAnchor),
+                              viewA.trailingAnchor.constraint(equalTo: viewB.trailingAnchor),
+                              viewA.topAnchor.constraint(equalTo: viewB.topAnchor),
+                              viewA.bottomAnchor.constraint(equalTo: viewB.bottomAnchor)])
     }
 
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         let currentIndexHorizontal = round(scrollView.contentOffset.x / self.view.frame.size.width)
         let currentIndexVertical = round(scrollView.contentOffset.y / self.view.frame.size.height)
-
-        switch axis {
+        switch config.axis {
         case .horizontal:
             self.pageControl.currentPage = Int(currentIndexHorizontal)
-            break
         case .vertical:
             self.pageControl.currentPage = Int(currentIndexVertical)
-            break
         }
         self.selectedPageIndex = self.pageControl.currentPage
         self.switchPageCompletion?(self.selectedPageIndex)
@@ -171,7 +152,7 @@ class UIScrollViewController<Content: View>: UIViewController, UIScrollViewDeleg
     
     private func scrollToPage(_ index: Int, animated: Bool = true) {
         let contentOffset: CGPoint
-        switch axis {
+        switch config.axis {
         case .horizontal:
             let x = scrollView.frame.size.width * CGFloat(index)
             contentOffset = CGPoint(x: x, y: scrollView.contentOffset.y)
