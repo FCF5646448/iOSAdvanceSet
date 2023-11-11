@@ -13,7 +13,8 @@ struct SegmentControl: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            SegmentPickerStyle2(titles: ["one", "two"], selectedIndex: self.$selectIndex).padding(.horizontal, 12)
+            SegmentPickerStyle2(titles: ["one", "two"], selectedIndex: self.$selectIndex)
+                .padding(.horizontal, 12)
             ScrollViewPager(axis: .horizontal,
                             numberOfPages: 2,
                             selectedPageNum: self.$selectIndex) {

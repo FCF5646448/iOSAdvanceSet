@@ -14,10 +14,7 @@ struct SegmentPickerStyle2: View {
     var body: some View {
         SegmentedPicker(
             titles,
-            selectedIndex: //self.$selectedIndex,
-                Binding(
-                get: { selectedIndex },
-                set: { selectedIndex = $0 }),
+            selectedIndex: self.$selectedIndex,
             content: { item, isSelected in
                 Text(item)
                     .foregroundColor(isSelected ? Color.white : Color.gray )
