@@ -42,7 +42,7 @@ struct TPBestFriendGiftViewCell: View {
                         .foregroundColor(.white)
                         .background(Color.red)
                         .clipShape(CornersRounded(cornerRadius: 8.0, corners: [.bottomLeft, .topRight]))
-                        .cornerRadius(/*@START_MENU_TOKEN@*/3.0/*@END_MENU_TOKEN@*/)
+//                        .cornerRadius(/*@START_MENU_TOKEN@*/3.0/*@END_MENU_TOKEN@*/)
                 }
             }
             .background(

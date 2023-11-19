@@ -148,19 +148,22 @@ struct SwiftUIButton: View {
             HStack {
                 Image(systemName: "trash")
                     .font(.title)
-                Text("Delete")
+                Text("Delete666")
                     .font(.title)
                     .fontWeight(.semibold)
             }
             .frame(minWidth: 0, maxWidth: .infinity) // infinity 表示填满容器宽度
-            .padding() // 内容与background的边距
+            .padding()  // 内容与background的边距
             .foregroundColor(.white)
             .background(
-                LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]), startPoint: .leading, endPoint: .trailing)
+                Color.blue
+//                LinearGradient(gradient: Gradient(colors: [Color.green, Color.blue]), startPoint: .leading, endPoint: .trailing)
             )
+//            .frame(height: 80)
             .cornerRadius(40)
             .padding(.horizontal, 20) // 左右20边距
         }
+//        .frame(height: 80)
         
         Button {
             print("button clicked")

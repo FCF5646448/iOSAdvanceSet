@@ -1,6 +1,0 @@
-framework module RxSwiftProgra {
-  umbrella header "RxSwiftProgra-umbrella.h"
-
-  export *
-  module * { export * }
-}

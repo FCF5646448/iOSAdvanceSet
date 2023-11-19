@@ -24,23 +24,37 @@ struct Describe: View {
 
 struct BestFriendGiftPannel: View {
     var body: some View {
-        VStack {
-            BestFirendView()
-                .frame(width: 130, height: 180)
-            Describe()
-            SegmentControl()
-            Button {
-                print("按钮被点击")
-            } label: {
-                Text("使用中")
-                    .fontWeight(.semibold)
-                    .font(.title)
-                    .frame(width: 366, height: 56)
-                    .foregroundColor(.white)
-                    .background(Color.red)
-                    .cornerRadius(28)
+        NavigationView {
+            VStack {
+                BestFirendView()
+                    .frame(width: 130, height: 180)
+                Describe()
+                SegmentControl()
+                Button {
+                    print("按钮被点击")
+                } label: {
+                    Text("使用中")
+                        .fontWeight(.semibold)
+                        .font(.title)
+                        .frame(width: 366, height: 56)
+                        .foregroundColor(.white)
+                        .background(Color.red)
+                        .cornerRadius(28)
+                }
+                Spacer()
             }
-            Spacer()
+            .padding()
+            .navigationBarTitle(Text("絆の証変更"), displayMode: .inline)
+            .navigationBarItems(leading: Button {
+                print("Left button pressed")
+            } label: {
+                Image(systemName: "plus")
+            })
+            .navigationBarItems(trailing: Button {
+                print("Right button pressed")
+            } label: {
+                Image(systemName: "plus")
+            })
         }
     }
 }
