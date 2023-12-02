@@ -26,6 +26,7 @@
 		191877BF2AFCFC8300D9656D /* BestFriendGiftPannel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */; };
 		191877C12AFD0E6A00D9656D /* BestFirendView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 191877C02AFD0E6A00D9656D /* BestFirendView.swift */; };
 		191877C32AFD0EAC00D9656D /* bestFriendBg@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = 191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */; };
+		192096132B18717F0050BA7E /* BindingTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 192096122B18717F0050BA7E /* BindingTest.swift */; };
 		195DB87C2B0754FD00444705 /* TextDemo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 195DB87B2B0754FD00444705 /* TextDemo.swift */; };
 		1968182A2B0397B20068036E /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 196818292B0397B20068036E /* Test.swift */; };
 /* End PBXBuildFile section */
@@ -70,6 +71,7 @@
 		191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFriendGiftPannel.swift; sourceTree = "<group>"; };
 		191877C02AFD0E6A00D9656D /* BestFirendView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BestFirendView.swift; sourceTree = "<group>"; };
 		191877C22AFD0EAC00D9656D /* bestFriendBg@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "bestFriendBg@3x.png"; sourceTree = "<group>"; };
+		192096122B18717F0050BA7E /* BindingTest.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BindingTest.swift; sourceTree = "<group>"; };
 		195DB87B2B0754FD00444705 /* TextDemo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextDemo.swift; sourceTree = "<group>"; };
 		196818292B0397B20068036E /* Test.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -132,6 +134,7 @@
 				191877AF2AFCC03A00D9656D /* SwiftUIGrid.swift */,
 				191877BE2AFCFC8300D9656D /* BestFriendGiftPannel.swift */,
 				196818292B0397B20068036E /* Test.swift */,
+				192096122B18717F0050BA7E /* BindingTest.swift */,
 			);
 			path = SwiftUIiOS13Demo;
 			sourceTree = "<group>";
@@ -339,6 +342,7 @@
 				1968182A2B0397B20068036E /* Test.swift in Sources */,
 				191877882AFCBE1100D9656D /* ContentView.swift in Sources */,
 				191877862AFCBE1100D9656D /* SwiftUIiOS13DemoApp.swift in Sources */,
+				192096132B18717F0050BA7E /* BindingTest.swift in Sources */,
 				191877B02AFCC03A00D9656D /* SwiftUIGrid.swift in Sources */,
 				19174A412AFF14F5005504BE /* TPCapsuleSegmentPicker.swift in Sources */,
 				19174A3F2AFF14F5005504BE /* TPLineSegmentPicker.swift in Sources */,

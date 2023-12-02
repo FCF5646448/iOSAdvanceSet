@@ -6,54 +6,14 @@
 //
 
 import SwiftUI
-
-class Settings: ObservableObject {
-    enum AccountBehavior: CaseIterable {
-        case register, login
-    }
-    
-    enum Sorting: CaseIterable {
-        case id, name, color, favorite
-    }
-    
-    @Published var accountBehavior = AccountBehavior.login
-    @Published var email = ""
-    @Published var password = ""
-    @Published var verifyPassword = ""
-    
-    @Published var showEnglishName = true
-    @Published var sorting = Sorting.id
-    @Published var showFavoriteOnly = false
-}
-
-extension Settings.AccountBehavior {
-    var text: String {
-        switch self {
-        case .register:
-            return "注册"
-        case .login:
-            return "登录"
-        }
-    }
-}
-
-extension Settings.Sorting {
-    var text: String {
-        switch self {
-        case .id:
-            return "ID"
-        case .name:
-            return "名字"
-        case .color:
-            return "颜色"
-        case .favorite:
-            return "最爱"
-        }
-    }
-}
+import Combine
 
 struct SettingView: View {
-    @ObservedObject var settings = Settings()
+    @EnvironmentObject var store: Store
+    
+    // 对于长的数据，可以使用这种方案包一层。使用起来更简洁明了
+    private var settings: AppState.Settings { store.appState.settings }
+    private var settingsBinding: Binding<AppState.Settings> { $store.appState.settings }
     
     var body: some View {
         Form {
@@ -64,34 +24,51 @@ struct SettingView: View {
     }
     
     var accountSection: some View {
-        Section(header: Text("账户")) {
-            Picker(selection: $settings.accountBehavior, label: Text("")) {
-                ForEach(Settings.AccountBehavior.allCases, id: \.self) {
-                    Text($0.text)
+        Section(header: Text("账户"), content: {
+            if settings.loginUser == nil {
+                Picker(selection: settingsBinding.checker.accountBehavior, label: Text("")) {
+                    ForEach(AppState.Settings.AccountBehavior.allCases, id: \.self) {
+                        Text($0.text)
+                    }
                 }
-            }.pickerStyle(SegmentedPickerStyle())
-            TextField("电子邮箱", text: $settings.email)
-            SecureField("密码", text: $settings.password)
-            if settings.accountBehavior == .register {
-                SecureField("确认密码", text: $settings.verifyPassword)
+                .pickerStyle(SegmentedPickerStyle())
+                TextField("电子邮箱", text: settingsBinding.checker.email)
+                SecureField("密码", text: settingsBinding.checker.password)
+                if settings.checker.accountBehavior == .register {
+                    SecureField("确认密码", text: settingsBinding.checker.verifyPassword)
+                }
+                Button(settings.checker.accountBehavior.text) {
+                    print("登录/注册")
+                    let checker = settings.checker
+                    switch checker.accountBehavior {
+                    case .login:
+                        self.store.dispatch(.login(email: checker.email,
+                                                   password: checker.password))
+                    case .register:
+//                        self.store.dispatch(.register(email: checker.email, password: checker.password))
+                        break
+                    }
+                }
+            } else {
+                Text(settings.loginUser!.email)
+                Button("注销") {
+                    print("注销")
+                }
             }
-            Button(settings.accountBehavior.text) {
-                print("登录/注册")
-            }
-        }
+        })
     }
     
     var optionSection: some View {
         Section(header: Text("选项")) {
-            Toggle(isOn: $settings.showEnglishName, label: {
+            Toggle(isOn: settingsBinding.showEnglishName, label: {
                 Text("显示英文名")
             })
-            Picker(selection: $settings.sorting, label: Text("排列方式")) {
-                ForEach(Settings.Sorting.allCases, id: \.self) {
+            Picker(selection: settingsBinding.sorting, label: Text("排列方式")) {
+                ForEach(AppState.Settings.Sorting.allCases, id: \.self) {
                     Text($0.text)
                 }
             }
-            Toggle(isOn: $settings.showFavoriteOnly, label: {
+            Toggle(isOn: settingsBinding.showFavoriteOnly, label: {
                 Text("只显示收藏")
             })
         }
@@ -108,6 +85,32 @@ struct SettingView: View {
     }
 }
 
+extension AppState.Settings.AccountBehavior {
+    var text: String {
+        switch self {
+        case .register:
+            return "注册"
+        case .login:
+            return "登录"
+        }
+    }
+}
+
+extension AppState.Settings.Sorting {
+    var text: String {
+        switch self {
+        case .id:
+            return "ID"
+        case .name:
+            return "名字"
+        case .color:
+            return "颜色"
+        case .favorite:
+            return "最爱"
+        }
+    }
+}
+
 #Preview {
-    SettingView()
+    SettingView().environmentObject(Store())
 }
